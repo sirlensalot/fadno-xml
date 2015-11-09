@@ -4,14 +4,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 -- | Emit an xml-like AST with renderers to String and 'Element'.
--- | Intended for use with generated code.
+-- Intended for use with generated code.
 module Fadno.Xml.EmitXml
     (
-     QN (..)
+     -- * Rendering functions
+     renderString
+    ,renderElement
+     -- * API types
     ,EmitXml (..)
     ,XmlRep (..)
-    ,renderString
-    ,renderElement
+    ,QN (..)
     ) where
 
 import Data.Decimal

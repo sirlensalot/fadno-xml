@@ -8,18 +8,18 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 -- | Parse an XSD into types with the ability to resolve references.
--- | All XSD type fields named with underscores and have lenses.
 module Fadno.Xml.ParseXsd
     (
      -- * Parsers and utilities
-     Schema (..),simpleTypes,complexTypes,groups,attributeGroups,elements,attributes
-    ,QN (..),qLocal,qPrefix
-    ,parseFile, loadXsdSchema, schemaParser, namespaceSchema
+    parseFile, loadXsdSchema, schemaParser, namespaceSchema
     ,qnParser, attrParser, parsec, qn, anySimpleTypeName
      -- * Type References
-    ,Ref (..),unresolved,resolved,refvalue
     ,Resolvable (..)
     ,refResolve
+     -- * Schema, QNs, Refs
+    ,Ref (..),unresolved,resolved,refvalue
+    ,Schema (..),simpleTypes,complexTypes,groups,attributeGroups,elements,attributes
+    ,QN (..),qLocal,qPrefix
     -- * Productions
     ,SimpleType(..),simpleTypeName,simpleTypeRestriction,simpleTypeUnion
     ,Bound(..)
@@ -39,7 +39,6 @@ module Fadno.Xml.ParseXsd
     ,Particle(..),partElement,partGroup,partChoice,partSequence
     ,Choice(..),choiceOccurs,choiceParticles
     ,Sequence(..),sequenceOccurs,sequenceParticles
-
     ) where
 
 import Control.Monad.State.Strict hiding (sequence)
@@ -145,7 +144,7 @@ data AttributeGroup =
 
 
 -- | Convenience grouping of attributes and attribute groups, which
--- | are always showing up together in xsd.
+-- are always showing up together in xsd.
 data Attributes =
     Attributes {
       _attrsAttributes :: ![Attribute],
@@ -203,7 +202,7 @@ data SimpleContent =
 
 
 -- | complexContent under a complex type.
--- | TODO: restrictions
+-- TODO: restrictions
 data ComplexContent =
     ComplexContentExtension {
       _complexContentBase :: !(Ref ComplexType)
@@ -314,7 +313,7 @@ $(makeLenses ''Schema)
 --
 
 -- | Resolvable indicates a type has a 'Ref' member that it can
--- | resolve from a top-level 'Schema' production.
+-- resolve from a top-level 'Schema' production.
 class (Typeable a) => Resolvable a where
     resolve :: Schema -> a -> a
 
@@ -452,8 +451,6 @@ parsec :: (P.Stream s Identity t) => P.Parsec s () a -> s -> a
 parsec p s = either (error.show) id $ P.parse p "ParseXsd" s
 
 -- | Attribute text parser, without whitespace.
--- | [a-zA-Z_:][-a-zA-Z0-9_:.],
--- | from http://razzed.com/2009/01/30/valid-characters-in-attribute-names-in-htmlxml/
 attrParser :: P.Parsec String m String
 attrParser = (:) <$> h <*> r
     where h = P.letter <|> P.oneOf "_:"
@@ -629,7 +626,7 @@ loadXsdSchema f = do
   ts <- _simpleTypes . namespaceSchema "xs" <$> parseFile f
   let anySimpleType = SimpleTypeRestrict (Just anySimpleTypeName) (SimpleRestriction Final [] Nothing Nothing Nothing)
   let s = set simpleTypes (M.insert anySimpleTypeName anySimpleType ts) mempty
-  return s -- $ resolveRefs s
+  return s
 
 
 -- | Parse an XSD file.

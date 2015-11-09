@@ -103,10 +103,16 @@ data DerivesFamily =
     deriving (Eq,Show,Data,Typeable,Ord,Enum,Bounded)
 
 -- | "Impl"s of classes, but also grab-bag of type deets.
-data Impl = Bounds (Maybe (Bound String), Maybe (Bound String))
-          | Pattern String
-          | NewTypeShow
-          | TopLevel
+data Impl =
+    -- | Specifies min and max values
+    Bounds (Maybe (Bound String), Maybe (Bound String)) |
+    -- | Specifies string pattern
+    Pattern String |
+    -- | Implement 'Show' for newtype
+    NewTypeShow |
+    -- | Top-level element, so emit element name as well as contents.
+    -- Elements normally inherit the name from the referencing production.
+    TopLevel
             deriving (Eq,Show,Data,Typeable,Ord)
 
 -- | newtype base types. Name after CT should be Haskell base type.
@@ -179,7 +185,8 @@ type Emit a = ReaderT Env (StateT EmitState IO) a
 runEmit :: Env -> EmitState -> Emit a -> IO (a, EmitState)
 runEmit env st act = runStateT (runReaderT act env) st
 
--- | Emit schema.
+-- | Emit schema types. Starts with element productions
+-- and emits all dependent types.
 emitSchema :: Schema -> Emit ()
 emitSchema s = do
   els <- M.keys <$> mapM emitElement (_elements s)
@@ -210,7 +217,7 @@ mkBuiltIn n ct df = BuiltIn (Name NSBuiltIn (QN n (Just "xs")) 0) ct df [NewType
 
 
 -- | Emit type for element content; element name production
--- | captured in containing field.
+-- captured in containing field.
 emitElement :: Element -> Emit Type
 emitElement (ElementType _ t _) = do
   rt <- resolvedRef t
@@ -286,7 +293,7 @@ emitEnum _base n vals = return $ EnumType n vals DataEnum []
 
 
 -- | Complex type. 'anon' arg indicates element-defined complex type, therefore unique;
--- | otherwise defined type.
+-- otherwise defined type.
 emitComplexType :: Maybe QN -> ComplexType -> Emit Type
 emitComplexType anon@(Just _) t =
     checkUniqueType NSComplex anon $ doComplexType t
@@ -385,7 +392,7 @@ emitSequence ns parentO (Sequence o ps) = do
       return $ forOccurs o (Field (head ns) t One FieldOther 0)
 
 -- | Particle field production.
--- | Element fields emit containing element.
+-- Element fields emit containing element.
 emitParticle :: [QN] -> Particle -> Emit [Field]
 emitParticle _ (PartElement e) = do
   et <- emitElement e
