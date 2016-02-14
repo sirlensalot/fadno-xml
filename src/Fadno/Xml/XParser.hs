@@ -11,8 +11,8 @@ module Fadno.Xml.XParser
     ,peek,push,pop,checkStack
     -- * Element operations
     ,atEl,findChild,findChildren,anyChildren,oneChild,allChildren,dropTo
-    -- * Attribute operations
-    ,attr
+    -- * Attribute/Text operations
+    ,attr,textContent
     -- * QNames
     ,name,xsName
     -- * Utility
@@ -59,6 +59,9 @@ attr n = do
   v <- X.findAttr n <$> peek
   maybe (throwError $ "Attribute not found: " ++ show n) return v
 
+-- | Get text content, returning empty string if none, per 'strContent'.
+textContent :: XParser m => m String
+textContent = X.strContent <$> peek
 
 -- | Verify current element.
 atEl :: XParser m => X.QName -> m ()

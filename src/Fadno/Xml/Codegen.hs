@@ -71,18 +71,39 @@ outputTypes :: EmitState -> Output ()
 outputTypes = mapM_ outputType . M.elems . _types
 
 -- | Comment header.
-header :: Name -> Output ()
-header (Name ns n i) = do
+header :: Name -> Maybe Documentation -> Output ()
+header (Name ns n i) doc = do
   outStrLn ""
-  outStrLn $ "-- " ++ show n ++ ": " ++ drop 2 (show ns) ++ (if i > 0 then "," ++ show i else "")
+  outStr $ "-- | @" ++ show n ++ "@"
+  outStrLn $ " /(" ++ drop 2 (map toLower $ show ns) ++ ")/"
+  case doc of
+    Nothing -> return ()
+    Just (Documentation d) ->
+        do
+          outStrLn "--"
+          let ls = lines d
+          if length ls < 10 -- lame "longer docs" heuristic
+          then mapM_ (outStrLn . ("-- " ++)) ls
+          else do
+            -- longer docs: head unformatted
+            outStrLn $ "-- " ++ head ls
+            -- explicit formatting for tail
+            outStrLn "--"
+            outStrLn "-- @"
+            mapM_ (outStrLn . ("-- " ++)) (tail ls)
+            outStrLn "-- @"
+  when (i > 0) $ do
+    outStrLn ""
+    outStrLn $ "-- mangled: " ++ show i
+
 
 -- | Codegen a type.
 outputType :: Type -> Output ()
 outputType (BuiltIn {}) = return ()
 
 -- NEWTYPE --
-outputType nt@(NewType n t ds is) = do
-  header n
+outputType nt@(NewType n t ds is doc) = do
+  header n doc
   mn <- mangleType n
   mf <- mangleField n "" 0
   rt <- refType t
@@ -96,8 +117,8 @@ outputType nt@(NewType n t ds is) = do
 
 
 -- DATA --
-outputType dt@(DataType n ctors ds is dte) = do
-  header n
+outputType dt@(DataType n ctors ds is dtemit doc) = do
+  header n doc
   mn <- mangleType n
   outStrLn $ "data " ++ mn ++ " = "
   forM_ (zip [(0 :: Int)..] ctors) $ \(i,Ctor cn fs) ->
@@ -107,19 +128,26 @@ outputType dt@(DataType n ctors ds is dte) = do
         if null fs then outStrLn ""
         else do
           outStrLn " {"
-          forM_ (zip [(0 :: Int)..] fs) $ \(j,Field fn ft fc _ fi) ->
+          forM_ (zip [(0 :: Int)..] fs) $ \(j,Field fn ft fc femit fi) ->
             do
               outStr (if j > 0 then "        , " else "          ")
               rt <- refType ft
               mf <- mangleField n (_qLocal fn) fi
-              outStrLn $ mf ++ " :: " ++ card fc rt
+              let docs = if dtemit == DataTypeSimple then ""
+                         else case femit of
+                           FieldAttribute -> " -- ^ /" ++ show fn ++ "/ attribute"
+                           FieldElement -> " -- ^ /" ++ show fn ++ "/ child element"
+                           FieldText -> " -- ^ text content"
+                           FieldOther -> ""
+
+              outStrLn $ mf ++ " :: " ++ card fc rt ++ docs
           outStrLn "       }"
   outStrLn $ "    deriving (" ++ outputDerives ds ++ ")"
   -- EmitXml instance
   outputEmitXml mn
   forM_ ctors $ \(Ctor cn fs) -> do
     mcn <- mangleCtor n cn
-    case dte of
+    case dtemit of
       DataTypeSimple ->
           outStrLn $ "    emitXml (" ++ mcn ++ " a) = emitXml a"
       _ -> do
@@ -163,7 +191,7 @@ outputType dt@(DataType n ctors ds is dte) = do
         else
           indent 6 >> outStrLn ("XReps " ++ genreps fas)
   -- smart ctors
-  unless (dte == DataTypeSimple) $
+  unless (dtemit == DataTypeSimple) $
          forM_ ctors $ \(Ctor cn fs) ->
            do
              mcn <- mangleCtor n cn
@@ -174,6 +202,7 @@ outputType dt@(DataType n ctors ds is dte) = do
                        ZeroOrOne -> return ("Nothing",Nothing)
                        Many -> return ("[]",Nothing)
              let args = mapMaybe snd mfs
+             outStrLn $ "-- | Smart constructor for '" ++ mcn ++ "'"
              outStrLn $ "mk" ++ mcn ++ " :: " ++ concatMap ((++ " -> ") . snd) args ++ mn
              outStrLn $ "mk" ++ mcn ++ " " ++ concatMap ((++ " ") . fst) args ++ "= " ++ mcn ++ " " ++
                       unwords (map fst mfs)
@@ -181,14 +210,14 @@ outputType dt@(DataType n ctors ds is dte) = do
 
 
 -- ENUM --
-outputType et@(EnumType n vals ds is) = do
-  header n
+outputType et@(EnumType n vals ds is doc) = do
+  header n doc
   mn <- mangleType n
   outStrLn $ "data " ++ mn ++ " = "
   forM_ (zip [(0 :: Int)..] vals) $ \(i,s) ->
       do
         outStr (if i > 0 then "    | " else "      ")
-        mangleCtor n s >>= outStrLn
+        mangleCtor n s >>= \e -> outStrLn $ e ++ " -- ^ /" ++ s ++ "/"
   outStrLn $ "    deriving (" ++ outputDerives ds  ++ ")"
   mapM_ (outputImpls et) is
   outputEmitXml mn

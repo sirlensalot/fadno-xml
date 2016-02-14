@@ -39,6 +39,7 @@ module Fadno.Xml.ParseXsd
     ,Particle(..),partElement,partGroup,partChoice,partSequence
     ,Choice(..),choiceOccurs,choiceParticles
     ,Sequence(..),sequenceOccurs,sequenceParticles
+    ,Documentation(..)
     ) where
 
 import Control.Monad.State.Strict hiding (sequence)
@@ -81,14 +82,20 @@ instance Show QN
     where show (QN l Nothing) = l
           show (QN l (Just p)) = p ++ ':':l
 
+newtype Documentation = Documentation String
+    deriving (Eq,Ord,Data,Typeable)
+instance Show Documentation where show (Documentation a) = show a
+
 -- | XSD simpleType production.
 data SimpleType =
     SimpleTypeRestrict {
       _simpleTypeName :: !(Maybe QN),
-      _simpleTypeRestriction :: !SimpleRestriction } |
+      _simpleTypeRestriction :: !SimpleRestriction,
+      _simpleTypeDoc :: Maybe Documentation } |
     SimpleTypeUnion {
       _simpleTypeName :: !(Maybe QN),
-      _simpleTypeUnion :: !Union }
+      _simpleTypeUnion :: !Union,
+      _simpleTypeDoc :: Maybe Documentation }
     deriving (Data,Typeable,Eq,Show)
 
 -- | Model min/max restrictions.
@@ -136,7 +143,8 @@ data Use = Required | Optional | Prohibited deriving (Data,Typeable,Eq,Show)
 data AttributeGroup =
     AttributeGroup {
       _attrGroupName :: !QN
-    , _attrGroupAttributes :: !Attributes } |
+    , _attrGroupAttributes :: !Attributes
+    , _attrGroupDoc :: Maybe Documentation } |
     AttributeGroupRef {
       _attrGroupRef :: !(Ref AttributeGroup)
     }
@@ -163,15 +171,18 @@ data Element =
     ElementType {
       _elementName :: !QN
     , _elementType :: !(Ref (Either ComplexType SimpleType))
-    , _elementOccurs :: !Occurs } |
+    , _elementOccurs :: !Occurs
+    , _elementDoc :: Maybe Documentation } |
     ElementSimple {
       _elementName :: !QN
     , _elementSimple :: !SimpleType
-    , _elementOccurs :: !Occurs } |
+    , _elementOccurs :: !Occurs
+    , _elementDoc :: Maybe Documentation } |
     ElementComplex {
       _elementName :: !QN
     , _elementComplex :: !ComplexType
-    , _elementOccurs :: !Occurs } |
+    , _elementOccurs :: !Occurs
+    , _elementDoc :: Maybe Documentation } |
     ElementRef {
       _elementRef :: !(Ref Element)
     , _elementOccurs :: !Occurs }
@@ -182,14 +193,17 @@ data Element =
 data ComplexType =
     ComplexTypeSimple {
       _complexTypeName :: !(Maybe QN)
-    , _complexSimpleContent :: !SimpleContent } |
+    , _complexSimpleContent :: !SimpleContent
+    , _complexTypeDoc :: Maybe Documentation } |
     ComplexTypeComplex {
       _complexTypeName :: !(Maybe QN)
-    , _complexComplexContent :: !ComplexContent } |
+    , _complexComplexContent :: !ComplexContent
+    , _complexTypeDoc :: Maybe Documentation } |
     ComplexTypeCompositor {
       _complexTypeName :: !(Maybe QN)
     , _complexCompositor :: !(Maybe Compositor)
-    , _complexAttributes :: !Attributes }
+    , _complexAttributes :: !Attributes
+    , _complexTypeDoc :: Maybe Documentation }
     deriving (Data,Typeable,Eq,Show)
 
 -- | simpleContent under a complex type.
@@ -222,11 +236,13 @@ data Group =
     GroupChoice {
       _groupName :: !(Maybe QN),
       _groupOccurs :: !Occurs,
-      _groupChoice :: !Choice } |
+      _groupChoice :: !Choice
+    , _groupDoc :: Maybe Documentation } |
     GroupSequence {
       _groupName :: !(Maybe QN),
       _groupOccurs :: !Occurs,
-      _groupSequence :: !Sequence } |
+      _groupSequence :: !Sequence
+    , _groupDoc :: Maybe Documentation } |
     GroupRef {
       _groupRef :: !(Ref Group),
       _groupOccurs :: !Occurs
@@ -462,14 +478,22 @@ qnParser = P.try ((\p _ l -> QN l (Just p)) <$> many (P.letter <|> P.oneOf "_") 
            P.char ':' <*> many (P.alphaNum <|> P.oneOf "-_.")) <|>
            (`QN` Nothing) <$> many (P.alphaNum <|> P.oneOf "-_.")
 
+-- | Match documentation, always optional.
+documentation :: XParser m => m (Maybe Documentation)
+documentation = (check.concat.concat) <$>
+                (findChildren (xsName "annotation") $
+                findChildren (xsName "documentation") $
+                textContent)
+    where check [] = Nothing
+          check s = Just (Documentation s)
 
 -- | Match a simpleType.
 simpleType :: XParser m => m SimpleType
 simpleType = do
   atEl (xsName "simpleType")
   n <- fmap qn <$> optional (attr (name "name"))
-  SimpleTypeRestrict n <$> simpleRestrict
-    <|> SimpleTypeUnion n <$> union
+  SimpleTypeRestrict n <$> simpleRestrict <*> documentation
+    <|> SimpleTypeUnion n <$> union <*> documentation
 
 -- | Match an attribute.
 attribute :: XParser m => m Attribute
@@ -501,7 +525,7 @@ attributeGroup :: XParser m => m AttributeGroup
 attributeGroup = do
   atEl (xsName "attributeGroup")
   -- debugStack >> error "attributeGroup"
-  AttributeGroup . qn <$> attr (name "name") <*> attrs <|>
+  AttributeGroup . qn <$> attr (name "name") <*> attrs <*> documentation <|>
     (AttributeGroupRef . Unresolved . qn) <$> attr (name "ref")
 
 -- | Match attributes and attributeGroups (which often come together).
@@ -517,9 +541,9 @@ complexType :: XParser m => m ComplexType
 complexType = do
   atEl (xsName "complexType")
   n <- fmap qn <$> optional (attr (name "name"))
-  ComplexTypeSimple n <$> simpleContent
-    <|> ComplexTypeComplex n <$> complexContent
-    <|> ComplexTypeCompositor n <$> optional (oneChild compositor) <*> attrs
+  ComplexTypeSimple n <$> simpleContent <*> documentation
+    <|> ComplexTypeComplex n <$> complexContent <*> documentation
+    <|> ComplexTypeCompositor n <$> optional (oneChild compositor) <*> attrs <*> documentation
 
 -- | Match simple content.
 simpleContent :: XParser m => m SimpleContent
@@ -545,8 +569,10 @@ group :: XParser m => m Group
 group = do
   atEl (xsName "group")
   GroupRef <$> (Unresolved . qn <$> attr (name "ref")) <*> occurs
-    <|> GroupChoice <$> (fmap qn <$> optional (attr (name "name"))) <*> occurs <*> oneChild choice
-    <|> GroupSequence <$> (fmap qn <$> optional (attr (name "name"))) <*> occurs <*> oneChild sequence
+    <|> GroupChoice <$> (fmap qn <$> optional (attr (name "name")))
+            <*> occurs <*> oneChild choice <*> documentation
+    <|> GroupSequence <$> (fmap qn <$> optional (attr (name "name")))
+            <*> occurs <*> oneChild sequence <*> documentation
 
 -- | Parse occurs-* attributes.
 occurs :: XParser m => m Occurs
@@ -571,9 +597,12 @@ particles = allChildren (PartGroup <$> group <|>
 element :: XParser m => m Element
 element = do
   atEl (xsName "element")
-  let el = ElementType . qn <$> attr (name "name") <*> (Unresolved . qn <$> attr (name "type")) <*> occurs
-      elSim = ElementSimple . qn <$> attr (name "name") <*> oneChild simpleType <*> occurs
-      elCom = ElementComplex . qn <$> attr (name "name") <*> oneChild complexType <*> occurs
+  let el = ElementType . qn <$> attr (name "name")
+           <*> (Unresolved . qn <$> attr (name "type")) <*> occurs <*> documentation
+      elSim = ElementSimple . qn <$> attr (name "name")
+              <*> oneChild simpleType <*> occurs <*> documentation
+      elCom = ElementComplex . qn <$> attr (name "name")
+              <*> oneChild complexType <*> occurs <*> documentation
       elRef = ElementRef <$> (Unresolved . qn <$> attr (name "ref")) <*> occurs
   el <|> elRef <|> elSim <|> elCom
 
@@ -624,7 +653,9 @@ anySimpleTypeName = QN "anySimpleType" (Just "xs")
 loadXsdSchema :: FilePath -> IO Schema
 loadXsdSchema f = do
   ts <- _simpleTypes . namespaceSchema "xs" <$> parseFile f
-  let anySimpleType = SimpleTypeRestrict (Just anySimpleTypeName) (SimpleRestriction Final [] Nothing Nothing Nothing)
+  let anySimpleType = SimpleTypeRestrict (Just anySimpleTypeName)
+                      (SimpleRestriction Final [] Nothing Nothing Nothing)
+                      Nothing
   let s = set simpleTypes (M.insert anySimpleTypeName anySimpleType ts) mempty
   return s
 

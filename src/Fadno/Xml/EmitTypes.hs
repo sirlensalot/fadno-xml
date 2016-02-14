@@ -139,6 +139,7 @@ data Type =
     , _typeType :: Type
     , _typeDerives :: DerivesFamily
     , _typeImpls :: [Impl]
+    , _typeDoc :: Maybe Documentation
     } |
     DataType {
       _typeName :: Name
@@ -146,12 +147,14 @@ data Type =
     , _typeDerives :: DerivesFamily
     , _typeImpls :: [Impl]
     , _typeEmit :: DataTypeEmit
+    , _typeDoc :: Maybe Documentation
     } |
     EnumType {
       _typeName :: Name
     , _typeEnumValues :: [String]
     , _typeDerives :: DerivesFamily
     , _typeImpls :: [Impl]
+    , _typeDoc :: Maybe Documentation
     } |
     BuiltIn {
       _typeName :: Name
@@ -219,12 +222,12 @@ mkBuiltIn n ct df = BuiltIn (Name NSBuiltIn (QN n (Just "xs")) 0) ct df [NewType
 -- | Emit type for element content; element name production
 -- captured in containing field.
 emitElement :: Element -> Emit Type
-emitElement (ElementType _ t _) = do
+emitElement (ElementType _ t _ doc) = do
   rt <- resolvedRef t
   case rt of
     Left ct -> emitComplexType Nothing ct
     Right st -> emitSimpleType st
-emitElement (ElementComplex n c _) = emitComplexType (Just n) c
+emitElement (ElementComplex n c _ doc) = emitComplexType (Just n) c
 emitElement (ElementRef {}) = die "ElementRef unsupported"
 emitElement (ElementSimple {}) = die "ElementSimple unsupported"
 
@@ -253,23 +256,27 @@ emitSimpleType t =
           maybe (checkDefinedType NSSimple stn $ doSimpleType t) return bt
 
 doSimpleType :: SimpleType -> Name -> Emit Type
-doSimpleType (SimpleTypeRestrict _ (SimpleRestriction base enumz mins maxs patt)) n = do
+doSimpleType (SimpleTypeRestrict _ (SimpleRestriction base enumz mins maxs patt) doc) n = do
   bt <- resolvedRef base
   if not (null enumz)
-  then emitEnum bt n enumz
+  then emitEnum bt n enumz doc
   else do
     btt <- emitSimpleType bt
     return $ NewType n btt (_typeDerives btt)
            ([Bounds (mins,maxs) | isJust mins || isJust maxs] ++
             maybe [] (return.Pattern) patt ++
-            _typeImpls btt)
-doSimpleType (SimpleTypeUnion _ (Union refs sts)) n = do
+            _typeImpls btt) doc
+doSimpleType (SimpleTypeUnion _ (Union refs sts) doc) n = do
   rts <- mapM resolvedRef refs
   rtts <- mapM emitSimpleType rts
   let doAnon t = checkUniqueType NSUnion Nothing (doSimpleType t)
   atns <- mapM doAnon sts
-  let doCtor i t = Ctor (_qLocal $ nName (_typeName t)) [Field (QN (show i) Nothing) t One FieldAttribute 0]
-  return $ fixFields $ DataType n (zipWith doCtor [(1 :: Int) ..] $ rtts ++ atns) OtherDerives [] DataTypeSimple
+  let doCtor i t =
+          Ctor (_qLocal $ nName (_typeName t))
+                   [Field (QN (show i) Nothing) t One FieldAttribute 0]
+  return $ fixFields $
+         DataType n (zipWith doCtor [(1 :: Int) ..] $ rtts ++ atns)
+                  OtherDerives [] DataTypeSimple doc
 
 -- | Check if type is built-in.
 tryBuiltIn :: SimpleType -> Emit (Maybe Type)
@@ -288,8 +295,8 @@ tryBuiltIn t =
 
 
 
-emitEnum :: SimpleType -> Name -> [String] -> Emit Type
-emitEnum _base n vals = return $ EnumType n vals DataEnum []
+emitEnum :: SimpleType -> Name -> [String] -> Maybe Documentation -> Emit Type
+emitEnum _base n vals doc = return $ EnumType n vals DataEnum [] doc
 
 
 -- | Complex type. 'anon' arg indicates element-defined complex type, therefore unique;
@@ -304,24 +311,25 @@ emitComplexType Nothing t = do
 
 
 doComplexType :: ComplexType -> Name -> Emit Type
-doComplexType (ComplexTypeSimple _ (SimpleContentExtension scb atts)) mn = do
+doComplexType (ComplexTypeSimple _ (SimpleContentExtension scb atts) doc) mn = do
   rt <- resolvedRef scb >>= emitSimpleType
   ats <- emitAttrFields atts
   return $ fixFields $ DataType mn
              [Ctor "" (Field (getRefType scb) rt One FieldText 0:ats)]
-             OtherDerives [] DataTypeComplex
-doComplexType (ComplexTypeCompositor _ comp atts) mn = do
+             OtherDerives [] DataTypeComplex doc
+doComplexType (ComplexTypeCompositor _ comp atts doc) mn = do
   ats <- emitAttrFields atts
   c <- maybe (return []) (emitCompositor [nName mn]) comp
-  return $ fixFields $ DataType mn [Ctor "" (ats ++ c)] OtherDerives [] DataTypeComplex
-doComplexType (ComplexTypeComplex _ (ComplexContentExtension ccb atts comp)) mn = do
+  return $ fixFields $
+         DataType mn [Ctor "" (ats ++ c)] OtherDerives [] DataTypeComplex doc
+doComplexType (ComplexTypeComplex _ (ComplexContentExtension ccb atts comp) doc) mn = do
   ct <- resolvedRef ccb >>= emitComplexType (Just $ nName mn)
   ats <- emitAttrFields atts
   c <- maybe (return []) (emitCompositor [nName mn]) comp
   -- TODO using FieldOther for base content, should be ok?
   return $ fixFields $ DataType mn
              [Ctor "" (Field (getRefType ccb) ct One FieldOther 0:(ats ++ c))]
-             OtherDerives [] DataTypeComplex
+             OtherDerives [] DataTypeComplex doc
 
 -- | Obtain string name of 'Ref'.
 getRefType :: Ref t -> QN
@@ -332,8 +340,8 @@ getRefType Final = error "Attempt to resolve ref on final"
 -- | Emit compositor field.
 emitCompositor :: [QN] -> Compositor -> Emit [Field]
 emitCompositor ns (CompositorGroup g) = emitGroup ns g
-emitCompositor ns (CompositorChoice c) = emitChoice ns c
-emitCompositor ns (CompositorSequence s) = emitSequence ns Nothing s
+emitCompositor ns (CompositorChoice c) = emitChoice ns c Nothing
+emitCompositor ns (CompositorSequence s) = emitSequence ns Nothing s Nothing
 
 -- | Build up name stack, used in compositor/particle field emittance.
 appendNames :: [QN] -> Maybe QN -> [QN]
@@ -347,21 +355,24 @@ emitGroup ns (GroupRef r o) = do
          do
            fs <- emitGroup ns g
            return $ DataType tn [Ctor "" fs]
-                  OtherDerives [] DataTypeComplex
+                  OtherDerives [] DataTypeComplex Nothing
     return $ forOccurs o $ Field (getRefType r) t One FieldOther 0
-emitGroup ns (GroupChoice n o c) = concatMap (forOccurs o) <$> emitChoice (appendNames ns n) c
-emitGroup ns (GroupSequence n o s) = concatMap (forOccurs o) <$> emitSequence (appendNames ns n) (Just o) s
+emitGroup ns (GroupChoice n o c doc) =
+    concatMap (forOccurs o) <$> emitChoice (appendNames ns n) c doc
+emitGroup ns (GroupSequence n o s doc) =
+    concatMap (forOccurs o) <$> emitSequence (appendNames ns n) (Just o) s doc
 
 -- | Choice production.
-emitChoice :: [QN] -> Choice -> Emit [Field]
-emitChoice ns (Choice o ps) = do
+emitChoice :: [QN] -> Choice -> Maybe Documentation -> Emit [Field]
+emitChoice ns (Choice o ps) doc = do
   fss <- mapM (emitParticle ns) ps
   t <- checkUniqueType NSChoice (Just $ head ns) $ \mn ->
        do
          let cctor fs = Ctor (_qLocal (chooseName fs)) fs
              chooseName [f] = _fieldName f
              chooseName fs = _fieldName (head fs) -- ++ show (length fs)
-         return $ fixFields $ DataType mn (map cctor fss) OtherDerives [] DataTypeCompositor
+         return $ fixFields $
+                DataType mn (map cctor fss) OtherDerives [] DataTypeCompositor doc
   return $ forOccurs o (Field (head ns) t One FieldOther 0)
 
 -- | Guarantee unique constructor fields for a type.
@@ -379,8 +390,8 @@ fixFields = over typeCtors (\cs -> evalState (mapM fixC cs) mempty)
 
 
 -- | Sequence production.
-emitSequence :: [QN] -> Maybe Occurs -> Sequence -> Emit [Field]
-emitSequence ns parentO (Sequence o ps) = do
+emitSequence :: [QN] -> Maybe Occurs -> Sequence -> Maybe Documentation -> Emit [Field]
+emitSequence ns parentO (Sequence o ps) doc = do
   fs <- concat <$> mapM (emitParticle ns) ps
   -- don't emit new type for 'One' cardinality
   case (occursToCardinality o,fmap occursToCardinality parentO) of
@@ -388,7 +399,8 @@ emitSequence ns parentO (Sequence o ps) = do
     (One,Just One) -> return fs
     _ -> do
       t <- checkUniqueType NSSequence (Just $ head ns) $ \mn ->
-           return $ fixFields $ DataType mn [Ctor "" fs] OtherDerives [] DataTypeCompositor
+           return $ fixFields $
+                  DataType mn [Ctor "" fs] OtherDerives [] DataTypeCompositor doc
       return $ forOccurs o (Field (head ns) t One FieldOther 0)
 
 -- | Particle field production.
@@ -401,8 +413,8 @@ emitParticle _ (PartElement e) = do
   let o = fromMaybe (Occurs Nothing Nothing) $ firstOf elementOccurs e
   return $ forOccurs o $ Field fn et One FieldElement 0
 emitParticle ns (PartGroup g) = emitGroup ns g
-emitParticle ns (PartChoice c) = emitChoice ns c
-emitParticle ns (PartSequence s) = emitSequence ns Nothing s
+emitParticle ns (PartChoice c) = emitChoice ns c Nothing
+emitParticle ns (PartSequence s) = emitSequence ns Nothing s Nothing
 
 
 -- | Modify a field cardinality per occurs.
@@ -441,7 +453,7 @@ emitAttrFields  = doAttrs
           resolveAttr (AttributeType n r u _) =
               resolvedRef r >>= emitSimpleType >>= \t ->
                   return $ forUse u $ Field n t One FieldAttribute 0
-          resolveAttrGroup (AttributeGroup _ as) = doAttrs as
+          resolveAttrGroup (AttributeGroup _ as doc) = doAttrs as
           resolveAttrGroup (AttributeGroupRef r) = resolvedRef r >>= resolveAttrGroup
 
 -- | register a unique type, where namespace collisions will
