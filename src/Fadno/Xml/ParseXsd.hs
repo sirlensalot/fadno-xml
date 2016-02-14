@@ -21,21 +21,21 @@ module Fadno.Xml.ParseXsd
     ,Schema (..),simpleTypes,complexTypes,groups,attributeGroups,elements,attributes
     ,QN (..),qLocal,qPrefix
     -- * Productions
-    ,SimpleType(..),simpleTypeName,simpleTypeRestriction,simpleTypeUnion
+    ,SimpleType(..),simpleTypeName,simpleTypeRestriction,simpleTypeUnion,simpleTypeDoc
     ,Bound(..)
     ,SimpleRestriction(..),simpleRestrictBase,simpleRestrictEnums,simpleRestrictMin,simpleRestrictMax,simpleRestrictPattern
     ,Union(..),unionMemberTypes,unionSimpleTypes
     ,Attribute(..),attrName,attrType,attrUse,attrDefault,attrRef,attrSimpleType
     ,Use(..)
-    ,AttributeGroup(..),attrGroupName,attrGroupAttributes,attrGroupRef
+    ,AttributeGroup(..),attrGroupName,attrGroupAttributes,attrGroupRef,attrGroupDoc
     ,Attributes(..),attrsAttributes,attrsAttributeGroups
     ,Occurs(..),occursMin,occursMax
-    ,Element(..),elementName,elementType,elementOccurs,elementSimple,elementComplex,elementRef
-    ,ComplexType(..),complexTypeName,complexSimpleContent,complexComplexContent,complexCompositor,complexAttributes
+    ,Element(..),elementName,elementType,elementOccurs,elementSimple,elementComplex,elementRef,elementDoc
+    ,ComplexType(..),complexTypeName,complexSimpleContent,complexComplexContent,complexCompositor,complexAttributes,complexTypeDoc
     ,SimpleContent(..),simpleContentBase,simpleContentAttributes
     ,ComplexContent(..),complexContentBase,complexContentAttributes,complexContentCompositor
     ,Compositor(..),compGroup,compChoice,compSequence
-    ,Group(..),groupName,groupOccurs,groupChoice,groupSequence,groupRef
+    ,Group(..),groupName,groupOccurs,groupChoice,groupSequence,groupRef,groupDoc
     ,Particle(..),partElement,partGroup,partChoice,partSequence
     ,Choice(..),choiceOccurs,choiceParticles
     ,Sequence(..),sequenceOccurs,sequenceParticles

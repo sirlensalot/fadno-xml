@@ -116,7 +116,9 @@ outputType nt@(NewType {..}) = do
   outStrLn $ "    emitXml = emitXml . " ++ mf
   -- PARSING
   outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
-  outStrLn $ "parse" ++ mn ++ " = readParse \"" ++ mn ++ "\""
+  if _typeDerives == NewTypeString
+  then outStrLn $ "parse" ++ mn ++ " = return . fromString"
+  else outStrLn $ "parse" ++ mn ++ " = readParse \"" ++ mn ++ "\""
 
 
 -- DATA --
@@ -224,11 +226,11 @@ outputType dt@(DataType {..}) = do
                 (FieldAttribute,_) -> attrParse
                 (FieldText,_) -> "(P.textContent >>= " ++ parser ++ ")"
                 (FieldElement,Many) ->
-                    "P.findChildren " ++ pname ++ " (" ++ elParse ++ ")"
+                    "P.findChildren " ++ pname ++ " " ++ elParse
                 (FieldElement,ZeroOrOne) ->
-                    "P.optional (" ++ elParse ++ ")"
+                    "P.optional (P.oneChild " ++ elParse ++ ")"
                 (FieldElement,One) ->
-                    "P.oneChild (" ++ elParse ++ ")"
+                    "P.oneChild " ++ elParse
                 (FieldOther,ZeroOrOne) -> "P.optional (" ++ parser ++ ")"
                 (FieldOther,Many) -> "P.many (" ++ parser ++ ")"
                 (FieldOther,_) -> parser
@@ -272,7 +274,7 @@ outputType et@(EnumType {..}) = do
   -- PARSING
   outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
   outStrLn $ "parse" ++ mn ++ " s"
-  forM_ (zip [(0 :: Int)..] _typeEnumValues) $ \(i,s) ->
+  forM_  _typeEnumValues $ \s ->
       do
         cn <- mangleCtor _typeName s
         outStrLn $ "        | s == \"" ++ s ++ "\" = return $ " ++ cn
@@ -290,7 +292,7 @@ parseEl parser pname fType =
 
 parseFun :: String -> String
 parseFun tn | tn == "Decimal" = rp
-            | tn == "DefString" = rp
+            | tn == "DefString" = "return"
             | tn == "Integer" = rp
             | otherwise = "parse" ++ tn
             where rp = "(readParse \"" ++ tn ++ "\")"

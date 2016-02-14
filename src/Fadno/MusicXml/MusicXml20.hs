@@ -33,7 +33,7 @@ instance Read ID where readsPrec i = map (A.first ID) . readsPrec i
 instance EmitXml ID where
     emitXml = emitXml . iD
 parseID :: P.XParser m => String -> m ID
-parseID = readParse "ID"
+parseID = return . fromString
 
 -- | @xs:IDREF@ /(simple)/
 newtype IDREF = IDREF { iDREF :: NCName }
@@ -43,7 +43,7 @@ instance Read IDREF where readsPrec i = map (A.first IDREF) . readsPrec i
 instance EmitXml IDREF where
     emitXml = emitXml . iDREF
 parseIDREF :: P.XParser m => String -> m IDREF
-parseIDREF = readParse "IDREF"
+parseIDREF = return . fromString
 
 -- | @xs:NCName@ /(simple)/
 newtype NCName = NCName { nCName :: Name }
@@ -53,7 +53,7 @@ instance Read NCName where readsPrec i = map (A.first NCName) . readsPrec i
 instance EmitXml NCName where
     emitXml = emitXml . nCName
 parseNCName :: P.XParser m => String -> m NCName
-parseNCName = readParse "NCName"
+parseNCName = return . fromString
 
 -- | @xs:NMTOKEN@ /(simple)/
 newtype NMTOKEN = NMTOKEN { nMTOKEN :: Token }
@@ -63,7 +63,7 @@ instance Read NMTOKEN where readsPrec i = map (A.first NMTOKEN) . readsPrec i
 instance EmitXml NMTOKEN where
     emitXml = emitXml . nMTOKEN
 parseNMTOKEN :: P.XParser m => String -> m NMTOKEN
-parseNMTOKEN = readParse "NMTOKEN"
+parseNMTOKEN = return . fromString
 
 -- | @xs:Name@ /(simple)/
 newtype Name = Name { name :: Token }
@@ -73,7 +73,7 @@ instance Read Name where readsPrec i = map (A.first Name) . readsPrec i
 instance EmitXml Name where
     emitXml = emitXml . name
 parseName :: P.XParser m => String -> m Name
-parseName = readParse "Name"
+parseName = return . fromString
 
 -- | @above-below@ /(simple)/
 --
@@ -307,7 +307,7 @@ instance Read Color where readsPrec i = map (A.first Color) . readsPrec i
 instance EmitXml Color where
     emitXml = emitXml . color
 parseColor :: P.XParser m => String -> m Color
-parseColor = readParse "Color"
+parseColor = return . fromString
 
 -- | @comma-separated-text@ /(simple)/
 --
@@ -319,7 +319,7 @@ instance Read CommaSeparatedText where readsPrec i = map (A.first CommaSeparated
 instance EmitXml CommaSeparatedText where
     emitXml = emitXml . commaSeparatedText
 parseCommaSeparatedText :: P.XParser m => String -> m CommaSeparatedText
-parseCommaSeparatedText = readParse "CommaSeparatedText"
+parseCommaSeparatedText = return . fromString
 
 -- | @css-font-size@ /(simple)/
 --
@@ -412,7 +412,7 @@ instance Read EndingNumber where readsPrec i = map (A.first EndingNumber) . read
 instance EmitXml EndingNumber where
     emitXml = emitXml . endingNumber
 parseEndingNumber :: P.XParser m => String -> m EndingNumber
-parseEndingNumber = readParse "EndingNumber"
+parseEndingNumber = return . fromString
 
 -- | @fan@ /(simple)/
 --
@@ -764,7 +764,7 @@ instance Read Language where readsPrec i = map (A.first Language) . readsPrec i
 instance EmitXml Language where
     emitXml = emitXml . language
 parseLanguage :: P.XParser m => String -> m Language
-parseLanguage = readParse "Language"
+parseLanguage = return . fromString
 
 -- | @left-center-right@ /(simple)/
 --
@@ -874,7 +874,7 @@ instance Read LineWidthType where readsPrec i = map (A.first LineWidthType) . re
 instance EmitXml LineWidthType where
     emitXml = emitXml . lineWidthType
 parseLineWidthType :: P.XParser m => String -> m LineWidthType
-parseLineWidthType = readParse "LineWidthType"
+parseLineWidthType = return . fromString
 
 -- | @margin-type@ /(simple)/
 --
@@ -972,7 +972,7 @@ instance Read Mode where readsPrec i = map (A.first Mode) . readsPrec i
 instance EmitXml Mode where
     emitXml = emitXml . mode
 parseMode :: P.XParser m => String -> m Mode
-parseMode = readParse "Mode"
+parseMode = return . fromString
 
 -- | @non-negative-decimal@ /(simple)/
 --
@@ -1004,7 +1004,7 @@ instance Read NormalizedString where readsPrec i = map (A.first NormalizedString
 instance EmitXml NormalizedString where
     emitXml = emitXml . normalizedString
 parseNormalizedString :: P.XParser m => String -> m NormalizedString
-parseNormalizedString = readParse "NormalizedString"
+parseNormalizedString = return . fromString
 
 -- | @note-size-type@ /(simple)/
 --
@@ -1729,7 +1729,7 @@ instance Read Token where readsPrec i = map (A.first Token) . readsPrec i
 instance EmitXml Token where
     emitXml = emitXml . token
 parseToken :: P.XParser m => String -> m Token
-parseToken = readParse "Token"
+parseToken = return . fromString
 
 -- | @top-bottom@ /(simple)/
 --
@@ -1979,7 +1979,7 @@ instance Read YyyyMmDd where readsPrec i = map (A.first YyyyMmDd) . readsPrec i
 instance EmitXml YyyyMmDd where
     emitXml = emitXml . yyyyMmDd
 parseYyyyMmDd :: P.XParser m => String -> m YyyyMmDd
-parseYyyyMmDd = readParse "YyyyMmDd"
+parseYyyyMmDd = return . fromString
 
 -- | @xml:lang@ /(union)/
 data SumLang = 
@@ -2230,9 +2230,9 @@ parseAccordionRegistration =
         <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
-        <*> P.optional ((P.atEl (P.name "accordion-high") >> parseEmpty))
-        <*> P.optional ((P.atEl (P.name "accordion-middle") >> P.textContent >>= parseAccordionMiddle))
-        <*> P.optional ((P.atEl (P.name "accordion-low") >> parseEmpty))
+        <*> P.optional (P.oneChild (P.atEl (P.name "accordion-high") >> parseEmpty))
+        <*> P.optional (P.oneChild (P.atEl (P.name "accordion-middle") >> P.textContent >>= parseAccordionMiddle))
+        <*> P.optional (P.oneChild (P.atEl (P.name "accordion-low") >> parseEmpty))
 
 -- | Smart constructor for 'AccordionRegistration'
 mkAccordionRegistration :: AccordionRegistration
@@ -2256,9 +2256,9 @@ instance EmitXml Appearance where
 parseAppearance :: P.XParser m => m Appearance
 parseAppearance = 
       Appearance
-        <$> P.findChildren (P.name "line-width") ((P.atEl (P.name "line-width") >> parseLineWidth))
-        <*> P.findChildren (P.name "note-size") ((P.atEl (P.name "note-size") >> parseNoteSize))
-        <*> P.findChildren (P.name "other-appearance") ((P.atEl (P.name "other-appearance") >> parseOtherAppearance))
+        <$> P.findChildren (P.name "line-width") (P.atEl (P.name "line-width") >> parseLineWidth)
+        <*> P.findChildren (P.name "note-size") (P.atEl (P.name "note-size") >> parseNoteSize)
+        <*> P.findChildren (P.name "other-appearance") (P.atEl (P.name "other-appearance") >> parseOtherAppearance)
 
 -- | Smart constructor for 'Appearance'
 mkAppearance :: Appearance
@@ -2348,17 +2348,17 @@ parseAttributes :: P.XParser m => m Attributes
 parseAttributes = 
       Attributes
         <$> parseEditorial
-        <*> P.optional ((P.atEl (P.name "divisions") >> P.textContent >>= parsePositiveDivisions))
-        <*> P.findChildren (P.name "key") ((P.atEl (P.name "key") >> parseKey))
-        <*> P.findChildren (P.name "time") ((P.atEl (P.name "time") >> parseTime))
-        <*> P.optional ((P.atEl (P.name "staves") >> P.textContent >>= parseNonNegativeInteger))
-        <*> P.optional ((P.atEl (P.name "part-symbol") >> parsePartSymbol))
-        <*> P.optional ((P.atEl (P.name "instruments") >> P.textContent >>= parseNonNegativeInteger))
-        <*> P.findChildren (P.name "clef") ((P.atEl (P.name "clef") >> parseClef))
-        <*> P.findChildren (P.name "staff-details") ((P.atEl (P.name "staff-details") >> parseStaffDetails))
-        <*> P.optional ((P.atEl (P.name "transpose") >> parseTranspose))
-        <*> P.findChildren (P.name "directive") ((P.atEl (P.name "directive") >> parseDirective))
-        <*> P.findChildren (P.name "measure-style") ((P.atEl (P.name "measure-style") >> parseMeasureStyle))
+        <*> P.optional (P.oneChild (P.atEl (P.name "divisions") >> P.textContent >>= parsePositiveDivisions))
+        <*> P.findChildren (P.name "key") (P.atEl (P.name "key") >> parseKey)
+        <*> P.findChildren (P.name "time") (P.atEl (P.name "time") >> parseTime)
+        <*> P.optional (P.oneChild (P.atEl (P.name "staves") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-symbol") >> parsePartSymbol))
+        <*> P.optional (P.oneChild (P.atEl (P.name "instruments") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.findChildren (P.name "clef") (P.atEl (P.name "clef") >> parseClef)
+        <*> P.findChildren (P.name "staff-details") (P.atEl (P.name "staff-details") >> parseStaffDetails)
+        <*> P.optional (P.oneChild (P.atEl (P.name "transpose") >> parseTranspose))
+        <*> P.findChildren (P.name "directive") (P.atEl (P.name "directive") >> parseDirective)
+        <*> P.findChildren (P.name "measure-style") (P.atEl (P.name "measure-style") >> parseMeasureStyle)
 
 -- | Smart constructor for 'Attributes'
 mkAttributes :: Editorial -> Attributes
@@ -2443,14 +2443,14 @@ parseBarline =
         <*> P.optional (P.attr (P.name "segno") >>= parseToken)
         <*> P.optional (P.attr (P.name "coda") >>= parseToken)
         <*> P.optional (P.attr (P.name "divisions") >>= parseDivisions)
-        <*> P.optional ((P.atEl (P.name "bar-style") >> parseBarStyleColor))
+        <*> P.optional (P.oneChild (P.atEl (P.name "bar-style") >> parseBarStyleColor))
         <*> parseEditorial
-        <*> P.optional ((P.atEl (P.name "wavy-line") >> parseWavyLine))
-        <*> P.optional ((P.atEl (P.name "segno") >> parseEmptyPrintStyle))
-        <*> P.optional ((P.atEl (P.name "coda") >> parseEmptyPrintStyle))
-        <*> P.findChildren (P.name "fermata") ((P.atEl (P.name "fermata") >> parseFermata))
-        <*> P.optional ((P.atEl (P.name "ending") >> parseEnding))
-        <*> P.optional ((P.atEl (P.name "repeat") >> parseRepeat))
+        <*> P.optional (P.oneChild (P.atEl (P.name "wavy-line") >> parseWavyLine))
+        <*> P.optional (P.oneChild (P.atEl (P.name "segno") >> parseEmptyPrintStyle))
+        <*> P.optional (P.oneChild (P.atEl (P.name "coda") >> parseEmptyPrintStyle))
+        <*> P.findChildren (P.name "fermata") (P.atEl (P.name "fermata") >> parseFermata)
+        <*> P.optional (P.oneChild (P.atEl (P.name "ending") >> parseEnding))
+        <*> P.optional (P.oneChild (P.atEl (P.name "repeat") >> parseRepeat))
 
 -- | Smart constructor for 'Barline'
 mkBarline :: Editorial -> Barline
@@ -2497,8 +2497,8 @@ instance EmitXml Bass where
 parseBass :: P.XParser m => m Bass
 parseBass = 
       Bass
-        <$> P.oneChild ((P.atEl (P.name "bass-step") >> parseBassStep))
-        <*> P.optional ((P.atEl (P.name "bass-alter") >> parseBassAlter))
+        <$> P.oneChild (P.atEl (P.name "bass-step") >> parseBassStep)
+        <*> P.optional (P.oneChild (P.atEl (P.name "bass-alter") >> parseBassAlter))
 
 -- | Smart constructor for 'Bass'
 mkBass :: BassStep -> Bass
@@ -2696,9 +2696,9 @@ parseBend =
         <*> P.optional (P.attr (P.name "beats") >>= parseTrillBeats)
         <*> P.optional (P.attr (P.name "first-beat") >>= parsePercent)
         <*> P.optional (P.attr (P.name "last-beat") >>= parsePercent)
-        <*> P.oneChild ((P.atEl (P.name "bend-alter") >> P.textContent >>= parseSemitones))
+        <*> P.oneChild (P.atEl (P.name "bend-alter") >> P.textContent >>= parseSemitones)
         <*> P.optional (parseChxBend)
-        <*> P.optional ((P.atEl (P.name "with-bar") >> parsePlacementText))
+        <*> P.optional (P.oneChild (P.atEl (P.name "with-bar") >> parsePlacementText))
 
 -- | Smart constructor for 'Bend'
 mkBend :: Semitones -> Bend
@@ -2842,9 +2842,9 @@ parseClef =
         <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
-        <*> P.oneChild ((P.atEl (P.name "sign") >> P.textContent >>= parseClefSign))
-        <*> P.optional ((P.atEl (P.name "line") >> P.textContent >>= parseStaffLine))
-        <*> P.optional ((P.atEl (P.name "clef-octave-change") >> P.textContent >>= (readParse "Integer")))
+        <*> P.oneChild (P.atEl (P.name "sign") >> P.textContent >>= parseClefSign)
+        <*> P.optional (P.oneChild (P.atEl (P.name "line") >> P.textContent >>= parseStaffLine))
+        <*> P.optional (P.oneChild (P.atEl (P.name "clef-octave-change") >> P.textContent >>= (readParse "Integer")))
 
 -- | Smart constructor for 'Clef'
 mkClef :: ClefSign -> Clef
@@ -2874,8 +2874,8 @@ parseCredit :: P.XParser m => m Credit
 parseCredit = 
       Credit
         <$> P.optional (P.attr (P.name "page") >>= parsePositiveInteger)
-        <*> P.findChildren (P.name "link") ((P.atEl (P.name "link") >> parseLink))
-        <*> P.findChildren (P.name "bookmark") ((P.atEl (P.name "bookmark") >> parseBookmark))
+        <*> P.findChildren (P.name "link") (P.atEl (P.name "link") >> parseLink)
+        <*> P.findChildren (P.name "bookmark") (P.atEl (P.name "bookmark") >> parseBookmark)
         <*> parseChxCredit
 
 -- | Smart constructor for 'Credit'
@@ -2938,13 +2938,13 @@ instance EmitXml Defaults where
 parseDefaults :: P.XParser m => m Defaults
 parseDefaults = 
       Defaults
-        <$> P.optional ((P.atEl (P.name "scaling") >> parseScaling))
+        <$> P.optional (P.oneChild (P.atEl (P.name "scaling") >> parseScaling))
         <*> parseLayout
-        <*> P.optional ((P.atEl (P.name "appearance") >> parseAppearance))
-        <*> P.optional ((P.atEl (P.name "music-font") >> parseEmptyFont))
-        <*> P.optional ((P.atEl (P.name "word-font") >> parseEmptyFont))
-        <*> P.findChildren (P.name "lyric-font") ((P.atEl (P.name "lyric-font") >> parseLyricFont))
-        <*> P.findChildren (P.name "lyric-language") ((P.atEl (P.name "lyric-language") >> parseLyricLanguage))
+        <*> P.optional (P.oneChild (P.atEl (P.name "appearance") >> parseAppearance))
+        <*> P.optional (P.oneChild (P.atEl (P.name "music-font") >> parseEmptyFont))
+        <*> P.optional (P.oneChild (P.atEl (P.name "word-font") >> parseEmptyFont))
+        <*> P.findChildren (P.name "lyric-font") (P.atEl (P.name "lyric-font") >> parseLyricFont)
+        <*> P.findChildren (P.name "lyric-language") (P.atEl (P.name "lyric-language") >> parseLyricLanguage)
 
 -- | Smart constructor for 'Defaults'
 mkDefaults :: Layout -> Defaults
@@ -2972,9 +2972,9 @@ parseDegree :: P.XParser m => m Degree
 parseDegree = 
       Degree
         <$> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
-        <*> P.oneChild ((P.atEl (P.name "degree-value") >> parseDegreeValue))
-        <*> P.oneChild ((P.atEl (P.name "degree-alter") >> parseDegreeAlter))
-        <*> P.oneChild ((P.atEl (P.name "degree-type") >> parseDegreeType))
+        <*> P.oneChild (P.atEl (P.name "degree-value") >> parseDegreeValue)
+        <*> P.oneChild (P.atEl (P.name "degree-alter") >> parseDegreeAlter)
+        <*> P.oneChild (P.atEl (P.name "degree-type") >> parseDegreeType)
 
 -- | Smart constructor for 'Degree'
 mkDegree :: DegreeValue -> DegreeAlter -> DegreeType -> Degree
@@ -3132,11 +3132,11 @@ parseDirection =
       Direction
         <$> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.attr (P.name "directive") >>= parseYesNo)
-        <*> P.findChildren (P.name "direction-type") ((P.atEl (P.name "direction-type") >> parseDirectionType))
-        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+        <*> P.findChildren (P.name "direction-type") (P.atEl (P.name "direction-type") >> parseDirectionType)
+        <*> P.optional (P.oneChild (P.atEl (P.name "offset") >> parseOffset))
         <*> parseEditorialVoiceDirection
         <*> P.optional (parseStaff)
-        <*> P.optional ((P.atEl (P.name "sound") >> parseSound))
+        <*> P.optional (P.oneChild (P.atEl (P.name "sound") >> parseSound))
 
 -- | Smart constructor for 'Direction'
 mkDirection :: EditorialVoiceDirection -> Direction
@@ -3186,7 +3186,7 @@ instance EmitXml Directive where
 parseDirective :: P.XParser m => m Directive
 parseDirective = 
       Directive
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
@@ -3287,7 +3287,7 @@ instance EmitXml Elision where
 parseElision :: P.XParser m => m Elision
 parseElision = 
       Elision
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
         <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
         <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
@@ -3572,7 +3572,7 @@ instance EmitXml Ending where
 parseEnding :: P.XParser m => m Ending
 parseEnding = 
       Ending
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "number") >>= parseEndingNumber)
         <*> (P.attr (P.name "type") >>= parseStartStopDiscontinue)
         <*> P.optional (P.attr (P.name "end-length") >>= parseTenths)
@@ -3640,7 +3640,7 @@ instance EmitXml Feature where
 parseFeature :: P.XParser m => m Feature
 parseFeature = 
       Feature
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "type") >>= parseToken)
 
 -- | Smart constructor for 'Feature'
@@ -3708,10 +3708,10 @@ instance EmitXml Figure where
 parseFigure :: P.XParser m => m Figure
 parseFigure = 
       Figure
-        <$> P.optional ((P.atEl (P.name "prefix") >> parseStyleText))
-        <*> P.optional ((P.atEl (P.name "figure-number") >> parseStyleText))
-        <*> P.optional ((P.atEl (P.name "suffix") >> parseStyleText))
-        <*> P.optional ((P.atEl (P.name "extend") >> parseExtend))
+        <$> P.optional (P.oneChild (P.atEl (P.name "prefix") >> parseStyleText))
+        <*> P.optional (P.oneChild (P.atEl (P.name "figure-number") >> parseStyleText))
+        <*> P.optional (P.oneChild (P.atEl (P.name "suffix") >> parseStyleText))
+        <*> P.optional (P.oneChild (P.atEl (P.name "extend") >> parseExtend))
 
 -- | Smart constructor for 'Figure'
 mkFigure :: Figure
@@ -3763,7 +3763,7 @@ parseFiguredBass =
         <*> P.optional (P.attr (P.name "print-lyric") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
-        <*> P.findChildren (P.name "figure") ((P.atEl (P.name "figure") >> parseFigure))
+        <*> P.findChildren (P.name "figure") (P.atEl (P.name "figure") >> parseFigure)
         <*> P.optional (parseDuration)
         <*> parseEditorial
 
@@ -3799,7 +3799,7 @@ instance EmitXml Fingering where
 parseFingering :: P.XParser m => m Fingering
 parseFingering = 
       Fingering
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "substitution") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "alternate") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
@@ -3880,7 +3880,7 @@ instance EmitXml FormattedText where
 parseFormattedText :: P.XParser m => m FormattedText
 parseFormattedText = 
       FormattedText
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
         <*> P.optional (P.attr (P.name "enclosure") >>= parseEnclosure)
         <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
@@ -3968,10 +3968,10 @@ parseFrame =
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
         <*> P.optional (P.attr (P.name "valign") >>= parseValign)
-        <*> P.oneChild ((P.atEl (P.name "frame-strings") >> P.textContent >>= parsePositiveInteger))
-        <*> P.oneChild ((P.atEl (P.name "frame-frets") >> P.textContent >>= parsePositiveInteger))
-        <*> P.optional ((P.atEl (P.name "first-fret") >> parseFirstFret))
-        <*> P.findChildren (P.name "frame-note") ((P.atEl (P.name "frame-note") >> parseFrameNote))
+        <*> P.oneChild (P.atEl (P.name "frame-strings") >> P.textContent >>= parsePositiveInteger)
+        <*> P.oneChild (P.atEl (P.name "frame-frets") >> P.textContent >>= parsePositiveInteger)
+        <*> P.optional (P.oneChild (P.atEl (P.name "first-fret") >> parseFirstFret))
+        <*> P.findChildren (P.name "frame-note") (P.atEl (P.name "frame-note") >> parseFrameNote)
 
 -- | Smart constructor for 'Frame'
 mkFrame :: PositiveInteger -> PositiveInteger -> Frame
@@ -3996,10 +3996,10 @@ instance EmitXml FrameNote where
 parseFrameNote :: P.XParser m => m FrameNote
 parseFrameNote = 
       FrameNote
-        <$> P.oneChild ((P.atEl (P.name "string") >> parseCmpString))
-        <*> P.oneChild ((P.atEl (P.name "fret") >> parseFret))
-        <*> P.optional ((P.atEl (P.name "fingering") >> parseFingering))
-        <*> P.optional ((P.atEl (P.name "barre") >> parseBarre))
+        <$> P.oneChild (P.atEl (P.name "string") >> parseCmpString)
+        <*> P.oneChild (P.atEl (P.name "fret") >> parseFret)
+        <*> P.optional (P.oneChild (P.atEl (P.name "fingering") >> parseFingering))
+        <*> P.optional (P.oneChild (P.atEl (P.name "barre") >> parseBarre))
 
 -- | Smart constructor for 'FrameNote'
 mkFrameNote :: CmpString -> Fret -> FrameNote
@@ -4065,7 +4065,7 @@ instance EmitXml Glissando where
 parseGlissando :: P.XParser m => m Glissando
 parseGlissando = 
       Glissando
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
@@ -4161,7 +4161,7 @@ instance EmitXml GroupName where
 parseGroupName :: P.XParser m => m GroupName
 parseGroupName = 
       GroupName
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
@@ -4233,7 +4233,7 @@ parseGrouping =
         <$> (P.attr (P.name "type") >>= parseStartStopSingle)
         <*> P.optional (P.attr (P.name "number") >>= parseToken)
         <*> P.optional (P.attr (P.name "member-of") >>= parseToken)
-        <*> P.findChildren (P.name "feature") ((P.atEl (P.name "feature") >> parseFeature))
+        <*> P.findChildren (P.name "feature") (P.atEl (P.name "feature") >> parseFeature)
 
 -- | Smart constructor for 'Grouping'
 mkGrouping :: StartStopSingle -> Grouping
@@ -4267,7 +4267,7 @@ instance EmitXml HammerOnPullOff where
 parseHammerOnPullOff :: P.XParser m => m HammerOnPullOff
 parseHammerOnPullOff = 
       HammerOnPullOff
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
@@ -4382,8 +4382,8 @@ parseHarmony =
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
         <*> P.many (parseHarmonyChord)
-        <*> P.optional ((P.atEl (P.name "frame") >> parseFrame))
-        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+        <*> P.optional (P.oneChild (P.atEl (P.name "frame") >> parseFrame))
+        <*> P.optional (P.oneChild (P.atEl (P.name "offset") >> parseOffset))
         <*> parseEditorial
         <*> P.optional (parseStaff)
 
@@ -4425,7 +4425,7 @@ parseHarpPedals =
         <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
-        <*> P.findChildren (P.name "pedal-tuning") ((P.atEl (P.name "pedal-tuning") >> parsePedalTuning))
+        <*> P.findChildren (P.name "pedal-tuning") (P.atEl (P.name "pedal-tuning") >> parsePedalTuning)
 
 -- | Smart constructor for 'HarpPedals'
 mkHarpPedals :: HarpPedals
@@ -4476,12 +4476,12 @@ instance EmitXml Identification where
 parseIdentification :: P.XParser m => m Identification
 parseIdentification = 
       Identification
-        <$> P.findChildren (P.name "creator") ((P.atEl (P.name "creator") >> parseTypedText))
-        <*> P.findChildren (P.name "rights") ((P.atEl (P.name "rights") >> parseTypedText))
-        <*> P.optional ((P.atEl (P.name "encoding") >> parseEncoding))
-        <*> P.optional ((P.atEl (P.name "source") >> P.textContent >>= (readParse "DefString")))
-        <*> P.findChildren (P.name "relation") ((P.atEl (P.name "relation") >> parseTypedText))
-        <*> P.optional ((P.atEl (P.name "miscellaneous") >> parseMiscellaneous))
+        <$> P.findChildren (P.name "creator") (P.atEl (P.name "creator") >> parseTypedText)
+        <*> P.findChildren (P.name "rights") (P.atEl (P.name "rights") >> parseTypedText)
+        <*> P.optional (P.oneChild (P.atEl (P.name "encoding") >> parseEncoding))
+        <*> P.optional (P.oneChild (P.atEl (P.name "source") >> P.textContent >>= return))
+        <*> P.findChildren (P.name "relation") (P.atEl (P.name "relation") >> parseTypedText)
+        <*> P.optional (P.oneChild (P.atEl (P.name "miscellaneous") >> parseMiscellaneous))
 
 -- | Smart constructor for 'Identification'
 mkIdentification :: Identification
@@ -4510,7 +4510,7 @@ instance EmitXml Image where
 parseImage :: P.XParser m => m Image
 parseImage = 
       Image
-        <$> (P.attr (P.name "source") >>= (readParse "DefString"))
+        <$> (P.attr (P.name "source") >>= return)
         <*> (P.attr (P.name "type") >>= parseToken)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
@@ -4625,7 +4625,7 @@ parseKey =
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
         <*> parseChxKey
-        <*> P.findChildren (P.name "key-octave") ((P.atEl (P.name "key-octave") >> parseKeyOctave))
+        <*> P.findChildren (P.name "key-octave") (P.atEl (P.name "key-octave") >> parseKeyOctave)
 
 -- | Smart constructor for 'Key'
 mkKey :: ChxKey -> Key
@@ -4746,7 +4746,7 @@ instance EmitXml Level where
 parseLevel :: P.XParser m => m Level
 parseLevel = 
       Level
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "reference") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "bracket") >>= parseYesNo)
@@ -4809,7 +4809,7 @@ parseLink :: P.XParser m => m Link
 parseLink = 
       Link
         <$> P.optional (P.attr (P.name "name") >>= parseToken)
-        <*> (P.attr (P.name "xlink:href") >>= (readParse "DefString"))
+        <*> (P.attr (P.name "xlink:href") >>= return)
         <*> P.optional (P.attr (P.name "xlink:type") >>= parseType)
         <*> P.optional (P.attr (P.name "xlink:role") >>= parseToken)
         <*> P.optional (P.attr (P.name "xlink:title") >>= parseToken)
@@ -4864,8 +4864,8 @@ parseLyric =
         <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> parseChxLyric
-        <*> P.optional ((P.atEl (P.name "end-line") >> parseEmpty))
-        <*> P.optional ((P.atEl (P.name "end-paragraph") >> parseEmpty))
+        <*> P.optional (P.oneChild (P.atEl (P.name "end-line") >> parseEmpty))
+        <*> P.optional (P.oneChild (P.atEl (P.name "end-paragraph") >> parseEmpty))
         <*> parseEditorial
 
 -- | Smart constructor for 'Lyric'
@@ -4982,7 +4982,7 @@ parseCmpMeasure =
         <*> P.optional (P.attr (P.name "implicit") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "non-controlling") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "width") >>= parseTenths)
-        <*> P.findChildren (P.name "part") ((P.atEl (P.name "part") >> parsePart))
+        <*> P.findChildren (P.name "part") (P.atEl (P.name "part") >> parsePart)
 
 -- | Smart constructor for 'CmpMeasure'
 mkCmpMeasure :: Token -> CmpMeasure
@@ -5004,7 +5004,7 @@ instance EmitXml MeasureLayout where
 parseMeasureLayout :: P.XParser m => m MeasureLayout
 parseMeasureLayout = 
       MeasureLayout
-        <$> P.optional ((P.atEl (P.name "measure-distance") >> P.textContent >>= parseTenths))
+        <$> P.optional (P.oneChild (P.atEl (P.name "measure-distance") >> P.textContent >>= parseTenths))
 
 -- | Smart constructor for 'MeasureLayout'
 mkMeasureLayout :: MeasureLayout
@@ -5199,10 +5199,10 @@ instance EmitXml MetronomeNote where
 parseMetronomeNote :: P.XParser m => m MetronomeNote
 parseMetronomeNote = 
       MetronomeNote
-        <$> P.oneChild ((P.atEl (P.name "metronome-type") >> P.textContent >>= parseNoteTypeValue))
-        <*> P.findChildren (P.name "metronome-dot") ((P.atEl (P.name "metronome-dot") >> parseEmpty))
-        <*> P.findChildren (P.name "metronome-beam") ((P.atEl (P.name "metronome-beam") >> parseMetronomeBeam))
-        <*> P.optional ((P.atEl (P.name "metronome-tuplet") >> parseMetronomeTuplet))
+        <$> P.oneChild (P.atEl (P.name "metronome-type") >> P.textContent >>= parseNoteTypeValue)
+        <*> P.findChildren (P.name "metronome-dot") (P.atEl (P.name "metronome-dot") >> parseEmpty)
+        <*> P.findChildren (P.name "metronome-beam") (P.atEl (P.name "metronome-beam") >> parseMetronomeBeam)
+        <*> P.optional (P.oneChild (P.atEl (P.name "metronome-tuplet") >> parseMetronomeTuplet))
 
 -- | Smart constructor for 'MetronomeNote'
 mkMetronomeNote :: NoteTypeValue -> MetronomeNote
@@ -5253,7 +5253,7 @@ instance EmitXml MidiDevice where
 parseMidiDevice :: P.XParser m => m MidiDevice
 parseMidiDevice = 
       MidiDevice
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "port") >>= parseMidi16)
 
 -- | Smart constructor for 'MidiDevice'
@@ -5285,14 +5285,14 @@ parseMidiInstrument :: P.XParser m => m MidiInstrument
 parseMidiInstrument = 
       MidiInstrument
         <$> (P.attr (P.name "id") >>= parseIDREF)
-        <*> P.optional ((P.atEl (P.name "midi-channel") >> P.textContent >>= parseMidi16))
-        <*> P.optional ((P.atEl (P.name "midi-name") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "midi-bank") >> P.textContent >>= parseMidi16384))
-        <*> P.optional ((P.atEl (P.name "midi-program") >> P.textContent >>= parseMidi128))
-        <*> P.optional ((P.atEl (P.name "midi-unpitched") >> P.textContent >>= parseMidi128))
-        <*> P.optional ((P.atEl (P.name "volume") >> P.textContent >>= parsePercent))
-        <*> P.optional ((P.atEl (P.name "pan") >> P.textContent >>= parseRotationDegrees))
-        <*> P.optional ((P.atEl (P.name "elevation") >> P.textContent >>= parseRotationDegrees))
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-channel") >> P.textContent >>= parseMidi16))
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-name") >> P.textContent >>= return))
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-bank") >> P.textContent >>= parseMidi16384))
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-program") >> P.textContent >>= parseMidi128))
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-unpitched") >> P.textContent >>= parseMidi128))
+        <*> P.optional (P.oneChild (P.atEl (P.name "volume") >> P.textContent >>= parsePercent))
+        <*> P.optional (P.oneChild (P.atEl (P.name "pan") >> P.textContent >>= parseRotationDegrees))
+        <*> P.optional (P.oneChild (P.atEl (P.name "elevation") >> P.textContent >>= parseRotationDegrees))
 
 -- | Smart constructor for 'MidiInstrument'
 mkMidiInstrument :: IDREF -> MidiInstrument
@@ -5314,7 +5314,7 @@ instance EmitXml Miscellaneous where
 parseMiscellaneous :: P.XParser m => m Miscellaneous
 parseMiscellaneous = 
       Miscellaneous
-        <$> P.findChildren (P.name "miscellaneous-field") ((P.atEl (P.name "miscellaneous-field") >> parseMiscellaneousField))
+        <$> P.findChildren (P.name "miscellaneous-field") (P.atEl (P.name "miscellaneous-field") >> parseMiscellaneousField)
 
 -- | Smart constructor for 'Miscellaneous'
 mkMiscellaneous :: Miscellaneous
@@ -5337,7 +5337,7 @@ instance EmitXml MiscellaneousField where
 parseMiscellaneousField :: P.XParser m => m MiscellaneousField
 parseMiscellaneousField = 
       MiscellaneousField
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "name") >>= parseToken)
 
 -- | Smart constructor for 'MiscellaneousField'
@@ -5543,18 +5543,18 @@ parseNote =
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
         <*> parseChxNote
-        <*> P.optional ((P.atEl (P.name "instrument") >> parseInstrument))
+        <*> P.optional (P.oneChild (P.atEl (P.name "instrument") >> parseInstrument))
         <*> parseEditorialVoice
-        <*> P.optional ((P.atEl (P.name "type") >> parseNoteType))
-        <*> P.findChildren (P.name "dot") ((P.atEl (P.name "dot") >> parseEmptyPlacement))
-        <*> P.optional ((P.atEl (P.name "accidental") >> parseAccidental))
-        <*> P.optional ((P.atEl (P.name "time-modification") >> parseTimeModification))
-        <*> P.optional ((P.atEl (P.name "stem") >> parseStem))
-        <*> P.optional ((P.atEl (P.name "notehead") >> parseNotehead))
+        <*> P.optional (P.oneChild (P.atEl (P.name "type") >> parseNoteType))
+        <*> P.findChildren (P.name "dot") (P.atEl (P.name "dot") >> parseEmptyPlacement)
+        <*> P.optional (P.oneChild (P.atEl (P.name "accidental") >> parseAccidental))
+        <*> P.optional (P.oneChild (P.atEl (P.name "time-modification") >> parseTimeModification))
+        <*> P.optional (P.oneChild (P.atEl (P.name "stem") >> parseStem))
+        <*> P.optional (P.oneChild (P.atEl (P.name "notehead") >> parseNotehead))
         <*> P.optional (parseStaff)
-        <*> P.findChildren (P.name "beam") ((P.atEl (P.name "beam") >> parseBeam))
-        <*> P.findChildren (P.name "notations") ((P.atEl (P.name "notations") >> parseNotations))
-        <*> P.findChildren (P.name "lyric") ((P.atEl (P.name "lyric") >> parseLyric))
+        <*> P.findChildren (P.name "beam") (P.atEl (P.name "beam") >> parseBeam)
+        <*> P.findChildren (P.name "notations") (P.atEl (P.name "notations") >> parseNotations)
+        <*> P.findChildren (P.name "lyric") (P.atEl (P.name "lyric") >> parseLyric)
 
 -- | Smart constructor for 'Note'
 mkNote :: ChxNote -> EditorialVoice -> Note
@@ -5737,7 +5737,7 @@ instance EmitXml Opus where
 parseOpus :: P.XParser m => m Opus
 parseOpus = 
       Opus
-        <$> (P.attr (P.name "xlink:href") >>= (readParse "DefString"))
+        <$> (P.attr (P.name "xlink:href") >>= return)
         <*> P.optional (P.attr (P.name "xlink:type") >>= parseType)
         <*> P.optional (P.attr (P.name "xlink:role") >>= parseToken)
         <*> P.optional (P.attr (P.name "xlink:title") >>= parseToken)
@@ -5785,7 +5785,7 @@ instance EmitXml OtherAppearance where
 parseOtherAppearance :: P.XParser m => m OtherAppearance
 parseOtherAppearance = 
       OtherAppearance
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "type") >>= parseToken)
 
 -- | Smart constructor for 'OtherAppearance'
@@ -5818,7 +5818,7 @@ instance EmitXml OtherDirection where
 parseOtherDirection :: P.XParser m => m OtherDirection
 parseOtherDirection = 
       OtherDirection
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
@@ -5863,7 +5863,7 @@ instance EmitXml OtherNotation where
 parseOtherNotation :: P.XParser m => m OtherNotation
 parseOtherNotation = 
       OtherNotation
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "type") >>= parseStartStopSingle)
         <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
@@ -5900,7 +5900,7 @@ parsePageLayout :: P.XParser m => m PageLayout
 parsePageLayout = 
       PageLayout
         <$> P.optional (parseSeqPageLayout)
-        <*> P.findChildren (P.name "page-margins") ((P.atEl (P.name "page-margins") >> parsePageMargins))
+        <*> P.findChildren (P.name "page-margins") (P.atEl (P.name "page-margins") >> parsePageMargins)
 
 -- | Smart constructor for 'PageLayout'
 mkPageLayout :: PageLayout
@@ -5946,7 +5946,7 @@ parseCmpPart :: P.XParser m => m CmpPart
 parseCmpPart = 
       CmpPart
         <$> (P.attr (P.name "id") >>= parseIDREF)
-        <*> P.findChildren (P.name "measure") ((P.atEl (P.name "measure") >> parseMeasure))
+        <*> P.findChildren (P.name "measure") (P.atEl (P.name "measure") >> parseMeasure)
 
 -- | Smart constructor for 'CmpPart'
 mkCmpPart :: IDREF -> CmpPart
@@ -6007,13 +6007,13 @@ parsePartGroup =
       PartGroup
         <$> (P.attr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.attr (P.name "number") >>= parseToken)
-        <*> P.optional ((P.atEl (P.name "group-name") >> parseGroupName))
-        <*> P.optional ((P.atEl (P.name "group-name-display") >> parseNameDisplay))
-        <*> P.optional ((P.atEl (P.name "group-abbreviation") >> parseGroupName))
-        <*> P.optional ((P.atEl (P.name "group-abbreviation-display") >> parseNameDisplay))
-        <*> P.optional ((P.atEl (P.name "group-symbol") >> parseGroupSymbol))
-        <*> P.optional ((P.atEl (P.name "group-barline") >> parseGroupBarline))
-        <*> P.optional ((P.atEl (P.name "group-time") >> parseEmpty))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-name") >> parseGroupName))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-name-display") >> parseNameDisplay))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-abbreviation") >> parseGroupName))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-abbreviation-display") >> parseNameDisplay))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-symbol") >> parseGroupSymbol))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-barline") >> parseGroupBarline))
+        <*> P.optional (P.oneChild (P.atEl (P.name "group-time") >> parseEmpty))
         <*> parseEditorial
 
 -- | Smart constructor for 'PartGroup'
@@ -6071,7 +6071,7 @@ instance EmitXml PartName where
 parsePartName :: P.XParser m => m PartName
 parsePartName = 
       PartName
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
@@ -6183,8 +6183,8 @@ instance EmitXml PedalTuning where
 parsePedalTuning :: P.XParser m => m PedalTuning
 parsePedalTuning = 
       PedalTuning
-        <$> P.oneChild ((P.atEl (P.name "pedal-step") >> P.textContent >>= parseStep))
-        <*> P.oneChild ((P.atEl (P.name "pedal-alter") >> P.textContent >>= parseSemitones))
+        <$> P.oneChild (P.atEl (P.name "pedal-step") >> P.textContent >>= parseStep)
+        <*> P.oneChild (P.atEl (P.name "pedal-alter") >> P.textContent >>= parseSemitones)
 
 -- | Smart constructor for 'PedalTuning'
 mkPedalTuning :: Step -> Semitones -> PedalTuning
@@ -6210,7 +6210,7 @@ instance EmitXml PerMinute where
 parsePerMinute :: P.XParser m => m PerMinute
 parsePerMinute = 
       PerMinute
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
         <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
         <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
@@ -6238,9 +6238,9 @@ instance EmitXml Pitch where
 parsePitch :: P.XParser m => m Pitch
 parsePitch = 
       Pitch
-        <$> P.oneChild ((P.atEl (P.name "step") >> P.textContent >>= parseStep))
-        <*> P.optional ((P.atEl (P.name "alter") >> P.textContent >>= parseSemitones))
-        <*> P.oneChild ((P.atEl (P.name "octave") >> P.textContent >>= parseOctave))
+        <$> P.oneChild (P.atEl (P.name "step") >> P.textContent >>= parseStep)
+        <*> P.optional (P.oneChild (P.atEl (P.name "alter") >> P.textContent >>= parseSemitones))
+        <*> P.oneChild (P.atEl (P.name "octave") >> P.textContent >>= parseOctave)
 
 -- | Smart constructor for 'Pitch'
 mkPitch :: Step -> Octave -> Pitch
@@ -6272,7 +6272,7 @@ instance EmitXml PlacementText where
 parsePlacementText :: P.XParser m => m PlacementText
 parsePlacementText = 
       PlacementText
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
@@ -6321,10 +6321,10 @@ parsePrint =
         <*> P.optional (P.attr (P.name "blank-page") >>= parsePositiveInteger)
         <*> P.optional (P.attr (P.name "page-number") >>= parseToken)
         <*> parseLayout
-        <*> P.optional ((P.atEl (P.name "measure-layout") >> parseMeasureLayout))
-        <*> P.optional ((P.atEl (P.name "measure-numbering") >> parseMeasureNumbering))
-        <*> P.optional ((P.atEl (P.name "part-name-display") >> parseNameDisplay))
-        <*> P.optional ((P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
+        <*> P.optional (P.oneChild (P.atEl (P.name "measure-layout") >> parseMeasureLayout))
+        <*> P.optional (P.oneChild (P.atEl (P.name "measure-numbering") >> parseMeasureNumbering))
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-name-display") >> parseNameDisplay))
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
 
 -- | Smart constructor for 'Print'
 mkPrint :: Layout -> Print
@@ -6362,7 +6362,7 @@ instance EmitXml Rehearsal where
 parseRehearsal :: P.XParser m => m Rehearsal
 parseRehearsal = 
       Rehearsal
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
         <*> P.optional (P.attr (P.name "enclosure") >>= parseRehearsalEnclosure)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
@@ -6425,8 +6425,8 @@ instance EmitXml Root where
 parseRoot :: P.XParser m => m Root
 parseRoot = 
       Root
-        <$> P.oneChild ((P.atEl (P.name "root-step") >> parseRootStep))
-        <*> P.optional ((P.atEl (P.name "root-alter") >> parseRootAlter))
+        <$> P.oneChild (P.atEl (P.name "root-step") >> parseRootStep)
+        <*> P.optional (P.oneChild (P.atEl (P.name "root-alter") >> parseRootAlter))
 
 -- | Smart constructor for 'Root'
 mkRoot :: RootStep -> Root
@@ -6535,8 +6535,8 @@ instance EmitXml Scaling where
 parseScaling :: P.XParser m => m Scaling
 parseScaling = 
       Scaling
-        <$> P.oneChild ((P.atEl (P.name "millimeters") >> P.textContent >>= parseMillimeters))
-        <*> P.oneChild ((P.atEl (P.name "tenths") >> P.textContent >>= parseTenths))
+        <$> P.oneChild (P.atEl (P.name "millimeters") >> P.textContent >>= parseMillimeters)
+        <*> P.oneChild (P.atEl (P.name "tenths") >> P.textContent >>= parseTenths)
 
 -- | Smart constructor for 'Scaling'
 mkScaling :: Millimeters -> Tenths -> Scaling
@@ -6558,7 +6558,7 @@ instance EmitXml Scordatura where
 parseScordatura :: P.XParser m => m Scordatura
 parseScordatura = 
       Scordatura
-        <$> P.findChildren (P.name "accord") ((P.atEl (P.name "accord") >> parseAccord))
+        <$> P.findChildren (P.name "accord") (P.atEl (P.name "accord") >> parseAccord)
 
 -- | Smart constructor for 'Scordatura'
 mkScordatura :: Scordatura
@@ -6586,8 +6586,8 @@ parseScoreInstrument :: P.XParser m => m ScoreInstrument
 parseScoreInstrument = 
       ScoreInstrument
         <$> (P.attr (P.name "id") >>= parseID)
-        <*> P.oneChild ((P.atEl (P.name "instrument-name") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "instrument-abbreviation") >> P.textContent >>= (readParse "DefString")))
+        <*> P.oneChild (P.atEl (P.name "instrument-name") >> P.textContent >>= return)
+        <*> P.optional (P.oneChild (P.atEl (P.name "instrument-abbreviation") >> P.textContent >>= return))
         <*> P.optional (parseChxScoreInstrument)
 
 -- | Smart constructor for 'ScoreInstrument'
@@ -6620,15 +6620,15 @@ parseCmpScorePart :: P.XParser m => m CmpScorePart
 parseCmpScorePart = 
       CmpScorePart
         <$> (P.attr (P.name "id") >>= parseID)
-        <*> P.optional ((P.atEl (P.name "identification") >> parseIdentification))
-        <*> P.oneChild ((P.atEl (P.name "part-name") >> parsePartName))
-        <*> P.optional ((P.atEl (P.name "part-name-display") >> parseNameDisplay))
-        <*> P.optional ((P.atEl (P.name "part-abbreviation") >> parsePartName))
-        <*> P.optional ((P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
-        <*> P.findChildren (P.name "group") ((P.atEl (P.name "group") >> P.textContent >>= (readParse "DefString")))
-        <*> P.findChildren (P.name "score-instrument") ((P.atEl (P.name "score-instrument") >> parseScoreInstrument))
-        <*> P.optional ((P.atEl (P.name "midi-device") >> parseMidiDevice))
-        <*> P.findChildren (P.name "midi-instrument") ((P.atEl (P.name "midi-instrument") >> parseMidiInstrument))
+        <*> P.optional (P.oneChild (P.atEl (P.name "identification") >> parseIdentification))
+        <*> P.oneChild (P.atEl (P.name "part-name") >> parsePartName)
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-name-display") >> parseNameDisplay))
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-abbreviation") >> parsePartName))
+        <*> P.optional (P.oneChild (P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
+        <*> P.findChildren (P.name "group") (P.atEl (P.name "group") >> P.textContent >>= return)
+        <*> P.findChildren (P.name "score-instrument") (P.atEl (P.name "score-instrument") >> parseScoreInstrument)
+        <*> P.optional (P.oneChild (P.atEl (P.name "midi-device") >> parseMidiDevice))
+        <*> P.findChildren (P.name "midi-instrument") (P.atEl (P.name "midi-instrument") >> parseMidiInstrument)
 
 -- | Smart constructor for 'CmpScorePart'
 mkCmpScorePart :: ID -> PartName -> CmpScorePart
@@ -6652,7 +6652,7 @@ parseScorePartwise =
       ScorePartwise
         <$> P.optional (P.attr (P.name "version") >>= parseToken)
         <*> parseScoreHeader
-        <*> P.findChildren (P.name "part") ((P.atEl (P.name "part") >> parseCmpPart))
+        <*> P.findChildren (P.name "part") (P.atEl (P.name "part") >> parseCmpPart)
 
 -- | Smart constructor for 'ScorePartwise'
 mkScorePartwise :: ScoreHeader -> ScorePartwise
@@ -6676,7 +6676,7 @@ parseScoreTimewise =
       ScoreTimewise
         <$> P.optional (P.attr (P.name "version") >>= parseToken)
         <*> parseScoreHeader
-        <*> P.findChildren (P.name "measure") ((P.atEl (P.name "measure") >> parseCmpMeasure))
+        <*> P.findChildren (P.name "measure") (P.atEl (P.name "measure") >> parseCmpMeasure)
 
 -- | Smart constructor for 'ScoreTimewise'
 mkScoreTimewise :: ScoreHeader -> ScoreTimewise
@@ -6742,7 +6742,7 @@ instance EmitXml Slide where
 parseSlide :: P.XParser m => m Slide
 parseSlide = 
       Slide
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> (P.attr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
@@ -6896,8 +6896,8 @@ parseSound =
         <*> P.optional (P.attr (P.name "damper-pedal") >>= parseYesNoNumber)
         <*> P.optional (P.attr (P.name "soft-pedal") >>= parseYesNoNumber)
         <*> P.optional (P.attr (P.name "sostenuto-pedal") >>= parseYesNoNumber)
-        <*> P.findChildren (P.name "midi-instrument") ((P.atEl (P.name "midi-instrument") >> parseMidiInstrument))
-        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+        <*> P.findChildren (P.name "midi-instrument") (P.atEl (P.name "midi-instrument") >> parseMidiInstrument)
+        <*> P.optional (P.oneChild (P.atEl (P.name "offset") >> parseOffset))
 
 -- | Smart constructor for 'Sound'
 mkSound :: Sound
@@ -6931,11 +6931,11 @@ parseStaffDetails =
         <*> P.optional (P.attr (P.name "show-frets") >>= parseShowFrets)
         <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
-        <*> P.optional ((P.atEl (P.name "staff-type") >> P.textContent >>= parseStaffType))
-        <*> P.optional ((P.atEl (P.name "staff-lines") >> P.textContent >>= parseNonNegativeInteger))
-        <*> P.findChildren (P.name "staff-tuning") ((P.atEl (P.name "staff-tuning") >> parseStaffTuning))
-        <*> P.optional ((P.atEl (P.name "capo") >> P.textContent >>= parseNonNegativeInteger))
-        <*> P.optional ((P.atEl (P.name "staff-size") >> P.textContent >>= parseNonNegativeDecimal))
+        <*> P.optional (P.oneChild (P.atEl (P.name "staff-type") >> P.textContent >>= parseStaffType))
+        <*> P.optional (P.oneChild (P.atEl (P.name "staff-lines") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.findChildren (P.name "staff-tuning") (P.atEl (P.name "staff-tuning") >> parseStaffTuning)
+        <*> P.optional (P.oneChild (P.atEl (P.name "capo") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.optional (P.oneChild (P.atEl (P.name "staff-size") >> P.textContent >>= parseNonNegativeDecimal))
 
 -- | Smart constructor for 'StaffDetails'
 mkStaffDetails :: StaffDetails
@@ -6959,7 +6959,7 @@ parseStaffLayout :: P.XParser m => m StaffLayout
 parseStaffLayout = 
       StaffLayout
         <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
-        <*> P.optional ((P.atEl (P.name "staff-distance") >> P.textContent >>= parseTenths))
+        <*> P.optional (P.oneChild (P.atEl (P.name "staff-distance") >> P.textContent >>= parseTenths))
 
 -- | Smart constructor for 'StaffLayout'
 mkStaffLayout :: StaffLayout
@@ -7112,7 +7112,7 @@ instance EmitXml StyleText where
 parseStyleText :: P.XParser m => m StyleText
 parseStyleText = 
       StyleText
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
@@ -7175,9 +7175,9 @@ instance EmitXml SystemLayout where
 parseSystemLayout :: P.XParser m => m SystemLayout
 parseSystemLayout = 
       SystemLayout
-        <$> P.optional ((P.atEl (P.name "system-margins") >> parseSystemMargins))
-        <*> P.optional ((P.atEl (P.name "system-distance") >> P.textContent >>= parseTenths))
-        <*> P.optional ((P.atEl (P.name "top-system-distance") >> P.textContent >>= parseTenths))
+        <$> P.optional (P.oneChild (P.atEl (P.name "system-margins") >> parseSystemMargins))
+        <*> P.optional (P.oneChild (P.atEl (P.name "system-distance") >> P.textContent >>= parseTenths))
+        <*> P.optional (P.oneChild (P.atEl (P.name "top-system-distance") >> P.textContent >>= parseTenths))
 
 -- | Smart constructor for 'SystemLayout'
 mkSystemLayout :: SystemLayout
@@ -7251,7 +7251,7 @@ instance EmitXml TextElementData where
 parseTextElementData :: P.XParser m => m TextElementData
 parseTextElementData = 
       TextElementData
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
         <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
         <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
@@ -7409,8 +7409,8 @@ instance EmitXml TimeModification where
 parseTimeModification :: P.XParser m => m TimeModification
 parseTimeModification = 
       TimeModification
-        <$> P.oneChild ((P.atEl (P.name "actual-notes") >> P.textContent >>= parseNonNegativeInteger))
-        <*> P.oneChild ((P.atEl (P.name "normal-notes") >> P.textContent >>= parseNonNegativeInteger))
+        <$> P.oneChild (P.atEl (P.name "actual-notes") >> P.textContent >>= parseNonNegativeInteger)
+        <*> P.oneChild (P.atEl (P.name "normal-notes") >> P.textContent >>= parseNonNegativeInteger)
         <*> P.optional (parseSeqTimeModification)
 
 -- | Smart constructor for 'TimeModification'
@@ -7436,10 +7436,10 @@ instance EmitXml Transpose where
 parseTranspose :: P.XParser m => m Transpose
 parseTranspose = 
       Transpose
-        <$> P.optional ((P.atEl (P.name "diatonic") >> P.textContent >>= (readParse "Integer")))
-        <*> P.oneChild ((P.atEl (P.name "chromatic") >> P.textContent >>= parseSemitones))
-        <*> P.optional ((P.atEl (P.name "octave-change") >> P.textContent >>= (readParse "Integer")))
-        <*> P.optional ((P.atEl (P.name "double") >> parseEmpty))
+        <$> P.optional (P.oneChild (P.atEl (P.name "diatonic") >> P.textContent >>= (readParse "Integer")))
+        <*> P.oneChild (P.atEl (P.name "chromatic") >> P.textContent >>= parseSemitones)
+        <*> P.optional (P.oneChild (P.atEl (P.name "octave-change") >> P.textContent >>= (readParse "Integer")))
+        <*> P.optional (P.oneChild (P.atEl (P.name "double") >> parseEmpty))
 
 -- | Smart constructor for 'Transpose'
 mkTranspose :: Semitones -> Transpose
@@ -7532,8 +7532,8 @@ parseTuplet =
         <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
-        <*> P.optional ((P.atEl (P.name "tuplet-actual") >> parseTupletPortion))
-        <*> P.optional ((P.atEl (P.name "tuplet-normal") >> parseTupletPortion))
+        <*> P.optional (P.oneChild (P.atEl (P.name "tuplet-actual") >> parseTupletPortion))
+        <*> P.optional (P.oneChild (P.atEl (P.name "tuplet-normal") >> parseTupletPortion))
 
 -- | Smart constructor for 'Tuplet'
 mkTuplet :: StartStop -> Tuplet
@@ -7619,9 +7619,9 @@ instance EmitXml TupletPortion where
 parseTupletPortion :: P.XParser m => m TupletPortion
 parseTupletPortion = 
       TupletPortion
-        <$> P.optional ((P.atEl (P.name "tuplet-number") >> parseTupletNumber))
-        <*> P.optional ((P.atEl (P.name "tuplet-type") >> parseTupletType))
-        <*> P.findChildren (P.name "tuplet-dot") ((P.atEl (P.name "tuplet-dot") >> parseTupletDot))
+        <$> P.optional (P.oneChild (P.atEl (P.name "tuplet-number") >> parseTupletNumber))
+        <*> P.optional (P.oneChild (P.atEl (P.name "tuplet-type") >> parseTupletType))
+        <*> P.findChildren (P.name "tuplet-dot") (P.atEl (P.name "tuplet-dot") >> parseTupletDot)
 
 -- | Smart constructor for 'TupletPortion'
 mkTupletPortion :: TupletPortion
@@ -7676,7 +7676,7 @@ instance EmitXml TypedText where
 parseTypedText :: P.XParser m => m TypedText
 parseTypedText = 
       TypedText
-        <$> (P.textContent >>= (readParse "DefString"))
+        <$> (P.textContent >>= return)
         <*> P.optional (P.attr (P.name "type") >>= parseToken)
 
 -- | Smart constructor for 'TypedText'
@@ -7787,9 +7787,9 @@ instance EmitXml Work where
 parseWork :: P.XParser m => m Work
 parseWork = 
       Work
-        <$> P.optional ((P.atEl (P.name "work-number") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "work-title") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "opus") >> parseOpus))
+        <$> P.optional (P.oneChild (P.atEl (P.name "work-number") >> P.textContent >>= return))
+        <*> P.optional (P.oneChild (P.atEl (P.name "work-title") >> P.textContent >>= return))
+        <*> P.optional (P.oneChild (P.atEl (P.name "opus") >> parseOpus))
 
 -- | Smart constructor for 'Work'
 mkWork :: Work
@@ -7914,37 +7914,37 @@ instance EmitXml ChxArticulations where
 parseChxArticulations :: P.XParser m => m ChxArticulations
 parseChxArticulations = 
       ArticulationsAccent
-        <$> P.oneChild ((P.atEl (P.name "accent") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "accent") >> parseEmptyPlacement)
       <|> ArticulationsStrongAccent
-        <$> P.oneChild ((P.atEl (P.name "strong-accent") >> parseStrongAccent))
+        <$> P.oneChild (P.atEl (P.name "strong-accent") >> parseStrongAccent)
       <|> ArticulationsStaccato
-        <$> P.oneChild ((P.atEl (P.name "staccato") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "staccato") >> parseEmptyPlacement)
       <|> ArticulationsTenuto
-        <$> P.oneChild ((P.atEl (P.name "tenuto") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "tenuto") >> parseEmptyPlacement)
       <|> ArticulationsDetachedLegato
-        <$> P.oneChild ((P.atEl (P.name "detached-legato") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "detached-legato") >> parseEmptyPlacement)
       <|> ArticulationsStaccatissimo
-        <$> P.oneChild ((P.atEl (P.name "staccatissimo") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "staccatissimo") >> parseEmptyPlacement)
       <|> ArticulationsSpiccato
-        <$> P.oneChild ((P.atEl (P.name "spiccato") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "spiccato") >> parseEmptyPlacement)
       <|> ArticulationsScoop
-        <$> P.oneChild ((P.atEl (P.name "scoop") >> parseEmptyLine))
+        <$> P.oneChild (P.atEl (P.name "scoop") >> parseEmptyLine)
       <|> ArticulationsPlop
-        <$> P.oneChild ((P.atEl (P.name "plop") >> parseEmptyLine))
+        <$> P.oneChild (P.atEl (P.name "plop") >> parseEmptyLine)
       <|> ArticulationsDoit
-        <$> P.oneChild ((P.atEl (P.name "doit") >> parseEmptyLine))
+        <$> P.oneChild (P.atEl (P.name "doit") >> parseEmptyLine)
       <|> ArticulationsFalloff
-        <$> P.oneChild ((P.atEl (P.name "falloff") >> parseEmptyLine))
+        <$> P.oneChild (P.atEl (P.name "falloff") >> parseEmptyLine)
       <|> ArticulationsBreathMark
-        <$> P.oneChild ((P.atEl (P.name "breath-mark") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "breath-mark") >> parseEmptyPlacement)
       <|> ArticulationsCaesura
-        <$> P.oneChild ((P.atEl (P.name "caesura") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "caesura") >> parseEmptyPlacement)
       <|> ArticulationsStress
-        <$> P.oneChild ((P.atEl (P.name "stress") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "stress") >> parseEmptyPlacement)
       <|> ArticulationsUnstress
-        <$> P.oneChild ((P.atEl (P.name "unstress") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "unstress") >> parseEmptyPlacement)
       <|> ArticulationsOtherArticulation
-        <$> P.oneChild ((P.atEl (P.name "other-articulation") >> parsePlacementText))
+        <$> P.oneChild (P.atEl (P.name "other-articulation") >> parsePlacementText)
 
 -- | Smart constructor for 'ArticulationsAccent'
 mkArticulationsAccent :: EmptyPlacement -> ChxArticulations
@@ -8016,9 +8016,9 @@ instance EmitXml ChxBend where
 parseChxBend :: P.XParser m => m ChxBend
 parseChxBend = 
       BendPreBend
-        <$> P.oneChild ((P.atEl (P.name "pre-bend") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "pre-bend") >> parseEmpty)
       <|> BendRelease
-        <$> P.oneChild ((P.atEl (P.name "release") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "release") >> parseEmpty)
 
 -- | Smart constructor for 'BendPreBend'
 mkBendPreBend :: Empty -> ChxBend
@@ -8049,9 +8049,9 @@ instance EmitXml ChxCredit where
 parseChxCredit :: P.XParser m => m ChxCredit
 parseChxCredit = 
       CreditCreditImage
-        <$> P.oneChild ((P.atEl (P.name "credit-image") >> parseImage))
+        <$> P.oneChild (P.atEl (P.name "credit-image") >> parseImage)
       <|> CreditCreditWords
-        <$> P.oneChild ((P.atEl (P.name "credit-words") >> parseFormattedText))
+        <$> P.oneChild (P.atEl (P.name "credit-words") >> parseFormattedText)
         <*> P.many (parseSeqCredit)
 
 -- | Smart constructor for 'CreditCreditImage'
@@ -8201,43 +8201,43 @@ instance EmitXml ChxDirectionType where
 parseChxDirectionType :: P.XParser m => m ChxDirectionType
 parseChxDirectionType = 
       DirectionTypeRehearsal
-        <$> P.findChildren (P.name "rehearsal") ((P.atEl (P.name "rehearsal") >> parseRehearsal))
+        <$> P.findChildren (P.name "rehearsal") (P.atEl (P.name "rehearsal") >> parseRehearsal)
       <|> DirectionTypeSegno
-        <$> P.findChildren (P.name "segno") ((P.atEl (P.name "segno") >> parseEmptyPrintStyle))
+        <$> P.findChildren (P.name "segno") (P.atEl (P.name "segno") >> parseEmptyPrintStyle)
       <|> DirectionTypeWords
-        <$> P.findChildren (P.name "words") ((P.atEl (P.name "words") >> parseFormattedText))
+        <$> P.findChildren (P.name "words") (P.atEl (P.name "words") >> parseFormattedText)
       <|> DirectionTypeCoda
-        <$> P.findChildren (P.name "coda") ((P.atEl (P.name "coda") >> parseEmptyPrintStyle))
+        <$> P.findChildren (P.name "coda") (P.atEl (P.name "coda") >> parseEmptyPrintStyle)
       <|> DirectionTypeWedge
-        <$> P.oneChild ((P.atEl (P.name "wedge") >> parseWedge))
+        <$> P.oneChild (P.atEl (P.name "wedge") >> parseWedge)
       <|> DirectionTypeDynamics
-        <$> P.findChildren (P.name "dynamics") ((P.atEl (P.name "dynamics") >> parseDynamics))
+        <$> P.findChildren (P.name "dynamics") (P.atEl (P.name "dynamics") >> parseDynamics)
       <|> DirectionTypeDashes
-        <$> P.oneChild ((P.atEl (P.name "dashes") >> parseDashes))
+        <$> P.oneChild (P.atEl (P.name "dashes") >> parseDashes)
       <|> DirectionTypeBracket
-        <$> P.oneChild ((P.atEl (P.name "bracket") >> parseBracket))
+        <$> P.oneChild (P.atEl (P.name "bracket") >> parseBracket)
       <|> DirectionTypePedal
-        <$> P.oneChild ((P.atEl (P.name "pedal") >> parsePedal))
+        <$> P.oneChild (P.atEl (P.name "pedal") >> parsePedal)
       <|> DirectionTypeMetronome
-        <$> P.oneChild ((P.atEl (P.name "metronome") >> parseMetronome))
+        <$> P.oneChild (P.atEl (P.name "metronome") >> parseMetronome)
       <|> DirectionTypeOctaveShift
-        <$> P.oneChild ((P.atEl (P.name "octave-shift") >> parseOctaveShift))
+        <$> P.oneChild (P.atEl (P.name "octave-shift") >> parseOctaveShift)
       <|> DirectionTypeHarpPedals
-        <$> P.oneChild ((P.atEl (P.name "harp-pedals") >> parseHarpPedals))
+        <$> P.oneChild (P.atEl (P.name "harp-pedals") >> parseHarpPedals)
       <|> DirectionTypeDamp
-        <$> P.oneChild ((P.atEl (P.name "damp") >> parseEmptyPrintStyle))
+        <$> P.oneChild (P.atEl (P.name "damp") >> parseEmptyPrintStyle)
       <|> DirectionTypeDampAll
-        <$> P.oneChild ((P.atEl (P.name "damp-all") >> parseEmptyPrintStyle))
+        <$> P.oneChild (P.atEl (P.name "damp-all") >> parseEmptyPrintStyle)
       <|> DirectionTypeEyeglasses
-        <$> P.oneChild ((P.atEl (P.name "eyeglasses") >> parseEmptyPrintStyle))
+        <$> P.oneChild (P.atEl (P.name "eyeglasses") >> parseEmptyPrintStyle)
       <|> DirectionTypeScordatura
-        <$> P.oneChild ((P.atEl (P.name "scordatura") >> parseScordatura))
+        <$> P.oneChild (P.atEl (P.name "scordatura") >> parseScordatura)
       <|> DirectionTypeImage
-        <$> P.oneChild ((P.atEl (P.name "image") >> parseImage))
+        <$> P.oneChild (P.atEl (P.name "image") >> parseImage)
       <|> DirectionTypeAccordionRegistration
-        <$> P.oneChild ((P.atEl (P.name "accordion-registration") >> parseAccordionRegistration))
+        <$> P.oneChild (P.atEl (P.name "accordion-registration") >> parseAccordionRegistration)
       <|> DirectionTypeOtherDirection
-        <$> P.oneChild ((P.atEl (P.name "other-direction") >> parseOtherDirection))
+        <$> P.oneChild (P.atEl (P.name "other-direction") >> parseOtherDirection)
 
 -- | Smart constructor for 'DirectionTypeRehearsal'
 mkDirectionTypeRehearsal :: ChxDirectionType
@@ -8472,53 +8472,53 @@ instance EmitXml ChxDynamics where
 parseChxDynamics :: P.XParser m => m ChxDynamics
 parseChxDynamics = 
       DynamicsP
-        <$> P.oneChild ((P.atEl (P.name "p") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "p") >> parseEmpty)
       <|> DynamicsPp
-        <$> P.oneChild ((P.atEl (P.name "pp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "pp") >> parseEmpty)
       <|> DynamicsPpp
-        <$> P.oneChild ((P.atEl (P.name "ppp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "ppp") >> parseEmpty)
       <|> DynamicsPppp
-        <$> P.oneChild ((P.atEl (P.name "pppp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "pppp") >> parseEmpty)
       <|> DynamicsPpppp
-        <$> P.oneChild ((P.atEl (P.name "ppppp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "ppppp") >> parseEmpty)
       <|> DynamicsPppppp
-        <$> P.oneChild ((P.atEl (P.name "pppppp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "pppppp") >> parseEmpty)
       <|> DynamicsF
-        <$> P.oneChild ((P.atEl (P.name "f") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "f") >> parseEmpty)
       <|> DynamicsFf
-        <$> P.oneChild ((P.atEl (P.name "ff") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "ff") >> parseEmpty)
       <|> DynamicsFff
-        <$> P.oneChild ((P.atEl (P.name "fff") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "fff") >> parseEmpty)
       <|> DynamicsFfff
-        <$> P.oneChild ((P.atEl (P.name "ffff") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "ffff") >> parseEmpty)
       <|> DynamicsFffff
-        <$> P.oneChild ((P.atEl (P.name "fffff") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "fffff") >> parseEmpty)
       <|> DynamicsFfffff
-        <$> P.oneChild ((P.atEl (P.name "ffffff") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "ffffff") >> parseEmpty)
       <|> DynamicsMp
-        <$> P.oneChild ((P.atEl (P.name "mp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "mp") >> parseEmpty)
       <|> DynamicsMf
-        <$> P.oneChild ((P.atEl (P.name "mf") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "mf") >> parseEmpty)
       <|> DynamicsSf
-        <$> P.oneChild ((P.atEl (P.name "sf") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sf") >> parseEmpty)
       <|> DynamicsSfp
-        <$> P.oneChild ((P.atEl (P.name "sfp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sfp") >> parseEmpty)
       <|> DynamicsSfpp
-        <$> P.oneChild ((P.atEl (P.name "sfpp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sfpp") >> parseEmpty)
       <|> DynamicsFp
-        <$> P.oneChild ((P.atEl (P.name "fp") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "fp") >> parseEmpty)
       <|> DynamicsRf
-        <$> P.oneChild ((P.atEl (P.name "rf") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "rf") >> parseEmpty)
       <|> DynamicsRfz
-        <$> P.oneChild ((P.atEl (P.name "rfz") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "rfz") >> parseEmpty)
       <|> DynamicsSfz
-        <$> P.oneChild ((P.atEl (P.name "sfz") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sfz") >> parseEmpty)
       <|> DynamicsSffz
-        <$> P.oneChild ((P.atEl (P.name "sffz") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sffz") >> parseEmpty)
       <|> DynamicsFz
-        <$> P.oneChild ((P.atEl (P.name "fz") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "fz") >> parseEmpty)
       <|> DynamicsOtherDynamics
-        <$> P.oneChild ((P.atEl (P.name "other-dynamics") >> P.textContent >>= (readParse "DefString")))
+        <$> P.oneChild (P.atEl (P.name "other-dynamics") >> P.textContent >>= return)
 
 -- | Smart constructor for 'DynamicsP'
 mkDynamicsP :: Empty -> ChxDynamics
@@ -8635,15 +8635,15 @@ instance EmitXml ChxEncoding where
 parseChxEncoding :: P.XParser m => m ChxEncoding
 parseChxEncoding = 
       EncodingEncodingDate
-        <$> P.oneChild ((P.atEl (P.name "encoding-date") >> P.textContent >>= parseYyyyMmDd))
+        <$> P.oneChild (P.atEl (P.name "encoding-date") >> P.textContent >>= parseYyyyMmDd)
       <|> EncodingEncoder
-        <$> P.oneChild ((P.atEl (P.name "encoder") >> parseTypedText))
+        <$> P.oneChild (P.atEl (P.name "encoder") >> parseTypedText)
       <|> EncodingSoftware
-        <$> P.oneChild ((P.atEl (P.name "software") >> P.textContent >>= (readParse "DefString")))
+        <$> P.oneChild (P.atEl (P.name "software") >> P.textContent >>= return)
       <|> EncodingEncodingDescription
-        <$> P.oneChild ((P.atEl (P.name "encoding-description") >> P.textContent >>= (readParse "DefString")))
+        <$> P.oneChild (P.atEl (P.name "encoding-description") >> P.textContent >>= return)
       <|> EncodingSupports
-        <$> P.oneChild ((P.atEl (P.name "supports") >> parseSupports))
+        <$> P.oneChild (P.atEl (P.name "supports") >> parseSupports)
 
 -- | Smart constructor for 'EncodingEncodingDate'
 mkEncodingEncodingDate :: YyyyMmDd -> ChxEncoding
@@ -8689,11 +8689,11 @@ instance EmitXml FullNote where
 parseFullNote :: P.XParser m => m FullNote
 parseFullNote = 
       FullNotePitch
-        <$> P.oneChild ((P.atEl (P.name "pitch") >> parsePitch))
+        <$> P.oneChild (P.atEl (P.name "pitch") >> parsePitch)
       <|> FullNoteUnpitched
-        <$> P.oneChild ((P.atEl (P.name "unpitched") >> parseDisplayStepOctave))
+        <$> P.oneChild (P.atEl (P.name "unpitched") >> parseDisplayStepOctave)
       <|> FullNoteRest
-        <$> P.oneChild ((P.atEl (P.name "rest") >> parseDisplayStepOctave))
+        <$> P.oneChild (P.atEl (P.name "rest") >> parseDisplayStepOctave)
 
 -- | Smart constructor for 'FullNotePitch'
 mkFullNotePitch :: Pitch -> FullNote
@@ -8726,9 +8726,9 @@ instance EmitXml ChxHarmonic where
 parseChxHarmonic :: P.XParser m => m ChxHarmonic
 parseChxHarmonic = 
       HarmonicNatural
-        <$> P.oneChild ((P.atEl (P.name "natural") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "natural") >> parseEmpty)
       <|> HarmonicArtificial
-        <$> P.oneChild ((P.atEl (P.name "artificial") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "artificial") >> parseEmpty)
 
 -- | Smart constructor for 'HarmonicNatural'
 mkHarmonicNatural :: Empty -> ChxHarmonic
@@ -8767,11 +8767,11 @@ instance EmitXml ChxHarmonic1 where
 parseChxHarmonic1 :: P.XParser m => m ChxHarmonic1
 parseChxHarmonic1 = 
       HarmonicBasePitch
-        <$> P.oneChild ((P.atEl (P.name "base-pitch") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "base-pitch") >> parseEmpty)
       <|> HarmonicTouchingPitch
-        <$> P.oneChild ((P.atEl (P.name "touching-pitch") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "touching-pitch") >> parseEmpty)
       <|> HarmonicSoundingPitch
-        <$> P.oneChild ((P.atEl (P.name "sounding-pitch") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "sounding-pitch") >> parseEmpty)
 
 -- | Smart constructor for 'HarmonicBasePitch'
 mkHarmonicBasePitch :: Empty -> ChxHarmonic1
@@ -8804,9 +8804,9 @@ instance EmitXml ChxHarmonyChord where
 parseChxHarmonyChord :: P.XParser m => m ChxHarmonyChord
 parseChxHarmonyChord = 
       HarmonyChordRoot
-        <$> P.oneChild ((P.atEl (P.name "root") >> parseRoot))
+        <$> P.oneChild (P.atEl (P.name "root") >> parseRoot)
       <|> HarmonyChordFunction
-        <$> P.oneChild ((P.atEl (P.name "function") >> parseStyleText))
+        <$> P.oneChild (P.atEl (P.name "function") >> parseStyleText)
 
 -- | Smart constructor for 'HarmonyChordRoot'
 mkHarmonyChordRoot :: Root -> ChxHarmonyChord
@@ -8881,16 +8881,16 @@ instance EmitXml ChxLyric where
 parseChxLyric :: P.XParser m => m ChxLyric
 parseChxLyric = 
       LyricSyllabic
-        <$> P.optional ((P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
-        <*> P.oneChild ((P.atEl (P.name "text") >> parseTextElementData))
+        <$> P.optional (P.oneChild (P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
+        <*> P.oneChild (P.atEl (P.name "text") >> parseTextElementData)
         <*> P.many (parseSeqLyric)
-        <*> P.optional ((P.atEl (P.name "extend") >> parseExtend))
+        <*> P.optional (P.oneChild (P.atEl (P.name "extend") >> parseExtend))
       <|> LyricExtend
-        <$> P.oneChild ((P.atEl (P.name "extend") >> parseExtend))
+        <$> P.oneChild (P.atEl (P.name "extend") >> parseExtend)
       <|> LyricLaughing
-        <$> P.oneChild ((P.atEl (P.name "laughing") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "laughing") >> parseEmpty)
       <|> LyricHumming
-        <$> P.oneChild ((P.atEl (P.name "humming") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "humming") >> parseEmpty)
 
 -- | Smart constructor for 'LyricSyllabic'
 mkLyricSyllabic :: TextElementData -> ChxLyric
@@ -8940,13 +8940,13 @@ instance EmitXml ChxMeasureStyle where
 parseChxMeasureStyle :: P.XParser m => m ChxMeasureStyle
 parseChxMeasureStyle = 
       MeasureStyleMultipleRest
-        <$> P.oneChild ((P.atEl (P.name "multiple-rest") >> parseMultipleRest))
+        <$> P.oneChild (P.atEl (P.name "multiple-rest") >> parseMultipleRest)
       <|> MeasureStyleMeasureRepeat
-        <$> P.oneChild ((P.atEl (P.name "measure-repeat") >> parseMeasureRepeat))
+        <$> P.oneChild (P.atEl (P.name "measure-repeat") >> parseMeasureRepeat)
       <|> MeasureStyleBeatRepeat
-        <$> P.oneChild ((P.atEl (P.name "beat-repeat") >> parseBeatRepeat))
+        <$> P.oneChild (P.atEl (P.name "beat-repeat") >> parseBeatRepeat)
       <|> MeasureStyleSlash
-        <$> P.oneChild ((P.atEl (P.name "slash") >> parseCmpSlash))
+        <$> P.oneChild (P.atEl (P.name "slash") >> parseCmpSlash)
 
 -- | Smart constructor for 'MeasureStyleMultipleRest'
 mkMeasureStyleMultipleRest :: MultipleRest -> ChxMeasureStyle
@@ -8980,7 +8980,7 @@ instance EmitXml ChxMetronome0 where
 parseChxMetronome0 :: P.XParser m => m ChxMetronome0
 parseChxMetronome0 = 
       MetronomePerMinute
-        <$> P.oneChild ((P.atEl (P.name "per-minute") >> parsePerMinute))
+        <$> P.oneChild (P.atEl (P.name "per-minute") >> parsePerMinute)
       <|> MetronomeBeatUnit
         <$> parseBeatUnit
 
@@ -9017,7 +9017,7 @@ parseChxMetronome =
         <$> parseBeatUnit
         <*> parseChxMetronome0
       <|> MetronomeMetronomeNote
-        <$> P.findChildren (P.name "metronome-note") ((P.atEl (P.name "metronome-note") >> parseMetronomeNote))
+        <$> P.findChildren (P.name "metronome-note") (P.atEl (P.name "metronome-note") >> parseMetronomeNote)
         <*> P.optional (parseSeqMetronome)
 
 -- | Smart constructor for 'ChxMetronomeBeatUnit'
@@ -9125,31 +9125,31 @@ instance EmitXml ChxMusicData where
 parseChxMusicData :: P.XParser m => m ChxMusicData
 parseChxMusicData = 
       MusicDataNote
-        <$> P.oneChild ((P.atEl (P.name "note") >> parseNote))
+        <$> P.oneChild (P.atEl (P.name "note") >> parseNote)
       <|> MusicDataBackup
-        <$> P.oneChild ((P.atEl (P.name "backup") >> parseBackup))
+        <$> P.oneChild (P.atEl (P.name "backup") >> parseBackup)
       <|> MusicDataForward
-        <$> P.oneChild ((P.atEl (P.name "forward") >> parseForward))
+        <$> P.oneChild (P.atEl (P.name "forward") >> parseForward)
       <|> MusicDataDirection
-        <$> P.oneChild ((P.atEl (P.name "direction") >> parseDirection))
+        <$> P.oneChild (P.atEl (P.name "direction") >> parseDirection)
       <|> MusicDataAttributes
-        <$> P.oneChild ((P.atEl (P.name "attributes") >> parseAttributes))
+        <$> P.oneChild (P.atEl (P.name "attributes") >> parseAttributes)
       <|> MusicDataHarmony
-        <$> P.oneChild ((P.atEl (P.name "harmony") >> parseHarmony))
+        <$> P.oneChild (P.atEl (P.name "harmony") >> parseHarmony)
       <|> MusicDataFiguredBass
-        <$> P.oneChild ((P.atEl (P.name "figured-bass") >> parseFiguredBass))
+        <$> P.oneChild (P.atEl (P.name "figured-bass") >> parseFiguredBass)
       <|> MusicDataPrint
-        <$> P.oneChild ((P.atEl (P.name "print") >> parsePrint))
+        <$> P.oneChild (P.atEl (P.name "print") >> parsePrint)
       <|> MusicDataSound
-        <$> P.oneChild ((P.atEl (P.name "sound") >> parseSound))
+        <$> P.oneChild (P.atEl (P.name "sound") >> parseSound)
       <|> MusicDataBarline
-        <$> P.oneChild ((P.atEl (P.name "barline") >> parseBarline))
+        <$> P.oneChild (P.atEl (P.name "barline") >> parseBarline)
       <|> MusicDataGrouping
-        <$> P.oneChild ((P.atEl (P.name "grouping") >> parseGrouping))
+        <$> P.oneChild (P.atEl (P.name "grouping") >> parseGrouping)
       <|> MusicDataLink
-        <$> P.oneChild ((P.atEl (P.name "link") >> parseLink))
+        <$> P.oneChild (P.atEl (P.name "link") >> parseLink)
       <|> MusicDataBookmark
-        <$> P.oneChild ((P.atEl (P.name "bookmark") >> parseBookmark))
+        <$> P.oneChild (P.atEl (P.name "bookmark") >> parseBookmark)
 
 -- | Smart constructor for 'MusicDataNote'
 mkMusicDataNote :: Note -> ChxMusicData
@@ -9212,9 +9212,9 @@ instance EmitXml ChxNameDisplay where
 parseChxNameDisplay :: P.XParser m => m ChxNameDisplay
 parseChxNameDisplay = 
       NameDisplayDisplayText
-        <$> P.oneChild ((P.atEl (P.name "display-text") >> parseFormattedText))
+        <$> P.oneChild (P.atEl (P.name "display-text") >> parseFormattedText)
       <|> NameDisplayAccidentalText
-        <$> P.oneChild ((P.atEl (P.name "accidental-text") >> parseAccidentalText))
+        <$> P.oneChild (P.atEl (P.name "accidental-text") >> parseAccidentalText)
 
 -- | Smart constructor for 'NameDisplayDisplayText'
 mkNameDisplayDisplayText :: FormattedText -> ChxNameDisplay
@@ -9328,33 +9328,33 @@ instance EmitXml ChxNotations where
 parseChxNotations :: P.XParser m => m ChxNotations
 parseChxNotations = 
       NotationsTied
-        <$> P.oneChild ((P.atEl (P.name "tied") >> parseTied))
+        <$> P.oneChild (P.atEl (P.name "tied") >> parseTied)
       <|> NotationsSlur
-        <$> P.oneChild ((P.atEl (P.name "slur") >> parseSlur))
+        <$> P.oneChild (P.atEl (P.name "slur") >> parseSlur)
       <|> NotationsTuplet
-        <$> P.oneChild ((P.atEl (P.name "tuplet") >> parseTuplet))
+        <$> P.oneChild (P.atEl (P.name "tuplet") >> parseTuplet)
       <|> NotationsGlissando
-        <$> P.oneChild ((P.atEl (P.name "glissando") >> parseGlissando))
+        <$> P.oneChild (P.atEl (P.name "glissando") >> parseGlissando)
       <|> NotationsSlide
-        <$> P.oneChild ((P.atEl (P.name "slide") >> parseSlide))
+        <$> P.oneChild (P.atEl (P.name "slide") >> parseSlide)
       <|> NotationsOrnaments
-        <$> P.oneChild ((P.atEl (P.name "ornaments") >> parseOrnaments))
+        <$> P.oneChild (P.atEl (P.name "ornaments") >> parseOrnaments)
       <|> NotationsTechnical
-        <$> P.oneChild ((P.atEl (P.name "technical") >> parseTechnical))
+        <$> P.oneChild (P.atEl (P.name "technical") >> parseTechnical)
       <|> NotationsArticulations
-        <$> P.oneChild ((P.atEl (P.name "articulations") >> parseArticulations))
+        <$> P.oneChild (P.atEl (P.name "articulations") >> parseArticulations)
       <|> NotationsDynamics
-        <$> P.oneChild ((P.atEl (P.name "dynamics") >> parseDynamics))
+        <$> P.oneChild (P.atEl (P.name "dynamics") >> parseDynamics)
       <|> NotationsFermata
-        <$> P.oneChild ((P.atEl (P.name "fermata") >> parseFermata))
+        <$> P.oneChild (P.atEl (P.name "fermata") >> parseFermata)
       <|> NotationsArpeggiate
-        <$> P.oneChild ((P.atEl (P.name "arpeggiate") >> parseArpeggiate))
+        <$> P.oneChild (P.atEl (P.name "arpeggiate") >> parseArpeggiate)
       <|> NotationsNonArpeggiate
-        <$> P.oneChild ((P.atEl (P.name "non-arpeggiate") >> parseNonArpeggiate))
+        <$> P.oneChild (P.atEl (P.name "non-arpeggiate") >> parseNonArpeggiate)
       <|> NotationsAccidentalMark
-        <$> P.oneChild ((P.atEl (P.name "accidental-mark") >> parseAccidentalMark))
+        <$> P.oneChild (P.atEl (P.name "accidental-mark") >> parseAccidentalMark)
       <|> NotationsOtherNotation
-        <$> P.oneChild ((P.atEl (P.name "other-notation") >> parseOtherNotation))
+        <$> P.oneChild (P.atEl (P.name "other-notation") >> parseOtherNotation)
 
 -- | Smart constructor for 'NotationsTied'
 mkNotationsTied :: Tied -> ChxNotations
@@ -9433,17 +9433,17 @@ instance EmitXml ChxNote where
 parseChxNote :: P.XParser m => m ChxNote
 parseChxNote = 
       NoteGrace
-        <$> P.oneChild ((P.atEl (P.name "grace") >> parseGrace))
+        <$> P.oneChild (P.atEl (P.name "grace") >> parseGrace)
         <*> parseGrpFullNote
-        <*> P.findChildren (P.name "tie") ((P.atEl (P.name "tie") >> parseTie))
+        <*> P.findChildren (P.name "tie") (P.atEl (P.name "tie") >> parseTie)
       <|> NoteCue
-        <$> P.oneChild ((P.atEl (P.name "cue") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "cue") >> parseEmpty)
         <*> parseGrpFullNote
         <*> parseDuration
       <|> NoteFullNote
         <$> parseGrpFullNote
         <*> parseDuration
-        <*> P.findChildren (P.name "tie") ((P.atEl (P.name "tie") >> parseTie))
+        <*> P.findChildren (P.name "tie") (P.atEl (P.name "tie") >> parseTie)
 
 -- | Smart constructor for 'NoteGrace'
 mkNoteGrace :: Grace -> GrpFullNote -> ChxNote
@@ -9539,27 +9539,27 @@ instance EmitXml ChxOrnaments where
 parseChxOrnaments :: P.XParser m => m ChxOrnaments
 parseChxOrnaments = 
       OrnamentsTrillMark
-        <$> P.oneChild ((P.atEl (P.name "trill-mark") >> parseEmptyTrillSound))
+        <$> P.oneChild (P.atEl (P.name "trill-mark") >> parseEmptyTrillSound)
       <|> OrnamentsTurn
-        <$> P.oneChild ((P.atEl (P.name "turn") >> parseEmptyTrillSound))
+        <$> P.oneChild (P.atEl (P.name "turn") >> parseEmptyTrillSound)
       <|> OrnamentsDelayedTurn
-        <$> P.oneChild ((P.atEl (P.name "delayed-turn") >> parseEmptyTrillSound))
+        <$> P.oneChild (P.atEl (P.name "delayed-turn") >> parseEmptyTrillSound)
       <|> OrnamentsInvertedTurn
-        <$> P.oneChild ((P.atEl (P.name "inverted-turn") >> parseEmptyTrillSound))
+        <$> P.oneChild (P.atEl (P.name "inverted-turn") >> parseEmptyTrillSound)
       <|> OrnamentsShake
-        <$> P.oneChild ((P.atEl (P.name "shake") >> parseEmptyTrillSound))
+        <$> P.oneChild (P.atEl (P.name "shake") >> parseEmptyTrillSound)
       <|> OrnamentsWavyLine
-        <$> P.oneChild ((P.atEl (P.name "wavy-line") >> parseWavyLine))
+        <$> P.oneChild (P.atEl (P.name "wavy-line") >> parseWavyLine)
       <|> OrnamentsMordent
-        <$> P.oneChild ((P.atEl (P.name "mordent") >> parseMordent))
+        <$> P.oneChild (P.atEl (P.name "mordent") >> parseMordent)
       <|> OrnamentsInvertedMordent
-        <$> P.oneChild ((P.atEl (P.name "inverted-mordent") >> parseMordent))
+        <$> P.oneChild (P.atEl (P.name "inverted-mordent") >> parseMordent)
       <|> OrnamentsSchleifer
-        <$> P.oneChild ((P.atEl (P.name "schleifer") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "schleifer") >> parseEmptyPlacement)
       <|> OrnamentsTremolo
-        <$> P.oneChild ((P.atEl (P.name "tremolo") >> parseTremolo))
+        <$> P.oneChild (P.atEl (P.name "tremolo") >> parseTremolo)
       <|> OrnamentsOtherOrnament
-        <$> P.oneChild ((P.atEl (P.name "other-ornament") >> parsePlacementText))
+        <$> P.oneChild (P.atEl (P.name "other-ornament") >> parsePlacementText)
 
 -- | Smart constructor for 'OrnamentsTrillMark'
 mkOrnamentsTrillMark :: EmptyTrillSound -> ChxOrnaments
@@ -9644,9 +9644,9 @@ instance EmitXml ChxScoreInstrument where
 parseChxScoreInstrument :: P.XParser m => m ChxScoreInstrument
 parseChxScoreInstrument = 
       ScoreInstrumentSolo
-        <$> P.oneChild ((P.atEl (P.name "solo") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "solo") >> parseEmpty)
       <|> ScoreInstrumentEnsemble
-        <$> P.oneChild ((P.atEl (P.name "ensemble") >> P.textContent >>= parsePositiveIntegerOrEmpty))
+        <$> P.oneChild (P.atEl (P.name "ensemble") >> P.textContent >>= parsePositiveIntegerOrEmpty)
 
 -- | Smart constructor for 'ScoreInstrumentSolo'
 mkScoreInstrumentSolo :: Empty -> ChxScoreInstrument
@@ -9809,47 +9809,47 @@ instance EmitXml ChxTechnical where
 parseChxTechnical :: P.XParser m => m ChxTechnical
 parseChxTechnical = 
       TechnicalUpBow
-        <$> P.oneChild ((P.atEl (P.name "up-bow") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "up-bow") >> parseEmptyPlacement)
       <|> TechnicalDownBow
-        <$> P.oneChild ((P.atEl (P.name "down-bow") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "down-bow") >> parseEmptyPlacement)
       <|> TechnicalHarmonic
-        <$> P.oneChild ((P.atEl (P.name "harmonic") >> parseHarmonic))
+        <$> P.oneChild (P.atEl (P.name "harmonic") >> parseHarmonic)
       <|> TechnicalOpenString
-        <$> P.oneChild ((P.atEl (P.name "open-string") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "open-string") >> parseEmptyPlacement)
       <|> TechnicalThumbPosition
-        <$> P.oneChild ((P.atEl (P.name "thumb-position") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "thumb-position") >> parseEmptyPlacement)
       <|> TechnicalFingering
-        <$> P.oneChild ((P.atEl (P.name "fingering") >> parseFingering))
+        <$> P.oneChild (P.atEl (P.name "fingering") >> parseFingering)
       <|> TechnicalPluck
-        <$> P.oneChild ((P.atEl (P.name "pluck") >> parsePlacementText))
+        <$> P.oneChild (P.atEl (P.name "pluck") >> parsePlacementText)
       <|> TechnicalDoubleTongue
-        <$> P.oneChild ((P.atEl (P.name "double-tongue") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "double-tongue") >> parseEmptyPlacement)
       <|> TechnicalTripleTongue
-        <$> P.oneChild ((P.atEl (P.name "triple-tongue") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "triple-tongue") >> parseEmptyPlacement)
       <|> TechnicalStopped
-        <$> P.oneChild ((P.atEl (P.name "stopped") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "stopped") >> parseEmptyPlacement)
       <|> TechnicalSnapPizzicato
-        <$> P.oneChild ((P.atEl (P.name "snap-pizzicato") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "snap-pizzicato") >> parseEmptyPlacement)
       <|> TechnicalFret
-        <$> P.oneChild ((P.atEl (P.name "fret") >> parseFret))
+        <$> P.oneChild (P.atEl (P.name "fret") >> parseFret)
       <|> TechnicalString
-        <$> P.oneChild ((P.atEl (P.name "string") >> parseCmpString))
+        <$> P.oneChild (P.atEl (P.name "string") >> parseCmpString)
       <|> TechnicalHammerOn
-        <$> P.oneChild ((P.atEl (P.name "hammer-on") >> parseHammerOnPullOff))
+        <$> P.oneChild (P.atEl (P.name "hammer-on") >> parseHammerOnPullOff)
       <|> TechnicalPullOff
-        <$> P.oneChild ((P.atEl (P.name "pull-off") >> parseHammerOnPullOff))
+        <$> P.oneChild (P.atEl (P.name "pull-off") >> parseHammerOnPullOff)
       <|> TechnicalBend
-        <$> P.oneChild ((P.atEl (P.name "bend") >> parseBend))
+        <$> P.oneChild (P.atEl (P.name "bend") >> parseBend)
       <|> TechnicalTap
-        <$> P.oneChild ((P.atEl (P.name "tap") >> parsePlacementText))
+        <$> P.oneChild (P.atEl (P.name "tap") >> parsePlacementText)
       <|> TechnicalHeel
-        <$> P.oneChild ((P.atEl (P.name "heel") >> parseHeelToe))
+        <$> P.oneChild (P.atEl (P.name "heel") >> parseHeelToe)
       <|> TechnicalToe
-        <$> P.oneChild ((P.atEl (P.name "toe") >> parseHeelToe))
+        <$> P.oneChild (P.atEl (P.name "toe") >> parseHeelToe)
       <|> TechnicalFingernails
-        <$> P.oneChild ((P.atEl (P.name "fingernails") >> parseEmptyPlacement))
+        <$> P.oneChild (P.atEl (P.name "fingernails") >> parseEmptyPlacement)
       <|> TechnicalOtherTechnical
-        <$> P.oneChild ((P.atEl (P.name "other-technical") >> parsePlacementText))
+        <$> P.oneChild (P.atEl (P.name "other-technical") >> parsePlacementText)
 
 -- | Smart constructor for 'TechnicalUpBow'
 mkTechnicalUpBow :: EmptyPlacement -> ChxTechnical
@@ -9936,7 +9936,7 @@ parseChxTime =
       TimeTime
         <$> P.many (parseSeqTime)
       <|> TimeSenzaMisura
-        <$> P.oneChild ((P.atEl (P.name "senza-misura") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "senza-misura") >> parseEmpty)
 
 -- | Smart constructor for 'TimeTime'
 mkTimeTime :: ChxTime
@@ -9961,9 +9961,9 @@ instance EmitXml SeqCredit where
 parseSeqCredit :: P.XParser m => m SeqCredit
 parseSeqCredit = 
       SeqCredit
-        <$> P.findChildren (P.name "link") ((P.atEl (P.name "link") >> parseLink))
-        <*> P.findChildren (P.name "bookmark") ((P.atEl (P.name "bookmark") >> parseBookmark))
-        <*> P.oneChild ((P.atEl (P.name "credit-words") >> parseFormattedText))
+        <$> P.findChildren (P.name "link") (P.atEl (P.name "link") >> parseLink)
+        <*> P.findChildren (P.name "bookmark") (P.atEl (P.name "bookmark") >> parseBookmark)
+        <*> P.oneChild (P.atEl (P.name "credit-words") >> parseFormattedText)
 
 -- | Smart constructor for 'SeqCredit'
 mkSeqCredit :: FormattedText -> SeqCredit
@@ -9984,8 +9984,8 @@ instance EmitXml SeqDisplayStepOctave where
 parseSeqDisplayStepOctave :: P.XParser m => m SeqDisplayStepOctave
 parseSeqDisplayStepOctave = 
       SeqDisplayStepOctave
-        <$> P.oneChild ((P.atEl (P.name "display-step") >> P.textContent >>= parseStep))
-        <*> P.oneChild ((P.atEl (P.name "display-octave") >> P.textContent >>= parseOctave))
+        <$> P.oneChild (P.atEl (P.name "display-step") >> P.textContent >>= parseStep)
+        <*> P.oneChild (P.atEl (P.name "display-octave") >> P.textContent >>= parseOctave)
 
 -- | Smart constructor for 'SeqDisplayStepOctave'
 mkSeqDisplayStepOctave :: Step -> Octave -> SeqDisplayStepOctave
@@ -10006,8 +10006,8 @@ instance EmitXml SeqLyric0 where
 parseSeqLyric0 :: P.XParser m => m SeqLyric0
 parseSeqLyric0 = 
       SeqLyric0
-        <$> P.oneChild ((P.atEl (P.name "elision") >> parseElision))
-        <*> P.optional ((P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
+        <$> P.oneChild (P.atEl (P.name "elision") >> parseElision)
+        <*> P.optional (P.oneChild (P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
 
 -- | Smart constructor for 'SeqLyric0'
 mkSeqLyric0 :: Elision -> SeqLyric0
@@ -10031,7 +10031,7 @@ parseSeqLyric :: P.XParser m => m SeqLyric
 parseSeqLyric = 
       SeqLyric
         <$> P.optional (parseSeqLyric0)
-        <*> P.oneChild ((P.atEl (P.name "text") >> parseTextElementData))
+        <*> P.oneChild (P.atEl (P.name "text") >> parseTextElementData)
 
 -- | Smart constructor for 'SeqLyric'
 mkSeqLyric :: TextElementData -> SeqLyric
@@ -10052,8 +10052,8 @@ instance EmitXml SeqMetronome where
 parseSeqMetronome :: P.XParser m => m SeqMetronome
 parseSeqMetronome = 
       SeqMetronome
-        <$> P.oneChild ((P.atEl (P.name "metronome-relation") >> P.textContent >>= (readParse "DefString")))
-        <*> P.findChildren (P.name "metronome-note") ((P.atEl (P.name "metronome-note") >> parseMetronomeNote))
+        <$> P.oneChild (P.atEl (P.name "metronome-relation") >> P.textContent >>= return)
+        <*> P.findChildren (P.name "metronome-note") (P.atEl (P.name "metronome-note") >> parseMetronomeNote)
 
 -- | Smart constructor for 'SeqMetronome'
 mkSeqMetronome :: String -> SeqMetronome
@@ -10074,8 +10074,8 @@ instance EmitXml SeqMetronomeTuplet where
 parseSeqMetronomeTuplet :: P.XParser m => m SeqMetronomeTuplet
 parseSeqMetronomeTuplet = 
       SeqMetronomeTuplet
-        <$> P.oneChild ((P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue))
-        <*> P.findChildren (P.name "normal-dot") ((P.atEl (P.name "normal-dot") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue)
+        <*> P.findChildren (P.name "normal-dot") (P.atEl (P.name "normal-dot") >> parseEmpty)
 
 -- | Smart constructor for 'SeqMetronomeTuplet'
 mkSeqMetronomeTuplet :: NoteTypeValue -> SeqMetronomeTuplet
@@ -10097,7 +10097,7 @@ parseSeqOrnaments :: P.XParser m => m SeqOrnaments
 parseSeqOrnaments = 
       SeqOrnaments
         <$> parseChxOrnaments
-        <*> P.findChildren (P.name "accidental-mark") ((P.atEl (P.name "accidental-mark") >> parseAccidentalMark))
+        <*> P.findChildren (P.name "accidental-mark") (P.atEl (P.name "accidental-mark") >> parseAccidentalMark)
 
 -- | Smart constructor for 'SeqOrnaments'
 mkSeqOrnaments :: ChxOrnaments -> SeqOrnaments
@@ -10118,8 +10118,8 @@ instance EmitXml SeqPageLayout where
 parseSeqPageLayout :: P.XParser m => m SeqPageLayout
 parseSeqPageLayout = 
       SeqPageLayout
-        <$> P.oneChild ((P.atEl (P.name "page-height") >> P.textContent >>= parseTenths))
-        <*> P.oneChild ((P.atEl (P.name "page-width") >> P.textContent >>= parseTenths))
+        <$> P.oneChild (P.atEl (P.name "page-height") >> P.textContent >>= parseTenths)
+        <*> P.oneChild (P.atEl (P.name "page-width") >> P.textContent >>= parseTenths)
 
 -- | Smart constructor for 'SeqPageLayout'
 mkSeqPageLayout :: Tenths -> Tenths -> SeqPageLayout
@@ -10140,8 +10140,8 @@ instance EmitXml SeqTime where
 parseSeqTime :: P.XParser m => m SeqTime
 parseSeqTime = 
       SeqTime
-        <$> P.oneChild ((P.atEl (P.name "beats") >> P.textContent >>= (readParse "DefString")))
-        <*> P.oneChild ((P.atEl (P.name "beat-type") >> P.textContent >>= (readParse "DefString")))
+        <$> P.oneChild (P.atEl (P.name "beats") >> P.textContent >>= return)
+        <*> P.oneChild (P.atEl (P.name "beat-type") >> P.textContent >>= return)
 
 -- | Smart constructor for 'SeqTime'
 mkSeqTime :: String -> String -> SeqTime
@@ -10162,8 +10162,8 @@ instance EmitXml SeqTimeModification where
 parseSeqTimeModification :: P.XParser m => m SeqTimeModification
 parseSeqTimeModification = 
       SeqTimeModification
-        <$> P.oneChild ((P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue))
-        <*> P.findChildren (P.name "normal-dot") ((P.atEl (P.name "normal-dot") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue)
+        <*> P.findChildren (P.name "normal-dot") (P.atEl (P.name "normal-dot") >> parseEmpty)
 
 -- | Smart constructor for 'SeqTimeModification'
 mkSeqTimeModification :: NoteTypeValue -> SeqTimeModification
@@ -10186,8 +10186,8 @@ parseAllMargins :: P.XParser m => m AllMargins
 parseAllMargins = 
       AllMargins
         <$> parseLeftRightMargins
-        <*> P.oneChild ((P.atEl (P.name "top-margin") >> P.textContent >>= parseTenths))
-        <*> P.oneChild ((P.atEl (P.name "bottom-margin") >> P.textContent >>= parseTenths))
+        <*> P.oneChild (P.atEl (P.name "top-margin") >> P.textContent >>= parseTenths)
+        <*> P.oneChild (P.atEl (P.name "bottom-margin") >> P.textContent >>= parseTenths)
 
 -- | Smart constructor for 'AllMargins'
 mkAllMargins :: LeftRightMargins -> Tenths -> Tenths -> AllMargins
@@ -10208,8 +10208,8 @@ instance EmitXml BeatUnit where
 parseBeatUnit :: P.XParser m => m BeatUnit
 parseBeatUnit = 
       BeatUnit
-        <$> P.oneChild ((P.atEl (P.name "beat-unit") >> P.textContent >>= parseNoteTypeValue))
-        <*> P.findChildren (P.name "beat-unit-dot") ((P.atEl (P.name "beat-unit-dot") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "beat-unit") >> P.textContent >>= parseNoteTypeValue)
+        <*> P.findChildren (P.name "beat-unit-dot") (P.atEl (P.name "beat-unit-dot") >> parseEmpty)
 
 -- | Smart constructor for 'BeatUnit'
 mkBeatUnit :: NoteTypeValue -> BeatUnit
@@ -10229,7 +10229,7 @@ instance EmitXml Duration where
 parseDuration :: P.XParser m => m Duration
 parseDuration = 
       Duration
-        <$> P.oneChild ((P.atEl (P.name "duration") >> P.textContent >>= parsePositiveDivisions))
+        <$> P.oneChild (P.atEl (P.name "duration") >> P.textContent >>= parsePositiveDivisions)
 
 -- | Smart constructor for 'Duration'
 mkDuration :: PositiveDivisions -> Duration
@@ -10313,7 +10313,7 @@ instance EmitXml Footnote where
 parseFootnote :: P.XParser m => m Footnote
 parseFootnote = 
       Footnote
-        <$> P.oneChild ((P.atEl (P.name "footnote") >> parseFormattedText))
+        <$> P.oneChild (P.atEl (P.name "footnote") >> parseFormattedText)
 
 -- | Smart constructor for 'Footnote'
 mkFootnote :: FormattedText -> Footnote
@@ -10334,7 +10334,7 @@ instance EmitXml GrpFullNote where
 parseGrpFullNote :: P.XParser m => m GrpFullNote
 parseGrpFullNote = 
       GrpFullNote
-        <$> P.optional ((P.atEl (P.name "chord") >> parseEmpty))
+        <$> P.optional (P.oneChild (P.atEl (P.name "chord") >> parseEmpty))
         <*> parseFullNote
 
 -- | Smart constructor for 'GrpFullNote'
@@ -10360,10 +10360,10 @@ parseHarmonyChord :: P.XParser m => m HarmonyChord
 parseHarmonyChord = 
       HarmonyChord
         <$> parseChxHarmonyChord
-        <*> P.oneChild ((P.atEl (P.name "kind") >> parseKind))
-        <*> P.optional ((P.atEl (P.name "inversion") >> parseInversion))
-        <*> P.optional ((P.atEl (P.name "bass") >> parseBass))
-        <*> P.findChildren (P.name "degree") ((P.atEl (P.name "degree") >> parseDegree))
+        <*> P.oneChild (P.atEl (P.name "kind") >> parseKind)
+        <*> P.optional (P.oneChild (P.atEl (P.name "inversion") >> parseInversion))
+        <*> P.optional (P.oneChild (P.atEl (P.name "bass") >> parseBass))
+        <*> P.findChildren (P.name "degree") (P.atEl (P.name "degree") >> parseDegree)
 
 -- | Smart constructor for 'HarmonyChord'
 mkHarmonyChord :: ChxHarmonyChord -> Kind -> HarmonyChord
@@ -10385,9 +10385,9 @@ instance EmitXml Layout where
 parseLayout :: P.XParser m => m Layout
 parseLayout = 
       Layout
-        <$> P.optional ((P.atEl (P.name "page-layout") >> parsePageLayout))
-        <*> P.optional ((P.atEl (P.name "system-layout") >> parseSystemLayout))
-        <*> P.findChildren (P.name "staff-layout") ((P.atEl (P.name "staff-layout") >> parseStaffLayout))
+        <$> P.optional (P.oneChild (P.atEl (P.name "page-layout") >> parsePageLayout))
+        <*> P.optional (P.oneChild (P.atEl (P.name "system-layout") >> parseSystemLayout))
+        <*> P.findChildren (P.name "staff-layout") (P.atEl (P.name "staff-layout") >> parseStaffLayout)
 
 -- | Smart constructor for 'Layout'
 mkLayout :: Layout
@@ -10408,8 +10408,8 @@ instance EmitXml LeftRightMargins where
 parseLeftRightMargins :: P.XParser m => m LeftRightMargins
 parseLeftRightMargins = 
       LeftRightMargins
-        <$> P.oneChild ((P.atEl (P.name "left-margin") >> P.textContent >>= parseTenths))
-        <*> P.oneChild ((P.atEl (P.name "right-margin") >> P.textContent >>= parseTenths))
+        <$> P.oneChild (P.atEl (P.name "left-margin") >> P.textContent >>= parseTenths)
+        <*> P.oneChild (P.atEl (P.name "right-margin") >> P.textContent >>= parseTenths)
 
 -- | Smart constructor for 'LeftRightMargins'
 mkLeftRightMargins :: Tenths -> Tenths -> LeftRightMargins
@@ -10429,7 +10429,7 @@ instance EmitXml GrpLevel where
 parseGrpLevel :: P.XParser m => m GrpLevel
 parseGrpLevel = 
       GrpLevel
-        <$> P.oneChild ((P.atEl (P.name "level") >> parseLevel))
+        <$> P.oneChild (P.atEl (P.name "level") >> parseLevel)
 
 -- | Smart constructor for 'GrpLevel'
 mkGrpLevel :: Level -> GrpLevel
@@ -10468,8 +10468,8 @@ instance EmitXml NonTraditionalKey where
 parseNonTraditionalKey :: P.XParser m => m NonTraditionalKey
 parseNonTraditionalKey = 
       NonTraditionalKey
-        <$> P.oneChild ((P.atEl (P.name "key-step") >> P.textContent >>= parseStep))
-        <*> P.oneChild ((P.atEl (P.name "key-alter") >> P.textContent >>= parseSemitones))
+        <$> P.oneChild (P.atEl (P.name "key-step") >> P.textContent >>= parseStep)
+        <*> P.oneChild (P.atEl (P.name "key-alter") >> P.textContent >>= parseSemitones)
 
 -- | Smart constructor for 'NonTraditionalKey'
 mkNonTraditionalKey :: Step -> Semitones -> NonTraditionalKey
@@ -10489,7 +10489,7 @@ instance EmitXml GrpPartGroup where
 parseGrpPartGroup :: P.XParser m => m GrpPartGroup
 parseGrpPartGroup = 
       GrpPartGroup
-        <$> P.oneChild ((P.atEl (P.name "part-group") >> parsePartGroup))
+        <$> P.oneChild (P.atEl (P.name "part-group") >> parsePartGroup)
 
 -- | Smart constructor for 'GrpPartGroup'
 mkGrpPartGroup :: PartGroup -> GrpPartGroup
@@ -10515,13 +10515,13 @@ instance EmitXml ScoreHeader where
 parseScoreHeader :: P.XParser m => m ScoreHeader
 parseScoreHeader = 
       ScoreHeader
-        <$> P.optional ((P.atEl (P.name "work") >> parseWork))
-        <*> P.optional ((P.atEl (P.name "movement-number") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "movement-title") >> P.textContent >>= (readParse "DefString")))
-        <*> P.optional ((P.atEl (P.name "identification") >> parseIdentification))
-        <*> P.optional ((P.atEl (P.name "defaults") >> parseDefaults))
-        <*> P.findChildren (P.name "credit") ((P.atEl (P.name "credit") >> parseCredit))
-        <*> P.oneChild ((P.atEl (P.name "part-list") >> parsePartList))
+        <$> P.optional (P.oneChild (P.atEl (P.name "work") >> parseWork))
+        <*> P.optional (P.oneChild (P.atEl (P.name "movement-number") >> P.textContent >>= return))
+        <*> P.optional (P.oneChild (P.atEl (P.name "movement-title") >> P.textContent >>= return))
+        <*> P.optional (P.oneChild (P.atEl (P.name "identification") >> parseIdentification))
+        <*> P.optional (P.oneChild (P.atEl (P.name "defaults") >> parseDefaults))
+        <*> P.findChildren (P.name "credit") (P.atEl (P.name "credit") >> parseCredit)
+        <*> P.oneChild (P.atEl (P.name "part-list") >> parsePartList)
 
 -- | Smart constructor for 'ScoreHeader'
 mkScoreHeader :: PartList -> ScoreHeader
@@ -10541,7 +10541,7 @@ instance EmitXml ScorePart where
 parseScorePart :: P.XParser m => m ScorePart
 parseScorePart = 
       ScorePart
-        <$> P.oneChild ((P.atEl (P.name "score-part") >> parseCmpScorePart))
+        <$> P.oneChild (P.atEl (P.name "score-part") >> parseCmpScorePart)
 
 -- | Smart constructor for 'ScorePart'
 mkScorePart :: CmpScorePart -> ScorePart
@@ -10562,8 +10562,8 @@ instance EmitXml Slash where
 parseSlash :: P.XParser m => m Slash
 parseSlash = 
       Slash
-        <$> P.oneChild ((P.atEl (P.name "slash-type") >> P.textContent >>= parseNoteTypeValue))
-        <*> P.findChildren (P.name "slash-dot") ((P.atEl (P.name "slash-dot") >> parseEmpty))
+        <$> P.oneChild (P.atEl (P.name "slash-type") >> P.textContent >>= parseNoteTypeValue)
+        <*> P.findChildren (P.name "slash-dot") (P.atEl (P.name "slash-dot") >> parseEmpty)
 
 -- | Smart constructor for 'Slash'
 mkSlash :: NoteTypeValue -> Slash
@@ -10583,7 +10583,7 @@ instance EmitXml Staff where
 parseStaff :: P.XParser m => m Staff
 parseStaff = 
       Staff
-        <$> P.oneChild ((P.atEl (P.name "staff") >> P.textContent >>= parsePositiveInteger))
+        <$> P.oneChild (P.atEl (P.name "staff") >> P.textContent >>= parsePositiveInteger)
 
 -- | Smart constructor for 'Staff'
 mkStaff :: PositiveInteger -> Staff
@@ -10605,9 +10605,9 @@ instance EmitXml TraditionalKey where
 parseTraditionalKey :: P.XParser m => m TraditionalKey
 parseTraditionalKey = 
       TraditionalKey
-        <$> P.optional ((P.atEl (P.name "cancel") >> parseCancel))
-        <*> P.oneChild ((P.atEl (P.name "fifths") >> P.textContent >>= parseFifths))
-        <*> P.optional ((P.atEl (P.name "mode") >> P.textContent >>= parseMode))
+        <$> P.optional (P.oneChild (P.atEl (P.name "cancel") >> parseCancel))
+        <*> P.oneChild (P.atEl (P.name "fifths") >> P.textContent >>= parseFifths)
+        <*> P.optional (P.oneChild (P.atEl (P.name "mode") >> P.textContent >>= parseMode))
 
 -- | Smart constructor for 'TraditionalKey'
 mkTraditionalKey :: Fifths -> TraditionalKey
@@ -10629,9 +10629,9 @@ instance EmitXml Tuning where
 parseTuning :: P.XParser m => m Tuning
 parseTuning = 
       Tuning
-        <$> P.oneChild ((P.atEl (P.name "tuning-step") >> P.textContent >>= parseStep))
-        <*> P.optional ((P.atEl (P.name "tuning-alter") >> P.textContent >>= parseSemitones))
-        <*> P.oneChild ((P.atEl (P.name "tuning-octave") >> P.textContent >>= parseOctave))
+        <$> P.oneChild (P.atEl (P.name "tuning-step") >> P.textContent >>= parseStep)
+        <*> P.optional (P.oneChild (P.atEl (P.name "tuning-alter") >> P.textContent >>= parseSemitones))
+        <*> P.oneChild (P.atEl (P.name "tuning-octave") >> P.textContent >>= parseOctave)
 
 -- | Smart constructor for 'Tuning'
 mkTuning :: Step -> Octave -> Tuning
@@ -10651,7 +10651,7 @@ instance EmitXml Voice where
 parseVoice :: P.XParser m => m Voice
 parseVoice = 
       Voice
-        <$> P.oneChild ((P.atEl (P.name "voice") >> P.textContent >>= (readParse "DefString")))
+        <$> P.oneChild (P.atEl (P.name "voice") >> P.textContent >>= return)
 
 -- | Smart constructor for 'Voice'
 mkVoice :: String -> Voice
