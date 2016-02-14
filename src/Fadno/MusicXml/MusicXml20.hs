@@ -15,42 +15,65 @@ import Data.Data
 import Data.Decimal
 import Data.String
 import Fadno.Xml.EmitXml
+import qualified Fadno.Xml.XParser as P
+import qualified Control.Applicative as P
+import Control.Applicative ((<|>))
+import qualified Text.Read as P
+import qualified Control.Monad.Except as P
+import qualified Control.Arrow as A
 
+readParse :: (P.XParser m, Read a) => String -> String -> m a
+readParse t s = maybe (P.throwError $ t ++ ": " ++ s) return $ P.readMaybe s
 
 -- | @xs:ID@ /(simple)/
 newtype ID = ID { iD :: NCName }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show ID where show (ID a) = show a
+instance Read ID where readsPrec i = map (A.first ID) . readsPrec i
 instance EmitXml ID where
     emitXml = emitXml . iD
+parseID :: P.XParser m => String -> m ID
+parseID = readParse "ID"
 
 -- | @xs:IDREF@ /(simple)/
 newtype IDREF = IDREF { iDREF :: NCName }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show IDREF where show (IDREF a) = show a
+instance Read IDREF where readsPrec i = map (A.first IDREF) . readsPrec i
 instance EmitXml IDREF where
     emitXml = emitXml . iDREF
+parseIDREF :: P.XParser m => String -> m IDREF
+parseIDREF = readParse "IDREF"
 
 -- | @xs:NCName@ /(simple)/
 newtype NCName = NCName { nCName :: Name }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show NCName where show (NCName a) = show a
+instance Read NCName where readsPrec i = map (A.first NCName) . readsPrec i
 instance EmitXml NCName where
     emitXml = emitXml . nCName
+parseNCName :: P.XParser m => String -> m NCName
+parseNCName = readParse "NCName"
 
 -- | @xs:NMTOKEN@ /(simple)/
 newtype NMTOKEN = NMTOKEN { nMTOKEN :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show NMTOKEN where show (NMTOKEN a) = show a
+instance Read NMTOKEN where readsPrec i = map (A.first NMTOKEN) . readsPrec i
 instance EmitXml NMTOKEN where
     emitXml = emitXml . nMTOKEN
+parseNMTOKEN :: P.XParser m => String -> m NMTOKEN
+parseNMTOKEN = readParse "NMTOKEN"
 
 -- | @xs:Name@ /(simple)/
 newtype Name = Name { name :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Name where show (Name a) = show a
+instance Read Name where readsPrec i = map (A.first Name) . readsPrec i
 instance EmitXml Name where
     emitXml = emitXml . name
+parseName :: P.XParser m => String -> m Name
+parseName = readParse "Name"
 
 -- | @above-below@ /(simple)/
 --
@@ -62,6 +85,11 @@ data AboveBelow =
 instance EmitXml AboveBelow where
     emitXml AboveBelowAbove = XLit "above"
     emitXml AboveBelowBelow = XLit "below"
+parseAboveBelow :: P.XParser m => String -> m AboveBelow
+parseAboveBelow s
+        | s == "above" = return $ AboveBelowAbove
+        | s == "below" = return $ AboveBelowBelow
+        | otherwise = P.throwError $ "AboveBelow: " ++ s
 
 -- | @accidental-value@ /(simple)/
 --
@@ -93,6 +121,21 @@ instance EmitXml AccidentalValue where
     emitXml AccidentalValueQuarterSharp = XLit "quarter-sharp"
     emitXml AccidentalValueThreeQuartersFlat = XLit "three-quarters-flat"
     emitXml AccidentalValueThreeQuartersSharp = XLit "three-quarters-sharp"
+parseAccidentalValue :: P.XParser m => String -> m AccidentalValue
+parseAccidentalValue s
+        | s == "sharp" = return $ AccidentalValueSharp
+        | s == "natural" = return $ AccidentalValueNatural
+        | s == "flat" = return $ AccidentalValueFlat
+        | s == "double-sharp" = return $ AccidentalValueDoubleSharp
+        | s == "sharp-sharp" = return $ AccidentalValueSharpSharp
+        | s == "flat-flat" = return $ AccidentalValueFlatFlat
+        | s == "natural-sharp" = return $ AccidentalValueNaturalSharp
+        | s == "natural-flat" = return $ AccidentalValueNaturalFlat
+        | s == "quarter-flat" = return $ AccidentalValueQuarterFlat
+        | s == "quarter-sharp" = return $ AccidentalValueQuarterSharp
+        | s == "three-quarters-flat" = return $ AccidentalValueThreeQuartersFlat
+        | s == "three-quarters-sharp" = return $ AccidentalValueThreeQuartersSharp
+        | otherwise = P.throwError $ "AccidentalValue: " ++ s
 
 -- | @accordion-middle@ /(simple)/
 --
@@ -100,8 +143,11 @@ instance EmitXml AccidentalValue where
 newtype AccordionMiddle = AccordionMiddle { accordionMiddle :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show AccordionMiddle where show (AccordionMiddle a) = show a
+instance Read AccordionMiddle where readsPrec i = map (A.first AccordionMiddle) . readsPrec i
 instance EmitXml AccordionMiddle where
     emitXml = emitXml . accordionMiddle
+parseAccordionMiddle :: P.XParser m => String -> m AccordionMiddle
+parseAccordionMiddle = readParse "AccordionMiddle"
 
 -- | @xlink:actuate@ /(simple)/
 data Actuate = 
@@ -115,6 +161,13 @@ instance EmitXml Actuate where
     emitXml ActuateOnLoad = XLit "onLoad"
     emitXml ActuateOther = XLit "other"
     emitXml ActuateNone = XLit "none"
+parseActuate :: P.XParser m => String -> m Actuate
+parseActuate s
+        | s == "onRequest" = return $ ActuateOnRequest
+        | s == "onLoad" = return $ ActuateOnLoad
+        | s == "other" = return $ ActuateOther
+        | s == "none" = return $ ActuateNone
+        | otherwise = P.throwError $ "Actuate: " ++ s
 
 -- | @backward-forward@ /(simple)/
 --
@@ -126,6 +179,11 @@ data BackwardForward =
 instance EmitXml BackwardForward where
     emitXml BackwardForwardBackward = XLit "backward"
     emitXml BackwardForwardForward = XLit "forward"
+parseBackwardForward :: P.XParser m => String -> m BackwardForward
+parseBackwardForward s
+        | s == "backward" = return $ BackwardForwardBackward
+        | s == "forward" = return $ BackwardForwardForward
+        | otherwise = P.throwError $ "BackwardForward: " ++ s
 
 -- | @bar-style@ /(simple)/
 --
@@ -155,6 +213,20 @@ instance EmitXml BarStyle where
     emitXml BarStyleTick = XLit "tick"
     emitXml BarStyleShort = XLit "short"
     emitXml BarStyleNone = XLit "none"
+parseBarStyle :: P.XParser m => String -> m BarStyle
+parseBarStyle s
+        | s == "regular" = return $ BarStyleRegular
+        | s == "dotted" = return $ BarStyleDotted
+        | s == "dashed" = return $ BarStyleDashed
+        | s == "heavy" = return $ BarStyleHeavy
+        | s == "light-light" = return $ BarStyleLightLight
+        | s == "light-heavy" = return $ BarStyleLightHeavy
+        | s == "heavy-light" = return $ BarStyleHeavyLight
+        | s == "heavy-heavy" = return $ BarStyleHeavyHeavy
+        | s == "tick" = return $ BarStyleTick
+        | s == "short" = return $ BarStyleShort
+        | s == "none" = return $ BarStyleNone
+        | otherwise = P.throwError $ "BarStyle: " ++ s
 
 -- | @beam-level@ /(simple)/
 --
@@ -162,8 +234,11 @@ instance EmitXml BarStyle where
 newtype BeamLevel = BeamLevel { beamLevel :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show BeamLevel where show (BeamLevel a) = show a
+instance Read BeamLevel where readsPrec i = map (A.first BeamLevel) . readsPrec i
 instance EmitXml BeamLevel where
     emitXml = emitXml . beamLevel
+parseBeamLevel :: P.XParser m => String -> m BeamLevel
+parseBeamLevel = readParse "BeamLevel"
 
 -- | @beam-value@ /(simple)/
 --
@@ -181,6 +256,14 @@ instance EmitXml BeamValue where
     emitXml BeamValueEnd = XLit "end"
     emitXml BeamValueForwardHook = XLit "forward hook"
     emitXml BeamValueBackwardHook = XLit "backward hook"
+parseBeamValue :: P.XParser m => String -> m BeamValue
+parseBeamValue s
+        | s == "begin" = return $ BeamValueBegin
+        | s == "continue" = return $ BeamValueContinue
+        | s == "end" = return $ BeamValueEnd
+        | s == "forward hook" = return $ BeamValueForwardHook
+        | s == "backward hook" = return $ BeamValueBackwardHook
+        | otherwise = P.throwError $ "BeamValue: " ++ s
 
 -- | @clef-sign@ /(simple)/
 --
@@ -200,6 +283,15 @@ instance EmitXml ClefSign where
     emitXml ClefSignPercussion = XLit "percussion"
     emitXml ClefSignTAB = XLit "TAB"
     emitXml ClefSignNone = XLit "none"
+parseClefSign :: P.XParser m => String -> m ClefSign
+parseClefSign s
+        | s == "G" = return $ ClefSignG
+        | s == "F" = return $ ClefSignF
+        | s == "C" = return $ ClefSignC
+        | s == "percussion" = return $ ClefSignPercussion
+        | s == "TAB" = return $ ClefSignTAB
+        | s == "none" = return $ ClefSignNone
+        | otherwise = P.throwError $ "ClefSign: " ++ s
 
 -- | @color@ /(simple)/
 --
@@ -211,8 +303,11 @@ instance EmitXml ClefSign where
 newtype Color = Color { color :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Color where show (Color a) = show a
+instance Read Color where readsPrec i = map (A.first Color) . readsPrec i
 instance EmitXml Color where
     emitXml = emitXml . color
+parseColor :: P.XParser m => String -> m Color
+parseColor = readParse "Color"
 
 -- | @comma-separated-text@ /(simple)/
 --
@@ -220,8 +315,11 @@ instance EmitXml Color where
 newtype CommaSeparatedText = CommaSeparatedText { commaSeparatedText :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show CommaSeparatedText where show (CommaSeparatedText a) = show a
+instance Read CommaSeparatedText where readsPrec i = map (A.first CommaSeparatedText) . readsPrec i
 instance EmitXml CommaSeparatedText where
     emitXml = emitXml . commaSeparatedText
+parseCommaSeparatedText :: P.XParser m => String -> m CommaSeparatedText
+parseCommaSeparatedText = readParse "CommaSeparatedText"
 
 -- | @css-font-size@ /(simple)/
 --
@@ -243,6 +341,16 @@ instance EmitXml CssFontSize where
     emitXml CssFontSizeLarge = XLit "large"
     emitXml CssFontSizeXLarge = XLit "x-large"
     emitXml CssFontSizeXxLarge = XLit "xx-large"
+parseCssFontSize :: P.XParser m => String -> m CssFontSize
+parseCssFontSize s
+        | s == "xx-small" = return $ CssFontSizeXxSmall
+        | s == "x-small" = return $ CssFontSizeXSmall
+        | s == "small" = return $ CssFontSizeSmall
+        | s == "medium" = return $ CssFontSizeMedium
+        | s == "large" = return $ CssFontSizeLarge
+        | s == "x-large" = return $ CssFontSizeXLarge
+        | s == "xx-large" = return $ CssFontSizeXxLarge
+        | otherwise = P.throwError $ "CssFontSize: " ++ s
 
 -- | @degree-type-value@ /(simple)/
 --
@@ -256,6 +364,12 @@ instance EmitXml DegreeTypeValue where
     emitXml DegreeTypeValueAdd = XLit "add"
     emitXml DegreeTypeValueAlter = XLit "alter"
     emitXml DegreeTypeValueSubtract = XLit "subtract"
+parseDegreeTypeValue :: P.XParser m => String -> m DegreeTypeValue
+parseDegreeTypeValue s
+        | s == "add" = return $ DegreeTypeValueAdd
+        | s == "alter" = return $ DegreeTypeValueAlter
+        | s == "subtract" = return $ DegreeTypeValueSubtract
+        | otherwise = P.throwError $ "DegreeTypeValue: " ++ s
 
 -- | @divisions@ /(simple)/
 --
@@ -263,8 +377,11 @@ instance EmitXml DegreeTypeValue where
 newtype Divisions = Divisions { divisions :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Divisions where show (Divisions a) = show a
+instance Read Divisions where readsPrec i = map (A.first Divisions) . readsPrec i
 instance EmitXml Divisions where
     emitXml = emitXml . divisions
+parseDivisions :: P.XParser m => String -> m Divisions
+parseDivisions = readParse "Divisions"
 
 -- | @enclosure@ /(simple)/
 --
@@ -278,6 +395,12 @@ instance EmitXml Enclosure where
     emitXml EnclosureRectangle = XLit "rectangle"
     emitXml EnclosureOval = XLit "oval"
     emitXml EnclosureNone = XLit "none"
+parseEnclosure :: P.XParser m => String -> m Enclosure
+parseEnclosure s
+        | s == "rectangle" = return $ EnclosureRectangle
+        | s == "oval" = return $ EnclosureOval
+        | s == "none" = return $ EnclosureNone
+        | otherwise = P.throwError $ "Enclosure: " ++ s
 
 -- | @ending-number@ /(simple)/
 --
@@ -285,8 +408,11 @@ instance EmitXml Enclosure where
 newtype EndingNumber = EndingNumber { endingNumber :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show EndingNumber where show (EndingNumber a) = show a
+instance Read EndingNumber where readsPrec i = map (A.first EndingNumber) . readsPrec i
 instance EmitXml EndingNumber where
     emitXml = emitXml . endingNumber
+parseEndingNumber :: P.XParser m => String -> m EndingNumber
+parseEndingNumber = readParse "EndingNumber"
 
 -- | @fan@ /(simple)/
 --
@@ -300,6 +426,12 @@ instance EmitXml Fan where
     emitXml FanAccel = XLit "accel"
     emitXml FanRit = XLit "rit"
     emitXml FanNone = XLit "none"
+parseFan :: P.XParser m => String -> m Fan
+parseFan s
+        | s == "accel" = return $ FanAccel
+        | s == "rit" = return $ FanRit
+        | s == "none" = return $ FanNone
+        | otherwise = P.throwError $ "Fan: " ++ s
 
 -- | @fermata-shape@ /(simple)/
 --
@@ -315,6 +447,13 @@ instance EmitXml FermataShape where
     emitXml FermataShapeAngled = XLit "angled"
     emitXml FermataShapeSquare = XLit "square"
     emitXml FermataShape = XLit ""
+parseFermataShape :: P.XParser m => String -> m FermataShape
+parseFermataShape s
+        | s == "normal" = return $ FermataShapeNormal
+        | s == "angled" = return $ FermataShapeAngled
+        | s == "square" = return $ FermataShapeSquare
+        | s == "" = return $ FermataShape
+        | otherwise = P.throwError $ "FermataShape: " ++ s
 
 -- | @fifths@ /(simple)/
 --
@@ -322,8 +461,11 @@ instance EmitXml FermataShape where
 newtype Fifths = Fifths { fifths :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show Fifths where show (Fifths a) = show a
+instance Read Fifths where readsPrec i = map (A.first Fifths) . readsPrec i
 instance EmitXml Fifths where
     emitXml = emitXml . fifths
+parseFifths :: P.XParser m => String -> m Fifths
+parseFifths = readParse "Fifths"
 
 -- | @font-size@ /(simple)/
 --
@@ -339,6 +481,13 @@ data FontSize =
 instance EmitXml FontSize where
     emitXml (FontSizeDecimal a) = emitXml a
     emitXml (FontSizeCssFontSize a) = emitXml a
+parseFontSize :: P.XParser m => String -> m FontSize
+parseFontSize s = 
+      FontSizeDecimal
+        <$> (readParse "Decimal") s
+      <|> FontSizeCssFontSize
+        <$> parseCssFontSize s
+
 
 -- | @font-style@ /(simple)/
 --
@@ -350,6 +499,11 @@ data FontStyle =
 instance EmitXml FontStyle where
     emitXml FontStyleNormal = XLit "normal"
     emitXml FontStyleItalic = XLit "italic"
+parseFontStyle :: P.XParser m => String -> m FontStyle
+parseFontStyle s
+        | s == "normal" = return $ FontStyleNormal
+        | s == "italic" = return $ FontStyleItalic
+        | otherwise = P.throwError $ "FontStyle: " ++ s
 
 -- | @font-weight@ /(simple)/
 --
@@ -361,6 +515,11 @@ data FontWeight =
 instance EmitXml FontWeight where
     emitXml FontWeightNormal = XLit "normal"
     emitXml FontWeightBold = XLit "bold"
+parseFontWeight :: P.XParser m => String -> m FontWeight
+parseFontWeight s
+        | s == "normal" = return $ FontWeightNormal
+        | s == "bold" = return $ FontWeightBold
+        | otherwise = P.throwError $ "FontWeight: " ++ s
 
 -- | @group-barline-value@ /(simple)/
 --
@@ -374,6 +533,12 @@ instance EmitXml GroupBarlineValue where
     emitXml GroupBarlineValueYes = XLit "yes"
     emitXml GroupBarlineValueNo = XLit "no"
     emitXml GroupBarlineValueMensurstrich = XLit "Mensurstrich"
+parseGroupBarlineValue :: P.XParser m => String -> m GroupBarlineValue
+parseGroupBarlineValue s
+        | s == "yes" = return $ GroupBarlineValueYes
+        | s == "no" = return $ GroupBarlineValueNo
+        | s == "Mensurstrich" = return $ GroupBarlineValueMensurstrich
+        | otherwise = P.throwError $ "GroupBarlineValue: " ++ s
 
 -- | @group-symbol-value@ /(simple)/
 --
@@ -389,6 +554,13 @@ instance EmitXml GroupSymbolValue where
     emitXml GroupSymbolValueBrace = XLit "brace"
     emitXml GroupSymbolValueLine = XLit "line"
     emitXml GroupSymbolValueBracket = XLit "bracket"
+parseGroupSymbolValue :: P.XParser m => String -> m GroupSymbolValue
+parseGroupSymbolValue s
+        | s == "none" = return $ GroupSymbolValueNone
+        | s == "brace" = return $ GroupSymbolValueBrace
+        | s == "line" = return $ GroupSymbolValueLine
+        | s == "bracket" = return $ GroupSymbolValueBracket
+        | otherwise = P.throwError $ "GroupSymbolValue: " ++ s
 
 -- | @harmony-type@ /(simple)/
 --
@@ -402,6 +574,12 @@ instance EmitXml HarmonyType where
     emitXml HarmonyTypeExplicit = XLit "explicit"
     emitXml HarmonyTypeImplied = XLit "implied"
     emitXml HarmonyTypeAlternate = XLit "alternate"
+parseHarmonyType :: P.XParser m => String -> m HarmonyType
+parseHarmonyType s
+        | s == "explicit" = return $ HarmonyTypeExplicit
+        | s == "implied" = return $ HarmonyTypeImplied
+        | s == "alternate" = return $ HarmonyTypeAlternate
+        | otherwise = P.throwError $ "HarmonyType: " ++ s
 
 -- | @kind-value@ /(simple)/
 --
@@ -521,6 +699,42 @@ instance EmitXml KindValue where
     emitXml KindValueTristan = XLit "Tristan"
     emitXml KindValueOther = XLit "other"
     emitXml KindValueNone = XLit "none"
+parseKindValue :: P.XParser m => String -> m KindValue
+parseKindValue s
+        | s == "major" = return $ KindValueMajor
+        | s == "minor" = return $ KindValueMinor
+        | s == "augmented" = return $ KindValueAugmented
+        | s == "diminished" = return $ KindValueDiminished
+        | s == "dominant" = return $ KindValueDominant
+        | s == "major-seventh" = return $ KindValueMajorSeventh
+        | s == "minor-seventh" = return $ KindValueMinorSeventh
+        | s == "diminished-seventh" = return $ KindValueDiminishedSeventh
+        | s == "augmented-seventh" = return $ KindValueAugmentedSeventh
+        | s == "half-diminished" = return $ KindValueHalfDiminished
+        | s == "major-minor" = return $ KindValueMajorMinor
+        | s == "major-sixth" = return $ KindValueMajorSixth
+        | s == "minor-sixth" = return $ KindValueMinorSixth
+        | s == "dominant-ninth" = return $ KindValueDominantNinth
+        | s == "major-ninth" = return $ KindValueMajorNinth
+        | s == "minor-ninth" = return $ KindValueMinorNinth
+        | s == "dominant-11th" = return $ KindValueDominant11th
+        | s == "major-11th" = return $ KindValueMajor11th
+        | s == "minor-11th" = return $ KindValueMinor11th
+        | s == "dominant-13th" = return $ KindValueDominant13th
+        | s == "major-13th" = return $ KindValueMajor13th
+        | s == "minor-13th" = return $ KindValueMinor13th
+        | s == "suspended-second" = return $ KindValueSuspendedSecond
+        | s == "suspended-fourth" = return $ KindValueSuspendedFourth
+        | s == "Neapolitan" = return $ KindValueNeapolitan
+        | s == "Italian" = return $ KindValueItalian
+        | s == "French" = return $ KindValueFrench
+        | s == "German" = return $ KindValueGerman
+        | s == "pedal" = return $ KindValuePedal
+        | s == "power" = return $ KindValuePower
+        | s == "Tristan" = return $ KindValueTristan
+        | s == "other" = return $ KindValueOther
+        | s == "none" = return $ KindValueNone
+        | otherwise = P.throwError $ "KindValue: " ++ s
 
 -- | @xml:lang@ /(simple)/
 data Lang = 
@@ -534,13 +748,23 @@ data Lang =
 instance EmitXml Lang where
     emitXml (LangLanguage a) = emitXml a
     emitXml (LangLang a) = emitXml a
+parseLang :: P.XParser m => String -> m Lang
+parseLang s = 
+      LangLanguage
+        <$> parseLanguage s
+      <|> LangLang
+        <$> parseSumLang s
+
 
 -- | @xs:language@ /(simple)/
 newtype Language = Language { language :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Language where show (Language a) = show a
+instance Read Language where readsPrec i = map (A.first Language) . readsPrec i
 instance EmitXml Language where
     emitXml = emitXml . language
+parseLanguage :: P.XParser m => String -> m Language
+parseLanguage = readParse "Language"
 
 -- | @left-center-right@ /(simple)/
 --
@@ -554,6 +778,12 @@ instance EmitXml LeftCenterRight where
     emitXml LeftCenterRightLeft = XLit "left"
     emitXml LeftCenterRightCenter = XLit "center"
     emitXml LeftCenterRightRight = XLit "right"
+parseLeftCenterRight :: P.XParser m => String -> m LeftCenterRight
+parseLeftCenterRight s
+        | s == "left" = return $ LeftCenterRightLeft
+        | s == "center" = return $ LeftCenterRightCenter
+        | s == "right" = return $ LeftCenterRightRight
+        | otherwise = P.throwError $ "LeftCenterRight: " ++ s
 
 -- | @left-right@ /(simple)/
 --
@@ -565,6 +795,11 @@ data LeftRight =
 instance EmitXml LeftRight where
     emitXml LeftRightLeft = XLit "left"
     emitXml LeftRightRight = XLit "right"
+parseLeftRight :: P.XParser m => String -> m LeftRight
+parseLeftRight s
+        | s == "left" = return $ LeftRightLeft
+        | s == "right" = return $ LeftRightRight
+        | otherwise = P.throwError $ "LeftRight: " ++ s
 
 -- | @line-end@ /(simple)/
 --
@@ -582,6 +817,14 @@ instance EmitXml LineEnd where
     emitXml LineEndBoth = XLit "both"
     emitXml LineEndArrow = XLit "arrow"
     emitXml LineEndNone = XLit "none"
+parseLineEnd :: P.XParser m => String -> m LineEnd
+parseLineEnd s
+        | s == "up" = return $ LineEndUp
+        | s == "down" = return $ LineEndDown
+        | s == "both" = return $ LineEndBoth
+        | s == "arrow" = return $ LineEndArrow
+        | s == "none" = return $ LineEndNone
+        | otherwise = P.throwError $ "LineEnd: " ++ s
 
 -- | @line-shape@ /(simple)/
 --
@@ -593,6 +836,11 @@ data LineShape =
 instance EmitXml LineShape where
     emitXml LineShapeStraight = XLit "straight"
     emitXml LineShapeCurved = XLit "curved"
+parseLineShape :: P.XParser m => String -> m LineShape
+parseLineShape s
+        | s == "straight" = return $ LineShapeStraight
+        | s == "curved" = return $ LineShapeCurved
+        | otherwise = P.throwError $ "LineShape: " ++ s
 
 -- | @line-type@ /(simple)/
 --
@@ -608,6 +856,13 @@ instance EmitXml LineType where
     emitXml LineTypeDashed = XLit "dashed"
     emitXml LineTypeDotted = XLit "dotted"
     emitXml LineTypeWavy = XLit "wavy"
+parseLineType :: P.XParser m => String -> m LineType
+parseLineType s
+        | s == "solid" = return $ LineTypeSolid
+        | s == "dashed" = return $ LineTypeDashed
+        | s == "dotted" = return $ LineTypeDotted
+        | s == "wavy" = return $ LineTypeWavy
+        | otherwise = P.throwError $ "LineType: " ++ s
 
 -- | @line-width-type@ /(simple)/
 --
@@ -615,8 +870,11 @@ instance EmitXml LineType where
 newtype LineWidthType = LineWidthType { lineWidthType :: Token }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show LineWidthType where show (LineWidthType a) = show a
+instance Read LineWidthType where readsPrec i = map (A.first LineWidthType) . readsPrec i
 instance EmitXml LineWidthType where
     emitXml = emitXml . lineWidthType
+parseLineWidthType :: P.XParser m => String -> m LineWidthType
+parseLineWidthType = readParse "LineWidthType"
 
 -- | @margin-type@ /(simple)/
 --
@@ -630,6 +888,12 @@ instance EmitXml MarginType where
     emitXml MarginTypeOdd = XLit "odd"
     emitXml MarginTypeEven = XLit "even"
     emitXml MarginTypeBoth = XLit "both"
+parseMarginType :: P.XParser m => String -> m MarginType
+parseMarginType s
+        | s == "odd" = return $ MarginTypeOdd
+        | s == "even" = return $ MarginTypeEven
+        | s == "both" = return $ MarginTypeBoth
+        | otherwise = P.throwError $ "MarginType: " ++ s
 
 -- | @measure-numbering-value@ /(simple)/
 --
@@ -643,6 +907,12 @@ instance EmitXml MeasureNumberingValue where
     emitXml MeasureNumberingValueNone = XLit "none"
     emitXml MeasureNumberingValueMeasure = XLit "measure"
     emitXml MeasureNumberingValueSystem = XLit "system"
+parseMeasureNumberingValue :: P.XParser m => String -> m MeasureNumberingValue
+parseMeasureNumberingValue s
+        | s == "none" = return $ MeasureNumberingValueNone
+        | s == "measure" = return $ MeasureNumberingValueMeasure
+        | s == "system" = return $ MeasureNumberingValueSystem
+        | otherwise = P.throwError $ "MeasureNumberingValue: " ++ s
 
 -- | @midi-128@ /(simple)/
 --
@@ -650,8 +920,11 @@ instance EmitXml MeasureNumberingValue where
 newtype Midi128 = Midi128 { midi128 :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show Midi128 where show (Midi128 a) = show a
+instance Read Midi128 where readsPrec i = map (A.first Midi128) . readsPrec i
 instance EmitXml Midi128 where
     emitXml = emitXml . midi128
+parseMidi128 :: P.XParser m => String -> m Midi128
+parseMidi128 = readParse "Midi128"
 
 -- | @midi-16@ /(simple)/
 --
@@ -659,8 +932,11 @@ instance EmitXml Midi128 where
 newtype Midi16 = Midi16 { midi16 :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show Midi16 where show (Midi16 a) = show a
+instance Read Midi16 where readsPrec i = map (A.first Midi16) . readsPrec i
 instance EmitXml Midi16 where
     emitXml = emitXml . midi16
+parseMidi16 :: P.XParser m => String -> m Midi16
+parseMidi16 = readParse "Midi16"
 
 -- | @midi-16384@ /(simple)/
 --
@@ -668,8 +944,11 @@ instance EmitXml Midi16 where
 newtype Midi16384 = Midi16384 { midi16384 :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show Midi16384 where show (Midi16384 a) = show a
+instance Read Midi16384 where readsPrec i = map (A.first Midi16384) . readsPrec i
 instance EmitXml Midi16384 where
     emitXml = emitXml . midi16384
+parseMidi16384 :: P.XParser m => String -> m Midi16384
+parseMidi16384 = readParse "Midi16384"
 
 -- | @millimeters@ /(simple)/
 --
@@ -677,8 +956,11 @@ instance EmitXml Midi16384 where
 newtype Millimeters = Millimeters { millimeters :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Millimeters where show (Millimeters a) = show a
+instance Read Millimeters where readsPrec i = map (A.first Millimeters) . readsPrec i
 instance EmitXml Millimeters where
     emitXml = emitXml . millimeters
+parseMillimeters :: P.XParser m => String -> m Millimeters
+parseMillimeters = readParse "Millimeters"
 
 -- | @mode@ /(simple)/
 --
@@ -686,8 +968,11 @@ instance EmitXml Millimeters where
 newtype Mode = Mode { mode :: String }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Mode where show (Mode a) = show a
+instance Read Mode where readsPrec i = map (A.first Mode) . readsPrec i
 instance EmitXml Mode where
     emitXml = emitXml . mode
+parseMode :: P.XParser m => String -> m Mode
+parseMode = readParse "Mode"
 
 -- | @non-negative-decimal@ /(simple)/
 --
@@ -695,22 +980,31 @@ instance EmitXml Mode where
 newtype NonNegativeDecimal = NonNegativeDecimal { nonNegativeDecimal :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show NonNegativeDecimal where show (NonNegativeDecimal a) = show a
+instance Read NonNegativeDecimal where readsPrec i = map (A.first NonNegativeDecimal) . readsPrec i
 instance EmitXml NonNegativeDecimal where
     emitXml = emitXml . nonNegativeDecimal
+parseNonNegativeDecimal :: P.XParser m => String -> m NonNegativeDecimal
+parseNonNegativeDecimal = readParse "NonNegativeDecimal"
 
 -- | @xs:nonNegativeInteger@ /(simple)/
 newtype NonNegativeInteger = NonNegativeInteger { nonNegativeInteger :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show NonNegativeInteger where show (NonNegativeInteger a) = show a
+instance Read NonNegativeInteger where readsPrec i = map (A.first NonNegativeInteger) . readsPrec i
 instance EmitXml NonNegativeInteger where
     emitXml = emitXml . nonNegativeInteger
+parseNonNegativeInteger :: P.XParser m => String -> m NonNegativeInteger
+parseNonNegativeInteger = readParse "NonNegativeInteger"
 
 -- | @xs:normalizedString@ /(simple)/
 newtype NormalizedString = NormalizedString { normalizedString :: String }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show NormalizedString where show (NormalizedString a) = show a
+instance Read NormalizedString where readsPrec i = map (A.first NormalizedString) . readsPrec i
 instance EmitXml NormalizedString where
     emitXml = emitXml . normalizedString
+parseNormalizedString :: P.XParser m => String -> m NormalizedString
+parseNormalizedString = readParse "NormalizedString"
 
 -- | @note-size-type@ /(simple)/
 --
@@ -724,6 +1018,12 @@ instance EmitXml NoteSizeType where
     emitXml NoteSizeTypeCue = XLit "cue"
     emitXml NoteSizeTypeGrace = XLit "grace"
     emitXml NoteSizeTypeLarge = XLit "large"
+parseNoteSizeType :: P.XParser m => String -> m NoteSizeType
+parseNoteSizeType s
+        | s == "cue" = return $ NoteSizeTypeCue
+        | s == "grace" = return $ NoteSizeTypeGrace
+        | s == "large" = return $ NoteSizeTypeLarge
+        | otherwise = P.throwError $ "NoteSizeType: " ++ s
 
 -- | @note-type-value@ /(simple)/
 --
@@ -753,6 +1053,20 @@ instance EmitXml NoteTypeValue where
     emitXml NoteTypeValueWhole = XLit "whole"
     emitXml NoteTypeValueBreve = XLit "breve"
     emitXml NoteTypeValueLong = XLit "long"
+parseNoteTypeValue :: P.XParser m => String -> m NoteTypeValue
+parseNoteTypeValue s
+        | s == "256th" = return $ NoteTypeValue256th
+        | s == "128th" = return $ NoteTypeValue128th
+        | s == "64th" = return $ NoteTypeValue64th
+        | s == "32nd" = return $ NoteTypeValue32nd
+        | s == "16th" = return $ NoteTypeValue16th
+        | s == "eighth" = return $ NoteTypeValueEighth
+        | s == "quarter" = return $ NoteTypeValueQuarter
+        | s == "half" = return $ NoteTypeValueHalf
+        | s == "whole" = return $ NoteTypeValueWhole
+        | s == "breve" = return $ NoteTypeValueBreve
+        | s == "long" = return $ NoteTypeValueLong
+        | otherwise = P.throwError $ "NoteTypeValue: " ++ s
 
 -- | @notehead-value@ /(simple)/
 --
@@ -807,6 +1121,31 @@ instance EmitXml NoteheadValue where
     emitXml NoteheadValueSo = XLit "so"
     emitXml NoteheadValueLa = XLit "la"
     emitXml NoteheadValueTi = XLit "ti"
+parseNoteheadValue :: P.XParser m => String -> m NoteheadValue
+parseNoteheadValue s
+        | s == "slash" = return $ NoteheadValueSlash
+        | s == "triangle" = return $ NoteheadValueTriangle
+        | s == "diamond" = return $ NoteheadValueDiamond
+        | s == "square" = return $ NoteheadValueSquare
+        | s == "cross" = return $ NoteheadValueCross
+        | s == "x" = return $ NoteheadValueX
+        | s == "circle-x" = return $ NoteheadValueCircleX
+        | s == "inverted triangle" = return $ NoteheadValueInvertedTriangle
+        | s == "arrow down" = return $ NoteheadValueArrowDown
+        | s == "arrow up" = return $ NoteheadValueArrowUp
+        | s == "slashed" = return $ NoteheadValueSlashed
+        | s == "back slashed" = return $ NoteheadValueBackSlashed
+        | s == "normal" = return $ NoteheadValueNormal
+        | s == "cluster" = return $ NoteheadValueCluster
+        | s == "none" = return $ NoteheadValueNone
+        | s == "do" = return $ NoteheadValueDo
+        | s == "re" = return $ NoteheadValueRe
+        | s == "mi" = return $ NoteheadValueMi
+        | s == "fa" = return $ NoteheadValueFa
+        | s == "so" = return $ NoteheadValueSo
+        | s == "la" = return $ NoteheadValueLa
+        | s == "ti" = return $ NoteheadValueTi
+        | otherwise = P.throwError $ "NoteheadValue: " ++ s
 
 -- | @number-level@ /(simple)/
 --
@@ -814,8 +1153,11 @@ instance EmitXml NoteheadValue where
 newtype NumberLevel = NumberLevel { numberLevel :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show NumberLevel where show (NumberLevel a) = show a
+instance Read NumberLevel where readsPrec i = map (A.first NumberLevel) . readsPrec i
 instance EmitXml NumberLevel where
     emitXml = emitXml . numberLevel
+parseNumberLevel :: P.XParser m => String -> m NumberLevel
+parseNumberLevel = readParse "NumberLevel"
 
 -- | @number-of-lines@ /(simple)/
 --
@@ -823,8 +1165,11 @@ instance EmitXml NumberLevel where
 newtype NumberOfLines = NumberOfLines { numberOfLines :: NonNegativeInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show NumberOfLines where show (NumberOfLines a) = show a
+instance Read NumberOfLines where readsPrec i = map (A.first NumberOfLines) . readsPrec i
 instance EmitXml NumberOfLines where
     emitXml = emitXml . numberOfLines
+parseNumberOfLines :: P.XParser m => String -> m NumberOfLines
+parseNumberOfLines = readParse "NumberOfLines"
 
 -- | @number-or-normal@ /(simple)/
 --
@@ -840,6 +1185,13 @@ data NumberOrNormal =
 instance EmitXml NumberOrNormal where
     emitXml (NumberOrNormalDecimal a) = emitXml a
     emitXml (NumberOrNormalNumberOrNormal a) = emitXml a
+parseNumberOrNormal :: P.XParser m => String -> m NumberOrNormal
+parseNumberOrNormal s = 
+      NumberOrNormalDecimal
+        <$> (readParse "Decimal") s
+      <|> NumberOrNormalNumberOrNormal
+        <$> parseSumNumberOrNormal s
+
 
 -- | @octave@ /(simple)/
 --
@@ -847,8 +1199,11 @@ instance EmitXml NumberOrNormal where
 newtype Octave = Octave { octave :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show Octave where show (Octave a) = show a
+instance Read Octave where readsPrec i = map (A.first Octave) . readsPrec i
 instance EmitXml Octave where
     emitXml = emitXml . octave
+parseOctave :: P.XParser m => String -> m Octave
+parseOctave = readParse "Octave"
 
 -- | @over-under@ /(simple)/
 --
@@ -860,6 +1215,11 @@ data OverUnder =
 instance EmitXml OverUnder where
     emitXml OverUnderOver = XLit "over"
     emitXml OverUnderUnder = XLit "under"
+parseOverUnder :: P.XParser m => String -> m OverUnder
+parseOverUnder s
+        | s == "over" = return $ OverUnderOver
+        | s == "under" = return $ OverUnderUnder
+        | otherwise = P.throwError $ "OverUnder: " ++ s
 
 -- | @percent@ /(simple)/
 --
@@ -867,8 +1227,11 @@ instance EmitXml OverUnder where
 newtype Percent = Percent { percent :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Percent where show (Percent a) = show a
+instance Read Percent where readsPrec i = map (A.first Percent) . readsPrec i
 instance EmitXml Percent where
     emitXml = emitXml . percent
+parsePercent :: P.XParser m => String -> m Percent
+parsePercent = readParse "Percent"
 
 -- | @positive-divisions@ /(simple)/
 --
@@ -876,8 +1239,11 @@ instance EmitXml Percent where
 newtype PositiveDivisions = PositiveDivisions { positiveDivisions :: Divisions }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show PositiveDivisions where show (PositiveDivisions a) = show a
+instance Read PositiveDivisions where readsPrec i = map (A.first PositiveDivisions) . readsPrec i
 instance EmitXml PositiveDivisions where
     emitXml = emitXml . positiveDivisions
+parsePositiveDivisions :: P.XParser m => String -> m PositiveDivisions
+parsePositiveDivisions = readParse "PositiveDivisions"
 
 -- | @positive-integer-or-empty@ /(simple)/
 --
@@ -893,13 +1259,23 @@ data PositiveIntegerOrEmpty =
 instance EmitXml PositiveIntegerOrEmpty where
     emitXml (PositiveIntegerOrEmptyPositiveInteger a) = emitXml a
     emitXml (PositiveIntegerOrEmptyPositiveIntegerOrEmpty a) = emitXml a
+parsePositiveIntegerOrEmpty :: P.XParser m => String -> m PositiveIntegerOrEmpty
+parsePositiveIntegerOrEmpty s = 
+      PositiveIntegerOrEmptyPositiveInteger
+        <$> parsePositiveInteger s
+      <|> PositiveIntegerOrEmptyPositiveIntegerOrEmpty
+        <$> parseSumPositiveIntegerOrEmpty s
+
 
 -- | @xs:positiveInteger@ /(simple)/
 newtype PositiveInteger = PositiveInteger { positiveInteger :: NonNegativeInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show PositiveInteger where show (PositiveInteger a) = show a
+instance Read PositiveInteger where readsPrec i = map (A.first PositiveInteger) . readsPrec i
 instance EmitXml PositiveInteger where
     emitXml = emitXml . positiveInteger
+parsePositiveInteger :: P.XParser m => String -> m PositiveInteger
+parsePositiveInteger = readParse "PositiveInteger"
 
 -- | @rehearsal-enclosure@ /(simple)/
 --
@@ -913,6 +1289,12 @@ instance EmitXml RehearsalEnclosure where
     emitXml RehearsalEnclosureSquare = XLit "square"
     emitXml RehearsalEnclosureCircle = XLit "circle"
     emitXml RehearsalEnclosureNone = XLit "none"
+parseRehearsalEnclosure :: P.XParser m => String -> m RehearsalEnclosure
+parseRehearsalEnclosure s
+        | s == "square" = return $ RehearsalEnclosureSquare
+        | s == "circle" = return $ RehearsalEnclosureCircle
+        | s == "none" = return $ RehearsalEnclosureNone
+        | otherwise = P.throwError $ "RehearsalEnclosure: " ++ s
 
 -- | @right-left-middle@ /(simple)/
 --
@@ -926,6 +1308,12 @@ instance EmitXml RightLeftMiddle where
     emitXml RightLeftMiddleRight = XLit "right"
     emitXml RightLeftMiddleLeft = XLit "left"
     emitXml RightLeftMiddleMiddle = XLit "middle"
+parseRightLeftMiddle :: P.XParser m => String -> m RightLeftMiddle
+parseRightLeftMiddle s
+        | s == "right" = return $ RightLeftMiddleRight
+        | s == "left" = return $ RightLeftMiddleLeft
+        | s == "middle" = return $ RightLeftMiddleMiddle
+        | otherwise = P.throwError $ "RightLeftMiddle: " ++ s
 
 -- | @rotation-degrees@ /(simple)/
 --
@@ -933,8 +1321,11 @@ instance EmitXml RightLeftMiddle where
 newtype RotationDegrees = RotationDegrees { rotationDegrees :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show RotationDegrees where show (RotationDegrees a) = show a
+instance Read RotationDegrees where readsPrec i = map (A.first RotationDegrees) . readsPrec i
 instance EmitXml RotationDegrees where
     emitXml = emitXml . rotationDegrees
+parseRotationDegrees :: P.XParser m => String -> m RotationDegrees
+parseRotationDegrees = readParse "RotationDegrees"
 
 -- | @semitones@ /(simple)/
 --
@@ -942,8 +1333,11 @@ instance EmitXml RotationDegrees where
 newtype Semitones = Semitones { semitones :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Semitones where show (Semitones a) = show a
+instance Read Semitones where readsPrec i = map (A.first Semitones) . readsPrec i
 instance EmitXml Semitones where
     emitXml = emitXml . semitones
+parseSemitones :: P.XParser m => String -> m Semitones
+parseSemitones = readParse "Semitones"
 
 -- | @xlink:show@ /(simple)/
 data SmpShow = 
@@ -959,6 +1353,14 @@ instance EmitXml SmpShow where
     emitXml ShowEmbed = XLit "embed"
     emitXml ShowOther = XLit "other"
     emitXml ShowNone = XLit "none"
+parseSmpShow :: P.XParser m => String -> m SmpShow
+parseSmpShow s
+        | s == "new" = return $ ShowNew
+        | s == "replace" = return $ ShowReplace
+        | s == "embed" = return $ ShowEmbed
+        | s == "other" = return $ ShowOther
+        | s == "none" = return $ ShowNone
+        | otherwise = P.throwError $ "SmpShow: " ++ s
 
 -- | @show-frets@ /(simple)/
 --
@@ -970,6 +1372,11 @@ data ShowFrets =
 instance EmitXml ShowFrets where
     emitXml ShowFretsNumbers = XLit "numbers"
     emitXml ShowFretsLetters = XLit "letters"
+parseShowFrets :: P.XParser m => String -> m ShowFrets
+parseShowFrets s
+        | s == "numbers" = return $ ShowFretsNumbers
+        | s == "letters" = return $ ShowFretsLetters
+        | otherwise = P.throwError $ "ShowFrets: " ++ s
 
 -- | @show-tuplet@ /(simple)/
 --
@@ -983,6 +1390,12 @@ instance EmitXml ShowTuplet where
     emitXml ShowTupletActual = XLit "actual"
     emitXml ShowTupletBoth = XLit "both"
     emitXml ShowTupletNone = XLit "none"
+parseShowTuplet :: P.XParser m => String -> m ShowTuplet
+parseShowTuplet s
+        | s == "actual" = return $ ShowTupletActual
+        | s == "both" = return $ ShowTupletBoth
+        | s == "none" = return $ ShowTupletNone
+        | otherwise = P.throwError $ "ShowTuplet: " ++ s
 
 -- | @staff-line@ /(simple)/
 --
@@ -990,8 +1403,11 @@ instance EmitXml ShowTuplet where
 newtype StaffLine = StaffLine { staffLine :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show StaffLine where show (StaffLine a) = show a
+instance Read StaffLine where readsPrec i = map (A.first StaffLine) . readsPrec i
 instance EmitXml StaffLine where
     emitXml = emitXml . staffLine
+parseStaffLine :: P.XParser m => String -> m StaffLine
+parseStaffLine = readParse "StaffLine"
 
 -- | @staff-number@ /(simple)/
 --
@@ -999,8 +1415,11 @@ instance EmitXml StaffLine where
 newtype StaffNumber = StaffNumber { staffNumber :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show StaffNumber where show (StaffNumber a) = show a
+instance Read StaffNumber where readsPrec i = map (A.first StaffNumber) . readsPrec i
 instance EmitXml StaffNumber where
     emitXml = emitXml . staffNumber
+parseStaffNumber :: P.XParser m => String -> m StaffNumber
+parseStaffNumber = readParse "StaffNumber"
 
 -- | @staff-type@ /(simple)/
 --
@@ -1018,6 +1437,14 @@ instance EmitXml StaffType where
     emitXml StaffTypeEditorial = XLit "editorial"
     emitXml StaffTypeRegular = XLit "regular"
     emitXml StaffTypeAlternate = XLit "alternate"
+parseStaffType :: P.XParser m => String -> m StaffType
+parseStaffType s
+        | s == "ossia" = return $ StaffTypeOssia
+        | s == "cue" = return $ StaffTypeCue
+        | s == "editorial" = return $ StaffTypeEditorial
+        | s == "regular" = return $ StaffTypeRegular
+        | s == "alternate" = return $ StaffTypeAlternate
+        | otherwise = P.throwError $ "StaffType: " ++ s
 
 -- | @start-note@ /(simple)/
 --
@@ -1031,6 +1458,12 @@ instance EmitXml StartNote where
     emitXml StartNoteUpper = XLit "upper"
     emitXml StartNoteMain = XLit "main"
     emitXml StartNoteBelow = XLit "below"
+parseStartNote :: P.XParser m => String -> m StartNote
+parseStartNote s
+        | s == "upper" = return $ StartNoteUpper
+        | s == "main" = return $ StartNoteMain
+        | s == "below" = return $ StartNoteBelow
+        | otherwise = P.throwError $ "StartNote: " ++ s
 
 -- | @start-stop@ /(simple)/
 --
@@ -1042,6 +1475,11 @@ data StartStop =
 instance EmitXml StartStop where
     emitXml StartStopStart = XLit "start"
     emitXml StartStopStop = XLit "stop"
+parseStartStop :: P.XParser m => String -> m StartStop
+parseStartStop s
+        | s == "start" = return $ StartStopStart
+        | s == "stop" = return $ StartStopStop
+        | otherwise = P.throwError $ "StartStop: " ++ s
 
 -- | @start-stop-change@ /(simple)/
 --
@@ -1055,6 +1493,12 @@ instance EmitXml StartStopChange where
     emitXml StartStopChangeStart = XLit "start"
     emitXml StartStopChangeStop = XLit "stop"
     emitXml StartStopChangeChange = XLit "change"
+parseStartStopChange :: P.XParser m => String -> m StartStopChange
+parseStartStopChange s
+        | s == "start" = return $ StartStopChangeStart
+        | s == "stop" = return $ StartStopChangeStop
+        | s == "change" = return $ StartStopChangeChange
+        | otherwise = P.throwError $ "StartStopChange: " ++ s
 
 -- | @start-stop-continue@ /(simple)/
 --
@@ -1068,6 +1512,12 @@ instance EmitXml StartStopContinue where
     emitXml StartStopContinueStart = XLit "start"
     emitXml StartStopContinueStop = XLit "stop"
     emitXml StartStopContinueContinue = XLit "continue"
+parseStartStopContinue :: P.XParser m => String -> m StartStopContinue
+parseStartStopContinue s
+        | s == "start" = return $ StartStopContinueStart
+        | s == "stop" = return $ StartStopContinueStop
+        | s == "continue" = return $ StartStopContinueContinue
+        | otherwise = P.throwError $ "StartStopContinue: " ++ s
 
 -- | @start-stop-discontinue@ /(simple)/
 --
@@ -1081,6 +1531,12 @@ instance EmitXml StartStopDiscontinue where
     emitXml StartStopDiscontinueStart = XLit "start"
     emitXml StartStopDiscontinueStop = XLit "stop"
     emitXml StartStopDiscontinueDiscontinue = XLit "discontinue"
+parseStartStopDiscontinue :: P.XParser m => String -> m StartStopDiscontinue
+parseStartStopDiscontinue s
+        | s == "start" = return $ StartStopDiscontinueStart
+        | s == "stop" = return $ StartStopDiscontinueStop
+        | s == "discontinue" = return $ StartStopDiscontinueDiscontinue
+        | otherwise = P.throwError $ "StartStopDiscontinue: " ++ s
 
 -- | @start-stop-single@ /(simple)/
 --
@@ -1094,6 +1550,12 @@ instance EmitXml StartStopSingle where
     emitXml StartStopSingleStart = XLit "start"
     emitXml StartStopSingleStop = XLit "stop"
     emitXml StartStopSingleSingle = XLit "single"
+parseStartStopSingle :: P.XParser m => String -> m StartStopSingle
+parseStartStopSingle s
+        | s == "start" = return $ StartStopSingleStart
+        | s == "stop" = return $ StartStopSingleStop
+        | s == "single" = return $ StartStopSingleSingle
+        | otherwise = P.throwError $ "StartStopSingle: " ++ s
 
 -- | @stem-value@ /(simple)/
 --
@@ -1109,6 +1571,13 @@ instance EmitXml StemValue where
     emitXml StemValueUp = XLit "up"
     emitXml StemValueDouble = XLit "double"
     emitXml StemValueNone = XLit "none"
+parseStemValue :: P.XParser m => String -> m StemValue
+parseStemValue s
+        | s == "down" = return $ StemValueDown
+        | s == "up" = return $ StemValueUp
+        | s == "double" = return $ StemValueDouble
+        | s == "none" = return $ StemValueNone
+        | otherwise = P.throwError $ "StemValue: " ++ s
 
 -- | @step@ /(simple)/
 --
@@ -1130,6 +1599,16 @@ instance EmitXml Step where
     emitXml StepE = XLit "E"
     emitXml StepF = XLit "F"
     emitXml StepG = XLit "G"
+parseStep :: P.XParser m => String -> m Step
+parseStep s
+        | s == "A" = return $ StepA
+        | s == "B" = return $ StepB
+        | s == "C" = return $ StepC
+        | s == "D" = return $ StepD
+        | s == "E" = return $ StepE
+        | s == "F" = return $ StepF
+        | s == "G" = return $ StepG
+        | otherwise = P.throwError $ "Step: " ++ s
 
 -- | @string-number@ /(simple)/
 --
@@ -1137,8 +1616,11 @@ instance EmitXml Step where
 newtype StringNumber = StringNumber { stringNumber :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show StringNumber where show (StringNumber a) = show a
+instance Read StringNumber where readsPrec i = map (A.first StringNumber) . readsPrec i
 instance EmitXml StringNumber where
     emitXml = emitXml . stringNumber
+parseStringNumber :: P.XParser m => String -> m StringNumber
+parseStringNumber = readParse "StringNumber"
 
 -- | @syllabic@ /(simple)/
 --
@@ -1154,6 +1636,13 @@ instance EmitXml Syllabic where
     emitXml SyllabicBegin = XLit "begin"
     emitXml SyllabicEnd = XLit "end"
     emitXml SyllabicMiddle = XLit "middle"
+parseSyllabic :: P.XParser m => String -> m Syllabic
+parseSyllabic s
+        | s == "single" = return $ SyllabicSingle
+        | s == "begin" = return $ SyllabicBegin
+        | s == "end" = return $ SyllabicEnd
+        | s == "middle" = return $ SyllabicMiddle
+        | otherwise = P.throwError $ "Syllabic: " ++ s
 
 -- | @symbol-size@ /(simple)/
 --
@@ -1167,6 +1656,12 @@ instance EmitXml SymbolSize where
     emitXml SymbolSizeFull = XLit "full"
     emitXml SymbolSizeCue = XLit "cue"
     emitXml SymbolSizeLarge = XLit "large"
+parseSymbolSize :: P.XParser m => String -> m SymbolSize
+parseSymbolSize s
+        | s == "full" = return $ SymbolSizeFull
+        | s == "cue" = return $ SymbolSizeCue
+        | s == "large" = return $ SymbolSizeLarge
+        | otherwise = P.throwError $ "SymbolSize: " ++ s
 
 -- | @tenths@ /(simple)/
 --
@@ -1176,8 +1671,11 @@ instance EmitXml SymbolSize where
 newtype Tenths = Tenths { tenths :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Tenths where show (Tenths a) = show a
+instance Read Tenths where readsPrec i = map (A.first Tenths) . readsPrec i
 instance EmitXml Tenths where
     emitXml = emitXml . tenths
+parseTenths :: P.XParser m => String -> m Tenths
+parseTenths = readParse "Tenths"
 
 -- | @text-direction@ /(simple)/
 --
@@ -1193,6 +1691,13 @@ instance EmitXml TextDirection where
     emitXml TextDirectionRtl = XLit "rtl"
     emitXml TextDirectionLro = XLit "lro"
     emitXml TextDirectionRlo = XLit "rlo"
+parseTextDirection :: P.XParser m => String -> m TextDirection
+parseTextDirection s
+        | s == "ltr" = return $ TextDirectionLtr
+        | s == "rtl" = return $ TextDirectionRtl
+        | s == "lro" = return $ TextDirectionLro
+        | s == "rlo" = return $ TextDirectionRlo
+        | otherwise = P.throwError $ "TextDirection: " ++ s
 
 -- | @time-symbol@ /(simple)/
 --
@@ -1208,13 +1713,23 @@ instance EmitXml TimeSymbol where
     emitXml TimeSymbolCut = XLit "cut"
     emitXml TimeSymbolSingleNumber = XLit "single-number"
     emitXml TimeSymbolNormal = XLit "normal"
+parseTimeSymbol :: P.XParser m => String -> m TimeSymbol
+parseTimeSymbol s
+        | s == "common" = return $ TimeSymbolCommon
+        | s == "cut" = return $ TimeSymbolCut
+        | s == "single-number" = return $ TimeSymbolSingleNumber
+        | s == "normal" = return $ TimeSymbolNormal
+        | otherwise = P.throwError $ "TimeSymbol: " ++ s
 
 -- | @xs:token@ /(simple)/
 newtype Token = Token { token :: NormalizedString }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Token where show (Token a) = show a
+instance Read Token where readsPrec i = map (A.first Token) . readsPrec i
 instance EmitXml Token where
     emitXml = emitXml . token
+parseToken :: P.XParser m => String -> m Token
+parseToken = readParse "Token"
 
 -- | @top-bottom@ /(simple)/
 --
@@ -1226,6 +1741,11 @@ data TopBottom =
 instance EmitXml TopBottom where
     emitXml TopBottomTop = XLit "top"
     emitXml TopBottomBottom = XLit "bottom"
+parseTopBottom :: P.XParser m => String -> m TopBottom
+parseTopBottom s
+        | s == "top" = return $ TopBottomTop
+        | s == "bottom" = return $ TopBottomBottom
+        | otherwise = P.throwError $ "TopBottom: " ++ s
 
 -- | @tremolo-marks@ /(simple)/
 --
@@ -1233,8 +1753,11 @@ instance EmitXml TopBottom where
 newtype TremoloMarks = TremoloMarks { tremoloMarks :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show TremoloMarks where show (TremoloMarks a) = show a
+instance Read TremoloMarks where readsPrec i = map (A.first TremoloMarks) . readsPrec i
 instance EmitXml TremoloMarks where
     emitXml = emitXml . tremoloMarks
+parseTremoloMarks :: P.XParser m => String -> m TremoloMarks
+parseTremoloMarks = readParse "TremoloMarks"
 
 -- | @trill-beats@ /(simple)/
 --
@@ -1242,8 +1765,11 @@ instance EmitXml TremoloMarks where
 newtype TrillBeats = TrillBeats { trillBeats :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show TrillBeats where show (TrillBeats a) = show a
+instance Read TrillBeats where readsPrec i = map (A.first TrillBeats) . readsPrec i
 instance EmitXml TrillBeats where
     emitXml = emitXml . trillBeats
+parseTrillBeats :: P.XParser m => String -> m TrillBeats
+parseTrillBeats = readParse "TrillBeats"
 
 -- | @trill-step@ /(simple)/
 --
@@ -1257,6 +1783,12 @@ instance EmitXml TrillStep where
     emitXml TrillStepWhole = XLit "whole"
     emitXml TrillStepHalf = XLit "half"
     emitXml TrillStepUnison = XLit "unison"
+parseTrillStep :: P.XParser m => String -> m TrillStep
+parseTrillStep s
+        | s == "whole" = return $ TrillStepWhole
+        | s == "half" = return $ TrillStepHalf
+        | s == "unison" = return $ TrillStepUnison
+        | otherwise = P.throwError $ "TrillStep: " ++ s
 
 -- | @two-note-turn@ /(simple)/
 --
@@ -1270,6 +1802,12 @@ instance EmitXml TwoNoteTurn where
     emitXml TwoNoteTurnWhole = XLit "whole"
     emitXml TwoNoteTurnHalf = XLit "half"
     emitXml TwoNoteTurnNone = XLit "none"
+parseTwoNoteTurn :: P.XParser m => String -> m TwoNoteTurn
+parseTwoNoteTurn s
+        | s == "whole" = return $ TwoNoteTurnWhole
+        | s == "half" = return $ TwoNoteTurnHalf
+        | s == "none" = return $ TwoNoteTurnNone
+        | otherwise = P.throwError $ "TwoNoteTurn: " ++ s
 
 -- | @xlink:type@ /(simple)/
 data Type = 
@@ -1277,6 +1815,10 @@ data Type =
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml Type where
     emitXml TypeSimple = XLit "simple"
+parseType :: P.XParser m => String -> m Type
+parseType s
+        | s == "simple" = return $ TypeSimple
+        | otherwise = P.throwError $ "Type: " ++ s
 
 -- | @up-down@ /(simple)/
 --
@@ -1288,6 +1830,11 @@ data UpDown =
 instance EmitXml UpDown where
     emitXml UpDownUp = XLit "up"
     emitXml UpDownDown = XLit "down"
+parseUpDown :: P.XParser m => String -> m UpDown
+parseUpDown s
+        | s == "up" = return $ UpDownUp
+        | s == "down" = return $ UpDownDown
+        | otherwise = P.throwError $ "UpDown: " ++ s
 
 -- | @up-down-stop@ /(simple)/
 --
@@ -1301,6 +1848,12 @@ instance EmitXml UpDownStop where
     emitXml UpDownStopUp = XLit "up"
     emitXml UpDownStopDown = XLit "down"
     emitXml UpDownStopStop = XLit "stop"
+parseUpDownStop :: P.XParser m => String -> m UpDownStop
+parseUpDownStop s
+        | s == "up" = return $ UpDownStopUp
+        | s == "down" = return $ UpDownStopDown
+        | s == "stop" = return $ UpDownStopStop
+        | otherwise = P.throwError $ "UpDownStop: " ++ s
 
 -- | @upright-inverted@ /(simple)/
 --
@@ -1312,6 +1865,11 @@ data UprightInverted =
 instance EmitXml UprightInverted where
     emitXml UprightInvertedUpright = XLit "upright"
     emitXml UprightInvertedInverted = XLit "inverted"
+parseUprightInverted :: P.XParser m => String -> m UprightInverted
+parseUprightInverted s
+        | s == "upright" = return $ UprightInvertedUpright
+        | s == "inverted" = return $ UprightInvertedInverted
+        | otherwise = P.throwError $ "UprightInverted: " ++ s
 
 -- | @valign@ /(simple)/
 --
@@ -1327,6 +1885,13 @@ instance EmitXml Valign where
     emitXml ValignMiddle = XLit "middle"
     emitXml ValignBottom = XLit "bottom"
     emitXml ValignBaseline = XLit "baseline"
+parseValign :: P.XParser m => String -> m Valign
+parseValign s
+        | s == "top" = return $ ValignTop
+        | s == "middle" = return $ ValignMiddle
+        | s == "bottom" = return $ ValignBottom
+        | s == "baseline" = return $ ValignBaseline
+        | otherwise = P.throwError $ "Valign: " ++ s
 
 -- | @valign-image@ /(simple)/
 --
@@ -1340,6 +1905,12 @@ instance EmitXml ValignImage where
     emitXml ValignImageTop = XLit "top"
     emitXml ValignImageMiddle = XLit "middle"
     emitXml ValignImageBottom = XLit "bottom"
+parseValignImage :: P.XParser m => String -> m ValignImage
+parseValignImage s
+        | s == "top" = return $ ValignImageTop
+        | s == "middle" = return $ ValignImageMiddle
+        | s == "bottom" = return $ ValignImageBottom
+        | otherwise = P.throwError $ "ValignImage: " ++ s
 
 -- | @wedge-type@ /(simple)/
 --
@@ -1353,6 +1924,12 @@ instance EmitXml WedgeType where
     emitXml WedgeTypeCrescendo = XLit "crescendo"
     emitXml WedgeTypeDiminuendo = XLit "diminuendo"
     emitXml WedgeTypeStop = XLit "stop"
+parseWedgeType :: P.XParser m => String -> m WedgeType
+parseWedgeType s
+        | s == "crescendo" = return $ WedgeTypeCrescendo
+        | s == "diminuendo" = return $ WedgeTypeDiminuendo
+        | s == "stop" = return $ WedgeTypeStop
+        | otherwise = P.throwError $ "WedgeType: " ++ s
 
 -- | @yes-no@ /(simple)/
 --
@@ -1364,6 +1941,11 @@ data YesNo =
 instance EmitXml YesNo where
     emitXml YesNoYes = XLit "yes"
     emitXml YesNoNo = XLit "no"
+parseYesNo :: P.XParser m => String -> m YesNo
+parseYesNo s
+        | s == "yes" = return $ YesNoYes
+        | s == "no" = return $ YesNoNo
+        | otherwise = P.throwError $ "YesNo: " ++ s
 
 -- | @yes-no-number@ /(simple)/
 --
@@ -1379,6 +1961,13 @@ data YesNoNumber =
 instance EmitXml YesNoNumber where
     emitXml (YesNoNumberYesNo a) = emitXml a
     emitXml (YesNoNumberDecimal a) = emitXml a
+parseYesNoNumber :: P.XParser m => String -> m YesNoNumber
+parseYesNoNumber s = 
+      YesNoNumberYesNo
+        <$> parseYesNo s
+      <|> YesNoNumberDecimal
+        <$> (readParse "Decimal") s
+
 
 -- | @yyyy-mm-dd@ /(simple)/
 --
@@ -1386,8 +1975,11 @@ instance EmitXml YesNoNumber where
 newtype YyyyMmDd = YyyyMmDd { yyyyMmDd :: String }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show YyyyMmDd where show (YyyyMmDd a) = show a
+instance Read YyyyMmDd where readsPrec i = map (A.first YyyyMmDd) . readsPrec i
 instance EmitXml YyyyMmDd where
     emitXml = emitXml . yyyyMmDd
+parseYyyyMmDd :: P.XParser m => String -> m YyyyMmDd
+parseYyyyMmDd = readParse "YyyyMmDd"
 
 -- | @xml:lang@ /(union)/
 data SumLang = 
@@ -1395,6 +1987,10 @@ data SumLang =
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml SumLang where
     emitXml SumLang = XLit ""
+parseSumLang :: P.XParser m => String -> m SumLang
+parseSumLang s
+        | s == "" = return $ SumLang
+        | otherwise = P.throwError $ "SumLang: " ++ s
 
 -- | @number-or-normal@ /(union)/
 data SumNumberOrNormal = 
@@ -1402,6 +1998,10 @@ data SumNumberOrNormal =
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml SumNumberOrNormal where
     emitXml NumberOrNormalNormal = XLit "normal"
+parseSumNumberOrNormal :: P.XParser m => String -> m SumNumberOrNormal
+parseSumNumberOrNormal s
+        | s == "normal" = return $ NumberOrNormalNormal
+        | otherwise = P.throwError $ "SumNumberOrNormal: " ++ s
 
 -- | @positive-integer-or-empty@ /(union)/
 data SumPositiveIntegerOrEmpty = 
@@ -1409,6 +2009,10 @@ data SumPositiveIntegerOrEmpty =
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml SumPositiveIntegerOrEmpty where
     emitXml SumPositiveIntegerOrEmpty = XLit ""
+parseSumPositiveIntegerOrEmpty :: P.XParser m => String -> m SumPositiveIntegerOrEmpty
+parseSumPositiveIntegerOrEmpty s
+        | s == "" = return $ SumPositiveIntegerOrEmpty
+        | otherwise = P.throwError $ "SumPositiveIntegerOrEmpty: " ++ s
 
 -- | @accidental@ /(complex)/
 --
@@ -1437,6 +2041,25 @@ instance EmitXml Accidental where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "cautionary" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "editorial" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o])
         []
+parseAccidental :: P.XParser m => m Accidental
+parseAccidental = 
+      Accidental
+        <$> (P.textContent >>= parseAccidentalValue)
+        <*> P.optional (P.attr (P.name "cautionary") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "editorial") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "bracket") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "size") >>= parseSymbolSize)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Accidental'
 mkAccidental :: AccidentalValue -> Accidental
 mkAccidental a = Accidental a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1464,6 +2087,21 @@ instance EmitXml AccidentalMark where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
+parseAccidentalMark :: P.XParser m => m AccidentalMark
+parseAccidentalMark = 
+      AccidentalMark
+        <$> (P.textContent >>= parseAccidentalValue)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'AccidentalMark'
 mkAccidentalMark :: AccidentalValue -> AccidentalMark
 mkAccidentalMark a = AccidentalMark a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1502,6 +2140,32 @@ instance EmitXml AccidentalText where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t]++[maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
         []
+parseAccidentalText :: P.XParser m => m AccidentalText
+parseAccidentalText = 
+      AccidentalText
+        <$> (P.textContent >>= parseAccidentalValue)
+        <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.attr (P.name "enclosure") >>= parseEnclosure)
+        <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.attr (P.name "letter-spacing") >>= parseNumberOrNormal)
+        <*> P.optional (P.attr (P.name "line-height") >>= parseNumberOrNormal)
+        <*> P.optional (P.attr (P.name "dir") >>= parseTextDirection)
+
 -- | Smart constructor for 'AccidentalText'
 mkAccidentalText :: AccidentalValue -> AccidentalText
 mkAccidentalText a = AccidentalText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1520,6 +2184,12 @@ instance EmitXml Accord where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "string" Nothing).emitXml) a])
         ([emitXml b])
+parseAccord :: P.XParser m => m Accord
+parseAccord = 
+      Accord
+        <$> P.optional (P.attr (P.name "string") >>= parseStringNumber)
+        <*> parseTuning
+
 -- | Smart constructor for 'Accord'
 mkAccord :: Tuning -> Accord
 mkAccord b = Accord Nothing b
@@ -1548,6 +2218,22 @@ instance EmitXml AccordionRegistration where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         ([maybe XEmpty (XElement (QN "accordion-high" Nothing).emitXml) j]++[maybe XEmpty (XElement (QN "accordion-middle" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "accordion-low" Nothing).emitXml) l])
+parseAccordionRegistration :: P.XParser m => m AccordionRegistration
+parseAccordionRegistration = 
+      AccordionRegistration
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional ((P.atEl (P.name "accordion-high") >> parseEmpty))
+        <*> P.optional ((P.atEl (P.name "accordion-middle") >> P.textContent >>= parseAccordionMiddle))
+        <*> P.optional ((P.atEl (P.name "accordion-low") >> parseEmpty))
+
 -- | Smart constructor for 'AccordionRegistration'
 mkAccordionRegistration :: AccordionRegistration
 mkAccordionRegistration = AccordionRegistration Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1567,6 +2253,13 @@ instance EmitXml Appearance where
       XContent XEmpty
         []
         (map (XElement (QN "line-width" Nothing).emitXml) a++map (XElement (QN "note-size" Nothing).emitXml) b++map (XElement (QN "other-appearance" Nothing).emitXml) c)
+parseAppearance :: P.XParser m => m Appearance
+parseAppearance = 
+      Appearance
+        <$> P.findChildren (P.name "line-width") ((P.atEl (P.name "line-width") >> parseLineWidth))
+        <*> P.findChildren (P.name "note-size") ((P.atEl (P.name "note-size") >> parseNoteSize))
+        <*> P.findChildren (P.name "other-appearance") ((P.atEl (P.name "other-appearance") >> parseOtherAppearance))
+
 -- | Smart constructor for 'Appearance'
 mkAppearance :: Appearance
 mkAppearance = Appearance [] [] []
@@ -1591,6 +2284,18 @@ instance EmitXml Arpeggiate where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "direction" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
+parseArpeggiate :: P.XParser m => m Arpeggiate
+parseArpeggiate = 
+      Arpeggiate
+        <$> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "direction") >>= parseUpDown)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Arpeggiate'
 mkArpeggiate :: Arpeggiate
 mkArpeggiate = Arpeggiate Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1606,6 +2311,11 @@ data Articulations =
 instance EmitXml Articulations where
     emitXml (Articulations a) =
       XReps [emitXml a]
+parseArticulations :: P.XParser m => m Articulations
+parseArticulations = 
+      Articulations
+        <$> P.many (parseChxArticulations)
+
 -- | Smart constructor for 'Articulations'
 mkArticulations :: Articulations
 mkArticulations = Articulations []
@@ -1634,6 +2344,22 @@ instance EmitXml Attributes where
       XContent XEmpty
         []
         ([emitXml a]++[maybe XEmpty (XElement (QN "divisions" Nothing).emitXml) b]++map (XElement (QN "key" Nothing).emitXml) c++map (XElement (QN "time" Nothing).emitXml) d++[maybe XEmpty (XElement (QN "staves" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "part-symbol" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "instruments" Nothing).emitXml) g]++map (XElement (QN "clef" Nothing).emitXml) h++map (XElement (QN "staff-details" Nothing).emitXml) i++[maybe XEmpty (XElement (QN "transpose" Nothing).emitXml) j]++map (XElement (QN "directive" Nothing).emitXml) k++map (XElement (QN "measure-style" Nothing).emitXml) l)
+parseAttributes :: P.XParser m => m Attributes
+parseAttributes = 
+      Attributes
+        <$> parseEditorial
+        <*> P.optional ((P.atEl (P.name "divisions") >> P.textContent >>= parsePositiveDivisions))
+        <*> P.findChildren (P.name "key") ((P.atEl (P.name "key") >> parseKey))
+        <*> P.findChildren (P.name "time") ((P.atEl (P.name "time") >> parseTime))
+        <*> P.optional ((P.atEl (P.name "staves") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.optional ((P.atEl (P.name "part-symbol") >> parsePartSymbol))
+        <*> P.optional ((P.atEl (P.name "instruments") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.findChildren (P.name "clef") ((P.atEl (P.name "clef") >> parseClef))
+        <*> P.findChildren (P.name "staff-details") ((P.atEl (P.name "staff-details") >> parseStaffDetails))
+        <*> P.optional ((P.atEl (P.name "transpose") >> parseTranspose))
+        <*> P.findChildren (P.name "directive") ((P.atEl (P.name "directive") >> parseDirective))
+        <*> P.findChildren (P.name "measure-style") ((P.atEl (P.name "measure-style") >> parseMeasureStyle))
+
 -- | Smart constructor for 'Attributes'
 mkAttributes :: Editorial -> Attributes
 mkAttributes a = Attributes a Nothing [] [] Nothing Nothing Nothing [] [] Nothing [] []
@@ -1650,6 +2376,12 @@ data Backup =
 instance EmitXml Backup where
     emitXml (Backup a b) =
       XReps [emitXml a,emitXml b]
+parseBackup :: P.XParser m => m Backup
+parseBackup = 
+      Backup
+        <$> parseDuration
+        <*> parseEditorial
+
 -- | Smart constructor for 'Backup'
 mkBackup :: Duration -> Editorial -> Backup
 mkBackup a b = Backup a b
@@ -1668,6 +2400,12 @@ instance EmitXml BarStyleColor where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "color" Nothing).emitXml) b])
         []
+parseBarStyleColor :: P.XParser m => m BarStyleColor
+parseBarStyleColor = 
+      BarStyleColor
+        <$> (P.textContent >>= parseBarStyle)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'BarStyleColor'
 mkBarStyleColor :: BarStyle -> BarStyleColor
 mkBarStyleColor a = BarStyleColor a Nothing
@@ -1698,6 +2436,22 @@ instance EmitXml Barline where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) d])
         ([maybe XEmpty (XElement (QN "bar-style" Nothing).emitXml) e]++[emitXml f]++[maybe XEmpty (XElement (QN "wavy-line" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "segno" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "coda" Nothing).emitXml) i]++map (XElement (QN "fermata" Nothing).emitXml) j++[maybe XEmpty (XElement (QN "ending" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "repeat" Nothing).emitXml) l])
+parseBarline :: P.XParser m => m Barline
+parseBarline = 
+      Barline
+        <$> P.optional (P.attr (P.name "location") >>= parseRightLeftMiddle)
+        <*> P.optional (P.attr (P.name "segno") >>= parseToken)
+        <*> P.optional (P.attr (P.name "coda") >>= parseToken)
+        <*> P.optional (P.attr (P.name "divisions") >>= parseDivisions)
+        <*> P.optional ((P.atEl (P.name "bar-style") >> parseBarStyleColor))
+        <*> parseEditorial
+        <*> P.optional ((P.atEl (P.name "wavy-line") >> parseWavyLine))
+        <*> P.optional ((P.atEl (P.name "segno") >> parseEmptyPrintStyle))
+        <*> P.optional ((P.atEl (P.name "coda") >> parseEmptyPrintStyle))
+        <*> P.findChildren (P.name "fermata") ((P.atEl (P.name "fermata") >> parseFermata))
+        <*> P.optional ((P.atEl (P.name "ending") >> parseEnding))
+        <*> P.optional ((P.atEl (P.name "repeat") >> parseRepeat))
+
 -- | Smart constructor for 'Barline'
 mkBarline :: Editorial -> Barline
 mkBarline f = Barline Nothing Nothing Nothing Nothing Nothing f Nothing Nothing Nothing [] Nothing Nothing
@@ -1716,6 +2470,12 @@ instance EmitXml Barre where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) b])
         []
+parseBarre :: P.XParser m => m Barre
+parseBarre = 
+      Barre
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Barre'
 mkBarre :: StartStop -> Barre
 mkBarre a = Barre a Nothing
@@ -1734,6 +2494,12 @@ instance EmitXml Bass where
       XContent XEmpty
         []
         ([XElement (QN "bass-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "bass-alter" Nothing).emitXml) b])
+parseBass :: P.XParser m => m Bass
+parseBass = 
+      Bass
+        <$> P.oneChild ((P.atEl (P.name "bass-step") >> parseBassStep))
+        <*> P.optional ((P.atEl (P.name "bass-alter") >> parseBassAlter))
+
 -- | Smart constructor for 'Bass'
 mkBass :: BassStep -> Bass
 mkBass a = Bass a Nothing
@@ -1762,6 +2528,22 @@ instance EmitXml BassAlter where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
+parseBassAlter :: P.XParser m => m BassAlter
+parseBassAlter = 
+      BassAlter
+        <$> (P.textContent >>= parseSemitones)
+        <*> P.optional (P.attr (P.name "location") >>= parseLeftRight)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'BassAlter'
 mkBassAlter :: Semitones -> BassAlter
 mkBassAlter a = BassAlter a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1789,6 +2571,21 @@ instance EmitXml BassStep where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseBassStep :: P.XParser m => m BassStep
+parseBassStep = 
+      BassStep
+        <$> (P.textContent >>= parseStep)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'BassStep'
 mkBassStep :: Step -> BassStep
 mkBassStep a = BassStep a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1812,6 +2609,15 @@ instance EmitXml Beam where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "repeater" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "fan" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
+parseBeam :: P.XParser m => m Beam
+parseBeam = 
+      Beam
+        <$> (P.textContent >>= parseBeamValue)
+        <*> P.optional (P.attr (P.name "number") >>= parseBeamLevel)
+        <*> P.optional (P.attr (P.name "repeater") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "fan") >>= parseFan)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Beam'
 mkBeam :: BeamValue -> Beam
 mkBeam a = Beam a Nothing Nothing Nothing Nothing
@@ -1834,6 +2640,14 @@ instance EmitXml BeatRepeat where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) c])
         ([emitXml d])
+parseBeatRepeat :: P.XParser m => m BeatRepeat
+parseBeatRepeat = 
+      BeatRepeat
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "slashes") >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "use-dots") >>= parseYesNo)
+        <*> P.optional (parseSlash)
+
 -- | Smart constructor for 'BeatRepeat'
 mkBeatRepeat :: StartStop -> BeatRepeat
 mkBeatRepeat a = BeatRepeat a Nothing Nothing Nothing
@@ -1866,6 +2680,26 @@ instance EmitXml Bend where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) m])
         ([XElement (QN "bend-alter" Nothing) (emitXml n)]++[emitXml o]++[maybe XEmpty (XElement (QN "with-bar" Nothing).emitXml) p])
+parseBend :: P.XParser m => m Bend
+parseBend = 
+      Bend
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "accelerate") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "beats") >>= parseTrillBeats)
+        <*> P.optional (P.attr (P.name "first-beat") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "last-beat") >>= parsePercent)
+        <*> P.oneChild ((P.atEl (P.name "bend-alter") >> P.textContent >>= parseSemitones))
+        <*> P.optional (parseChxBend)
+        <*> P.optional ((P.atEl (P.name "with-bar") >> parsePlacementText))
+
 -- | Smart constructor for 'Bend'
 mkBend :: Semitones -> Bend
 mkBend n = Bend Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing n Nothing Nothing
@@ -1886,6 +2720,14 @@ instance EmitXml Bookmark where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "element" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "position" Nothing).emitXml) d])
         []
+parseBookmark :: P.XParser m => m Bookmark
+parseBookmark = 
+      Bookmark
+        <$> (P.attr (P.name "id") >>= parseID)
+        <*> P.optional (P.attr (P.name "name") >>= parseToken)
+        <*> P.optional (P.attr (P.name "element") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "position") >>= parsePositiveInteger)
+
 -- | Smart constructor for 'Bookmark'
 mkBookmark :: ID -> Bookmark
 mkBookmark a = Bookmark a Nothing Nothing Nothing
@@ -1912,6 +2754,20 @@ instance EmitXml Bracket where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[XAttr (QN "line-end" Nothing) (emitXml c)]++[maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
+parseBracket :: P.XParser m => m Bracket
+parseBracket = 
+      Bracket
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> (P.attr (P.name "line-end") >>= parseLineEnd)
+        <*> P.optional (P.attr (P.name "end-length") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Bracket'
 mkBracket :: StartStop -> LineEnd -> Bracket
 mkBracket a c = Bracket a Nothing c Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -1930,6 +2786,12 @@ instance EmitXml Cancel where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b])
         []
+parseCancel :: P.XParser m => m Cancel
+parseCancel = 
+      Cancel
+        <$> (P.textContent >>= parseFifths)
+        <*> P.optional (P.attr (P.name "location") >>= parseLeftRight)
+
 -- | Smart constructor for 'Cancel'
 mkCancel :: Fifths -> Cancel
 mkCancel a = Cancel a Nothing
@@ -1964,6 +2826,26 @@ instance EmitXml Clef where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "additional" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m])
         ([XElement (QN "sign" Nothing) (emitXml n)]++[maybe XEmpty (XElement (QN "line" Nothing).emitXml) o]++[maybe XEmpty (XElement (QN "clef-octave-change" Nothing).emitXml) p])
+parseClef :: P.XParser m => m Clef
+parseClef = 
+      Clef
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "additional") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "size") >>= parseSymbolSize)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.oneChild ((P.atEl (P.name "sign") >> P.textContent >>= parseClefSign))
+        <*> P.optional ((P.atEl (P.name "line") >> P.textContent >>= parseStaffLine))
+        <*> P.optional ((P.atEl (P.name "clef-octave-change") >> P.textContent >>= (readParse "Integer")))
+
 -- | Smart constructor for 'Clef'
 mkClef :: ClefSign -> Clef
 mkClef n = Clef Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing n Nothing Nothing
@@ -1988,6 +2870,14 @@ instance EmitXml Credit where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "page" Nothing).emitXml) a])
         (map (XElement (QN "link" Nothing).emitXml) b++map (XElement (QN "bookmark" Nothing).emitXml) c++[emitXml d])
+parseCredit :: P.XParser m => m Credit
+parseCredit = 
+      Credit
+        <$> P.optional (P.attr (P.name "page") >>= parsePositiveInteger)
+        <*> P.findChildren (P.name "link") ((P.atEl (P.name "link") >> parseLink))
+        <*> P.findChildren (P.name "bookmark") ((P.atEl (P.name "bookmark") >> parseBookmark))
+        <*> parseChxCredit
+
 -- | Smart constructor for 'Credit'
 mkCredit :: ChxCredit -> Credit
 mkCredit d = Credit Nothing [] [] d
@@ -2011,6 +2901,17 @@ instance EmitXml Dashes where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g])
         []
+parseDashes :: P.XParser m => m Dashes
+parseDashes = 
+      Dashes
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Dashes'
 mkDashes :: StartStop -> Dashes
 mkDashes a = Dashes a Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2034,6 +2935,17 @@ instance EmitXml Defaults where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "scaling" Nothing).emitXml) a]++[emitXml b]++[maybe XEmpty (XElement (QN "appearance" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "music-font" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "word-font" Nothing).emitXml) e]++map (XElement (QN "lyric-font" Nothing).emitXml) f++map (XElement (QN "lyric-language" Nothing).emitXml) g)
+parseDefaults :: P.XParser m => m Defaults
+parseDefaults = 
+      Defaults
+        <$> P.optional ((P.atEl (P.name "scaling") >> parseScaling))
+        <*> parseLayout
+        <*> P.optional ((P.atEl (P.name "appearance") >> parseAppearance))
+        <*> P.optional ((P.atEl (P.name "music-font") >> parseEmptyFont))
+        <*> P.optional ((P.atEl (P.name "word-font") >> parseEmptyFont))
+        <*> P.findChildren (P.name "lyric-font") ((P.atEl (P.name "lyric-font") >> parseLyricFont))
+        <*> P.findChildren (P.name "lyric-language") ((P.atEl (P.name "lyric-language") >> parseLyricLanguage))
+
 -- | Smart constructor for 'Defaults'
 mkDefaults :: Layout -> Defaults
 mkDefaults b = Defaults Nothing b Nothing Nothing Nothing [] []
@@ -2056,6 +2968,14 @@ instance EmitXml Degree where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a])
         ([XElement (QN "degree-value" Nothing) (emitXml b)]++[XElement (QN "degree-alter" Nothing) (emitXml c)]++[XElement (QN "degree-type" Nothing) (emitXml d)])
+parseDegree :: P.XParser m => m Degree
+parseDegree = 
+      Degree
+        <$> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.oneChild ((P.atEl (P.name "degree-value") >> parseDegreeValue))
+        <*> P.oneChild ((P.atEl (P.name "degree-alter") >> parseDegreeAlter))
+        <*> P.oneChild ((P.atEl (P.name "degree-type") >> parseDegreeType))
+
 -- | Smart constructor for 'Degree'
 mkDegree :: DegreeValue -> DegreeAlter -> DegreeType -> Degree
 mkDegree b c d = Degree Nothing b c d
@@ -2083,6 +3003,21 @@ instance EmitXml DegreeAlter where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "plus-minus" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseDegreeAlter :: P.XParser m => m DegreeAlter
+parseDegreeAlter = 
+      DegreeAlter
+        <$> (P.textContent >>= parseSemitones)
+        <*> P.optional (P.attr (P.name "plus-minus") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'DegreeAlter'
 mkDegreeAlter :: Semitones -> DegreeAlter
 mkDegreeAlter a = DegreeAlter a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2110,6 +3045,21 @@ instance EmitXml DegreeType where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseDegreeType :: P.XParser m => m DegreeType
+parseDegreeType = 
+      DegreeType
+        <$> (P.textContent >>= parseDegreeTypeValue)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'DegreeType'
 mkDegreeType :: DegreeTypeValue -> DegreeType
 mkDegreeType a = DegreeType a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2137,6 +3087,21 @@ instance EmitXml DegreeValue where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseDegreeValue :: P.XParser m => m DegreeValue
+parseDegreeValue = 
+      DegreeValue
+        <$> (P.textContent >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'DegreeValue'
 mkDegreeValue :: PositiveInteger -> DegreeValue
 mkDegreeValue a = DegreeValue a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2162,6 +3127,17 @@ instance EmitXml Direction where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "directive" Nothing).emitXml) b])
         (map (XElement (QN "direction-type" Nothing).emitXml) c++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) d]++[emitXml e]++[emitXml f]++[maybe XEmpty (XElement (QN "sound" Nothing).emitXml) g])
+parseDirection :: P.XParser m => m Direction
+parseDirection = 
+      Direction
+        <$> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "directive") >>= parseYesNo)
+        <*> P.findChildren (P.name "direction-type") ((P.atEl (P.name "direction-type") >> parseDirectionType))
+        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+        <*> parseEditorialVoiceDirection
+        <*> P.optional (parseStaff)
+        <*> P.optional ((P.atEl (P.name "sound") >> parseSound))
+
 -- | Smart constructor for 'Direction'
 mkDirection :: EditorialVoiceDirection -> Direction
 mkDirection e = Direction Nothing Nothing [] Nothing e Nothing Nothing
@@ -2177,6 +3153,11 @@ data DirectionType =
 instance EmitXml DirectionType where
     emitXml (DirectionType a) =
       XReps [emitXml a]
+parseDirectionType :: P.XParser m => m DirectionType
+parseDirectionType = 
+      DirectionType
+        <$> parseChxDirectionType
+
 -- | Smart constructor for 'DirectionType'
 mkDirectionType :: ChxDirectionType -> DirectionType
 mkDirectionType a = DirectionType a
@@ -2202,6 +3183,21 @@ instance EmitXml Directive where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseDirective :: P.XParser m => m Directive
+parseDirective = 
+      Directive
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Directive'
 mkDirective :: String -> Directive
 mkDirective a = Directive a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2217,6 +3213,11 @@ data DisplayStepOctave =
 instance EmitXml DisplayStepOctave where
     emitXml (DisplayStepOctave a) =
       XReps [emitXml a]
+parseDisplayStepOctave :: P.XParser m => m DisplayStepOctave
+parseDisplayStepOctave = 
+      DisplayStepOctave
+        <$> P.optional (parseSeqDisplayStepOctave)
+
 -- | Smart constructor for 'DisplayStepOctave'
 mkDisplayStepOctave :: DisplayStepOctave
 mkDisplayStepOctave = DisplayStepOctave Nothing
@@ -2246,6 +3247,21 @@ instance EmitXml Dynamics where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
         ([emitXml k])
+parseDynamics :: P.XParser m => m Dynamics
+parseDynamics = 
+      Dynamics
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.many (parseChxDynamics)
+
 -- | Smart constructor for 'Dynamics'
 mkDynamics :: Dynamics
 mkDynamics = Dynamics Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
@@ -2268,6 +3284,16 @@ instance EmitXml Elision where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseElision :: P.XParser m => m Elision
+parseElision = 
+      Elision
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Elision'
 mkElision :: String -> Elision
 mkElision a = Elision a Nothing Nothing Nothing Nothing Nothing
@@ -2281,6 +3307,10 @@ data Empty =
 instance EmitXml Empty where
     emitXml (Empty) =
       XReps []
+parseEmpty :: P.XParser m => m Empty
+parseEmpty = 
+      return Empty
+
 -- | Smart constructor for 'Empty'
 mkEmpty :: Empty
 mkEmpty = Empty 
@@ -2301,6 +3331,14 @@ instance EmitXml EmptyFont where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d])
         []
+parseEmptyFont :: P.XParser m => m EmptyFont
+parseEmptyFont = 
+      EmptyFont
+        <$> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+
 -- | Smart constructor for 'EmptyFont'
 mkEmptyFont :: EmptyFont
 mkEmptyFont = EmptyFont Nothing Nothing Nothing Nothing
@@ -2329,6 +3367,22 @@ instance EmitXml EmptyLine where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
         []
+parseEmptyLine :: P.XParser m => m EmptyLine
+parseEmptyLine = 
+      EmptyLine
+        <$> P.optional (P.attr (P.name "line-shape") >>= parseLineShape)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'EmptyLine'
 mkEmptyLine :: EmptyLine
 mkEmptyLine = EmptyLine Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2355,6 +3409,20 @@ instance EmitXml EmptyPlacement where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
         []
+parseEmptyPlacement :: P.XParser m => m EmptyPlacement
+parseEmptyPlacement = 
+      EmptyPlacement
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'EmptyPlacement'
 mkEmptyPlacement :: EmptyPlacement
 mkEmptyPlacement = EmptyPlacement Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2380,6 +3448,19 @@ instance EmitXml EmptyPrintStyle where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         []
+parseEmptyPrintStyle :: P.XParser m => m EmptyPrintStyle
+parseEmptyPrintStyle = 
+      EmptyPrintStyle
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'EmptyPrintStyle'
 mkEmptyPrintStyle :: EmptyPrintStyle
 mkEmptyPrintStyle = EmptyPrintStyle Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2413,6 +3494,27 @@ instance EmitXml EmptyTrillSound where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
         []
+parseEmptyTrillSound :: P.XParser m => m EmptyTrillSound
+parseEmptyTrillSound = 
+      EmptyTrillSound
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "start-note") >>= parseStartNote)
+        <*> P.optional (P.attr (P.name "trill-step") >>= parseTrillStep)
+        <*> P.optional (P.attr (P.name "two-note-turn") >>= parseTwoNoteTurn)
+        <*> P.optional (P.attr (P.name "accelerate") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "beats") >>= parseTrillBeats)
+        <*> P.optional (P.attr (P.name "second-beat") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "last-beat") >>= parsePercent)
+
 -- | Smart constructor for 'EmptyTrillSound'
 mkEmptyTrillSound :: EmptyTrillSound
 mkEmptyTrillSound = EmptyTrillSound Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2428,6 +3530,11 @@ data Encoding =
 instance EmitXml Encoding where
     emitXml (Encoding a) =
       XReps [emitXml a]
+parseEncoding :: P.XParser m => m Encoding
+parseEncoding = 
+      Encoding
+        <$> P.many (parseChxEncoding)
+
 -- | Smart constructor for 'Encoding'
 mkEncoding :: Encoding
 mkEncoding = Encoding []
@@ -2462,6 +3569,26 @@ instance EmitXml Ending where
       XContent (emitXml a)
         ([XAttr (QN "number" Nothing) (emitXml b)]++[XAttr (QN "type" Nothing) (emitXml c)]++[maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "text-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "text-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
+parseEnding :: P.XParser m => m Ending
+parseEnding = 
+      Ending
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "number") >>= parseEndingNumber)
+        <*> (P.attr (P.name "type") >>= parseStartStopDiscontinue)
+        <*> P.optional (P.attr (P.name "end-length") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "text-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "text-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Ending'
 mkEnding :: String -> EndingNumber -> StartStopDiscontinue -> Ending
 mkEnding a b c = Ending a b c Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2483,6 +3610,15 @@ instance EmitXml Extend where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
+parseExtend :: P.XParser m => m Extend
+parseExtend = 
+      Extend
+        <$> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Extend'
 mkExtend :: Extend
 mkExtend = Extend Nothing Nothing Nothing Nothing Nothing
@@ -2501,6 +3637,12 @@ instance EmitXml Feature where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b])
         []
+parseFeature :: P.XParser m => m Feature
+parseFeature = 
+      Feature
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "type") >>= parseToken)
+
 -- | Smart constructor for 'Feature'
 mkFeature :: String -> Feature
 mkFeature a = Feature a Nothing
@@ -2528,6 +3670,21 @@ instance EmitXml Fermata where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseFermata :: P.XParser m => m Fermata
+parseFermata = 
+      Fermata
+        <$> (P.textContent >>= parseFermataShape)
+        <*> P.optional (P.attr (P.name "type") >>= parseUprightInverted)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Fermata'
 mkFermata :: FermataShape -> Fermata
 mkFermata a = Fermata a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2548,6 +3705,14 @@ instance EmitXml Figure where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "prefix" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "figure-number" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "suffix" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
+parseFigure :: P.XParser m => m Figure
+parseFigure = 
+      Figure
+        <$> P.optional ((P.atEl (P.name "prefix") >> parseStyleText))
+        <*> P.optional ((P.atEl (P.name "figure-number") >> parseStyleText))
+        <*> P.optional ((P.atEl (P.name "suffix") >> parseStyleText))
+        <*> P.optional ((P.atEl (P.name "extend") >> parseExtend))
+
 -- | Smart constructor for 'Figure'
 mkFigure :: Figure
 mkFigure = Figure Nothing Nothing Nothing Nothing
@@ -2581,6 +3746,27 @@ instance EmitXml FiguredBass where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) n])
         (map (XElement (QN "figure" Nothing).emitXml) o++[emitXml p]++[emitXml q])
+parseFiguredBass :: P.XParser m => m FiguredBass
+parseFiguredBass = 
+      FiguredBass
+        <$> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-dot") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-lyric") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
+        <*> P.findChildren (P.name "figure") ((P.atEl (P.name "figure") >> parseFigure))
+        <*> P.optional (parseDuration)
+        <*> parseEditorial
+
 -- | Smart constructor for 'FiguredBass'
 mkFiguredBass :: Editorial -> FiguredBass
 mkFiguredBass q = FiguredBass Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing q
@@ -2610,6 +3796,23 @@ instance EmitXml Fingering where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "substitution" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "alternate" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
         []
+parseFingering :: P.XParser m => m Fingering
+parseFingering = 
+      Fingering
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "substitution") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "alternate") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'Fingering'
 mkFingering :: String -> Fingering
 mkFingering a = Fingering a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2629,6 +3832,13 @@ instance EmitXml FirstFret where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "location" Nothing).emitXml) c])
         []
+parseFirstFret :: P.XParser m => m FirstFret
+parseFirstFret = 
+      FirstFret
+        <$> (P.textContent >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "location") >>= parseLeftRight)
+
 -- | Smart constructor for 'FirstFret'
 mkFirstFret :: PositiveInteger -> FirstFret
 mkFirstFret a = FirstFret a Nothing Nothing
@@ -2667,6 +3877,32 @@ instance EmitXml FormattedText where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t]++[maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
         []
+parseFormattedText :: P.XParser m => m FormattedText
+parseFormattedText = 
+      FormattedText
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.attr (P.name "enclosure") >>= parseEnclosure)
+        <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.attr (P.name "letter-spacing") >>= parseNumberOrNormal)
+        <*> P.optional (P.attr (P.name "line-height") >>= parseNumberOrNormal)
+        <*> P.optional (P.attr (P.name "dir") >>= parseTextDirection)
+
 -- | Smart constructor for 'FormattedText'
 mkFormattedText :: String -> FormattedText
 mkFormattedText a = FormattedText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2684,6 +3920,13 @@ data Forward =
 instance EmitXml Forward where
     emitXml (Forward a b c) =
       XReps [emitXml a,emitXml b,emitXml c]
+parseForward :: P.XParser m => m Forward
+parseForward = 
+      Forward
+        <$> parseDuration
+        <*> parseEditorialVoice
+        <*> P.optional (parseStaff)
+
 -- | Smart constructor for 'Forward'
 mkForward :: Duration -> EditorialVoice -> Forward
 mkForward a b = Forward a b Nothing
@@ -2713,6 +3956,23 @@ instance EmitXml Frame where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "height" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) i])
         ([XElement (QN "frame-strings" Nothing) (emitXml j)]++[XElement (QN "frame-frets" Nothing) (emitXml k)]++[maybe XEmpty (XElement (QN "first-fret" Nothing).emitXml) l]++map (XElement (QN "frame-note" Nothing).emitXml) m)
+parseFrame :: P.XParser m => m Frame
+parseFrame = 
+      Frame
+        <$> P.optional (P.attr (P.name "height") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "width") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "valign") >>= parseValign)
+        <*> P.oneChild ((P.atEl (P.name "frame-strings") >> P.textContent >>= parsePositiveInteger))
+        <*> P.oneChild ((P.atEl (P.name "frame-frets") >> P.textContent >>= parsePositiveInteger))
+        <*> P.optional ((P.atEl (P.name "first-fret") >> parseFirstFret))
+        <*> P.findChildren (P.name "frame-note") ((P.atEl (P.name "frame-note") >> parseFrameNote))
+
 -- | Smart constructor for 'Frame'
 mkFrame :: PositiveInteger -> PositiveInteger -> Frame
 mkFrame j k = Frame Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing j k Nothing []
@@ -2733,6 +3993,14 @@ instance EmitXml FrameNote where
       XContent XEmpty
         []
         ([XElement (QN "string" Nothing) (emitXml a)]++[XElement (QN "fret" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "fingering" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "barre" Nothing).emitXml) d])
+parseFrameNote :: P.XParser m => m FrameNote
+parseFrameNote = 
+      FrameNote
+        <$> P.oneChild ((P.atEl (P.name "string") >> parseCmpString))
+        <*> P.oneChild ((P.atEl (P.name "fret") >> parseFret))
+        <*> P.optional ((P.atEl (P.name "fingering") >> parseFingering))
+        <*> P.optional ((P.atEl (P.name "barre") >> parseBarre))
+
 -- | Smart constructor for 'FrameNote'
 mkFrameNote :: CmpString -> Fret -> FrameNote
 mkFrameNote a b = FrameNote a b Nothing Nothing
@@ -2755,6 +4023,16 @@ instance EmitXml Fret where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseFret :: P.XParser m => m Fret
+parseFret = 
+      Fret
+        <$> (P.textContent >>= parseNonNegativeInteger)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Fret'
 mkFret :: NonNegativeInteger -> Fret
 mkFret a = Fret a Nothing Nothing Nothing Nothing Nothing
@@ -2784,6 +4062,23 @@ instance EmitXml Glissando where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m])
         []
+parseGlissando :: P.XParser m => m Glissando
+parseGlissando = 
+      Glissando
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Glissando'
 mkGlissando :: String -> StartStop -> Glissando
 mkGlissando a b = Glissando a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2804,6 +4099,14 @@ instance EmitXml Grace where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "steal-time-previous" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "steal-time-following" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "make-time" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "slash" Nothing).emitXml) d])
         []
+parseGrace :: P.XParser m => m Grace
+parseGrace = 
+      Grace
+        <$> P.optional (P.attr (P.name "steal-time-previous") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "steal-time-following") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "make-time") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "slash") >>= parseYesNo)
+
 -- | Smart constructor for 'Grace'
 mkGrace :: Grace
 mkGrace = Grace Nothing Nothing Nothing Nothing
@@ -2822,6 +4125,12 @@ instance EmitXml GroupBarline where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "color" Nothing).emitXml) b])
         []
+parseGroupBarline :: P.XParser m => m GroupBarline
+parseGroupBarline = 
+      GroupBarline
+        <$> (P.textContent >>= parseGroupBarlineValue)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'GroupBarline'
 mkGroupBarline :: GroupBarlineValue -> GroupBarline
 mkGroupBarline a = GroupBarline a Nothing
@@ -2849,6 +4158,21 @@ instance EmitXml GroupName where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) k])
         []
+parseGroupName :: P.XParser m => m GroupName
+parseGroupName = 
+      GroupName
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
+
 -- | Smart constructor for 'GroupName'
 mkGroupName :: String -> GroupName
 mkGroupName a = GroupName a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2871,6 +4195,16 @@ instance EmitXml GroupSymbol where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseGroupSymbol :: P.XParser m => m GroupSymbol
+parseGroupSymbol = 
+      GroupSymbol
+        <$> (P.textContent >>= parseGroupSymbolValue)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'GroupSymbol'
 mkGroupSymbol :: GroupSymbolValue -> GroupSymbol
 mkGroupSymbol a = GroupSymbol a Nothing Nothing Nothing Nothing Nothing
@@ -2893,6 +4227,14 @@ instance EmitXml Grouping where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "member-of" Nothing).emitXml) c])
         (map (XElement (QN "feature" Nothing).emitXml) d)
+parseGrouping :: P.XParser m => m Grouping
+parseGrouping = 
+      Grouping
+        <$> (P.attr (P.name "type") >>= parseStartStopSingle)
+        <*> P.optional (P.attr (P.name "number") >>= parseToken)
+        <*> P.optional (P.attr (P.name "member-of") >>= parseToken)
+        <*> P.findChildren (P.name "feature") ((P.atEl (P.name "feature") >> parseFeature))
+
 -- | Smart constructor for 'Grouping'
 mkGrouping :: StartStopSingle -> Grouping
 mkGrouping a = Grouping a Nothing Nothing []
@@ -2922,6 +4264,23 @@ instance EmitXml HammerOnPullOff where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
         []
+parseHammerOnPullOff :: P.XParser m => m HammerOnPullOff
+parseHammerOnPullOff = 
+      HammerOnPullOff
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'HammerOnPullOff'
 mkHammerOnPullOff :: String -> StartStop -> HammerOnPullOff
 mkHammerOnPullOff a b = HammerOnPullOff a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2951,6 +4310,23 @@ instance EmitXml Harmonic where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         ([emitXml l]++[emitXml m])
+parseHarmonic :: P.XParser m => m Harmonic
+parseHarmonic = 
+      Harmonic
+        <$> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (parseChxHarmonic)
+        <*> P.optional (parseChxHarmonic1)
+
 -- | Smart constructor for 'Harmonic'
 mkHarmonic :: Harmonic
 mkHarmonic = Harmonic Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -2989,6 +4365,28 @@ instance EmitXml Harmony where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "print-frame" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
         ([emitXml n]++[maybe XEmpty (XElement (QN "frame" Nothing).emitXml) o]++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) p]++[emitXml q]++[emitXml r])
+parseHarmony :: P.XParser m => m Harmony
+parseHarmony = 
+      Harmony
+        <$> P.optional (P.attr (P.name "type") >>= parseHarmonyType)
+        <*> P.optional (P.attr (P.name "print-frame") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.many (parseHarmonyChord)
+        <*> P.optional ((P.atEl (P.name "frame") >> parseFrame))
+        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+        <*> parseEditorial
+        <*> P.optional (parseStaff)
+
 -- | Smart constructor for 'Harmony'
 mkHarmony :: Editorial -> Harmony
 mkHarmony q = Harmony Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing Nothing q Nothing
@@ -3015,6 +4413,20 @@ instance EmitXml HarpPedals where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         (map (XElement (QN "pedal-tuning" Nothing).emitXml) j)
+parseHarpPedals :: P.XParser m => m HarpPedals
+parseHarpPedals = 
+      HarpPedals
+        <$> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.findChildren (P.name "pedal-tuning") ((P.atEl (P.name "pedal-tuning") >> parsePedalTuning))
+
 -- | Smart constructor for 'HarpPedals'
 mkHarpPedals :: HarpPedals
 mkHarpPedals = HarpPedals Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
@@ -3033,6 +4445,12 @@ instance EmitXml HeelToe where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "substitution" Nothing).emitXml) b])
         ([emitXml a])
+parseHeelToe :: P.XParser m => m HeelToe
+parseHeelToe = 
+      HeelToe
+        <$> parseHeelToe
+        <*> P.optional (P.attr (P.name "substitution") >>= parseYesNo)
+
 -- | Smart constructor for 'HeelToe'
 mkHeelToe :: HeelToe -> HeelToe
 mkHeelToe a = HeelToe a Nothing
@@ -3055,6 +4473,16 @@ instance EmitXml Identification where
       XContent XEmpty
         []
         (map (XElement (QN "creator" Nothing).emitXml) a++map (XElement (QN "rights" Nothing).emitXml) b++[maybe XEmpty (XElement (QN "encoding" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "source" Nothing).emitXml) d]++map (XElement (QN "relation" Nothing).emitXml) e++[maybe XEmpty (XElement (QN "miscellaneous" Nothing).emitXml) f])
+parseIdentification :: P.XParser m => m Identification
+parseIdentification = 
+      Identification
+        <$> P.findChildren (P.name "creator") ((P.atEl (P.name "creator") >> parseTypedText))
+        <*> P.findChildren (P.name "rights") ((P.atEl (P.name "rights") >> parseTypedText))
+        <*> P.optional ((P.atEl (P.name "encoding") >> parseEncoding))
+        <*> P.optional ((P.atEl (P.name "source") >> P.textContent >>= (readParse "DefString")))
+        <*> P.findChildren (P.name "relation") ((P.atEl (P.name "relation") >> parseTypedText))
+        <*> P.optional ((P.atEl (P.name "miscellaneous") >> parseMiscellaneous))
+
 -- | Smart constructor for 'Identification'
 mkIdentification :: Identification
 mkIdentification = Identification [] [] Nothing Nothing [] Nothing
@@ -3079,6 +4507,18 @@ instance EmitXml Image where
       XContent XEmpty
         ([XAttr (QN "source" Nothing) (emitXml a)]++[XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) h])
         []
+parseImage :: P.XParser m => m Image
+parseImage = 
+      Image
+        <$> (P.attr (P.name "source") >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseToken)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "valign") >>= parseValignImage)
+
 -- | Smart constructor for 'Image'
 mkImage :: String -> Token -> Image
 mkImage a b = Image a b Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3096,6 +4536,11 @@ instance EmitXml Instrument where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         []
+parseInstrument :: P.XParser m => m Instrument
+parseInstrument = 
+      Instrument
+        <$> (P.attr (P.name "id") >>= parseIDREF)
+
 -- | Smart constructor for 'Instrument'
 mkInstrument :: IDREF -> Instrument
 mkInstrument a = Instrument a
@@ -3122,6 +4567,20 @@ instance EmitXml Inversion where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
+parseInversion :: P.XParser m => m Inversion
+parseInversion = 
+      Inversion
+        <$> (P.textContent >>= parseNonNegativeInteger)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Inversion'
 mkInversion :: NonNegativeInteger -> Inversion
 mkInversion a = Inversion a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3151,6 +4610,23 @@ instance EmitXml Key where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k])
         ([emitXml l]++map (XElement (QN "key-octave" Nothing).emitXml) m)
+parseKey :: P.XParser m => m Key
+parseKey = 
+      Key
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> parseChxKey
+        <*> P.findChildren (P.name "key-octave") ((P.atEl (P.name "key-octave") >> parseKeyOctave))
+
 -- | Smart constructor for 'Key'
 mkKey :: ChxKey -> Key
 mkKey l = Key Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing l []
@@ -3170,6 +4646,13 @@ instance EmitXml KeyOctave where
       XContent (emitXml a)
         ([XAttr (QN "number" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "cancel" Nothing).emitXml) c])
         []
+parseKeyOctave :: P.XParser m => m KeyOctave
+parseKeyOctave = 
+      KeyOctave
+        <$> (P.textContent >>= parseOctave)
+        <*> (P.attr (P.name "number") >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "cancel") >>= parseYesNo)
+
 -- | Smart constructor for 'KeyOctave'
 mkKeyOctave :: Octave -> PositiveInteger -> KeyOctave
 mkKeyOctave a b = KeyOctave a b Nothing
@@ -3218,6 +4701,27 @@ instance EmitXml Kind where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "use-symbols" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "text" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "stack-degrees" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "parentheses-degrees" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "bracket-degrees" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) q])
         []
+parseKind :: P.XParser m => m Kind
+parseKind = 
+      Kind
+        <$> (P.textContent >>= parseKindValue)
+        <*> P.optional (P.attr (P.name "use-symbols") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "stack-degrees") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "parentheses-degrees") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "bracket-degrees") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "valign") >>= parseValign)
+
 -- | Smart constructor for 'Kind'
 mkKind :: KindValue -> Kind
 mkKind a = Kind a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3239,6 +4743,15 @@ instance EmitXml Level where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "reference" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) e])
         []
+parseLevel :: P.XParser m => m Level
+parseLevel = 
+      Level
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "reference") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "bracket") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "size") >>= parseSymbolSize)
+
 -- | Smart constructor for 'Level'
 mkLevel :: String -> Level
 mkLevel a = Level a Nothing Nothing Nothing Nothing
@@ -3257,6 +4770,12 @@ instance EmitXml LineWidth where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)])
         []
+parseLineWidth :: P.XParser m => m LineWidth
+parseLineWidth = 
+      LineWidth
+        <$> (P.textContent >>= parseTenths)
+        <*> (P.attr (P.name "type") >>= parseLineWidthType)
+
 -- | Smart constructor for 'LineWidth'
 mkLineWidth :: Tenths -> LineWidthType -> LineWidth
 mkLineWidth a b = LineWidth a b
@@ -3286,6 +4805,23 @@ instance EmitXml Link where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "name" Nothing).emitXml) a]++[XAttr (QN "href" (Just "xlink")) (emitXml b)]++[maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) c]++[maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) d]++[maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) e]++[maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) f]++[maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) g]++[maybe XEmpty (XAttr (QN "element" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "position" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) m])
         []
+parseLink :: P.XParser m => m Link
+parseLink = 
+      Link
+        <$> P.optional (P.attr (P.name "name") >>= parseToken)
+        <*> (P.attr (P.name "xlink:href") >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xlink:type") >>= parseType)
+        <*> P.optional (P.attr (P.name "xlink:role") >>= parseToken)
+        <*> P.optional (P.attr (P.name "xlink:title") >>= parseToken)
+        <*> P.optional (P.attr (P.name "xlink:show") >>= parseSmpShow)
+        <*> P.optional (P.attr (P.name "xlink:actuate") >>= parseActuate)
+        <*> P.optional (P.attr (P.name "element") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "position") >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+
 -- | Smart constructor for 'Link'
 mkLink :: String -> Link
 mkLink b = Link Nothing b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3315,6 +4851,23 @@ instance EmitXml Lyric where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         ([emitXml j]++[maybe XEmpty (XElement (QN "end-line" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "end-paragraph" Nothing).emitXml) l]++[emitXml m])
+parseLyric :: P.XParser m => m Lyric
+parseLyric = 
+      Lyric
+        <$> P.optional (P.attr (P.name "number") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "name") >>= parseToken)
+        <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> parseChxLyric
+        <*> P.optional ((P.atEl (P.name "end-line") >> parseEmpty))
+        <*> P.optional ((P.atEl (P.name "end-paragraph") >> parseEmpty))
+        <*> parseEditorial
+
 -- | Smart constructor for 'Lyric'
 mkLyric :: ChxLyric -> Editorial -> Lyric
 mkLyric j m = Lyric Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing j Nothing Nothing m
@@ -3337,6 +4890,16 @@ instance EmitXml LyricFont where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f])
         []
+parseLyricFont :: P.XParser m => m LyricFont
+parseLyricFont = 
+      LyricFont
+        <$> P.optional (P.attr (P.name "number") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "name") >>= parseToken)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+
 -- | Smart constructor for 'LyricFont'
 mkLyricFont :: LyricFont
 mkLyricFont = LyricFont Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3356,6 +4919,13 @@ instance EmitXml LyricLanguage where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[XAttr (QN "lang" (Just "xml")) (emitXml c)])
         []
+parseLyricLanguage :: P.XParser m => m LyricLanguage
+parseLyricLanguage = 
+      LyricLanguage
+        <$> P.optional (P.attr (P.name "number") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "name") >>= parseToken)
+        <*> (P.attr (P.name "xml:lang") >>= parseLang)
+
 -- | Smart constructor for 'LyricLanguage'
 mkLyricLanguage :: Lang -> LyricLanguage
 mkLyricLanguage c = LyricLanguage Nothing Nothing c
@@ -3375,6 +4945,15 @@ instance EmitXml Measure where
       XContent XEmpty
         ([XAttr (QN "number" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
         ([emitXml e])
+parseMeasure :: P.XParser m => m Measure
+parseMeasure = 
+      Measure
+        <$> (P.attr (P.name "number") >>= parseToken)
+        <*> P.optional (P.attr (P.name "implicit") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "non-controlling") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "width") >>= parseTenths)
+        <*> parseMusicData
+
 -- | Smart constructor for 'Measure'
 mkMeasure :: Token -> MusicData -> Measure
 mkMeasure a e = Measure a Nothing Nothing Nothing e
@@ -3396,6 +4975,15 @@ instance EmitXml CmpMeasure where
       XContent XEmpty
         ([XAttr (QN "number" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
         (map (XElement (QN "part" Nothing).emitXml) e)
+parseCmpMeasure :: P.XParser m => m CmpMeasure
+parseCmpMeasure = 
+      CmpMeasure
+        <$> (P.attr (P.name "number") >>= parseToken)
+        <*> P.optional (P.attr (P.name "implicit") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "non-controlling") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "width") >>= parseTenths)
+        <*> P.findChildren (P.name "part") ((P.atEl (P.name "part") >> parsePart))
+
 -- | Smart constructor for 'CmpMeasure'
 mkCmpMeasure :: Token -> CmpMeasure
 mkCmpMeasure a = CmpMeasure a Nothing Nothing Nothing []
@@ -3413,6 +5001,11 @@ instance EmitXml MeasureLayout where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "measure-distance" Nothing).emitXml) a])
+parseMeasureLayout :: P.XParser m => m MeasureLayout
+parseMeasureLayout = 
+      MeasureLayout
+        <$> P.optional ((P.atEl (P.name "measure-distance") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'MeasureLayout'
 mkMeasureLayout :: MeasureLayout
 mkMeasureLayout = MeasureLayout Nothing
@@ -3439,6 +5032,20 @@ instance EmitXml MeasureNumbering where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
+parseMeasureNumbering :: P.XParser m => m MeasureNumbering
+parseMeasureNumbering = 
+      MeasureNumbering
+        <$> (P.textContent >>= parseMeasureNumberingValue)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'MeasureNumbering'
 mkMeasureNumbering :: MeasureNumberingValue -> MeasureNumbering
 mkMeasureNumbering a = MeasureNumbering a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3460,6 +5067,13 @@ instance EmitXml MeasureRepeat where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) c])
         []
+parseMeasureRepeat :: P.XParser m => m MeasureRepeat
+parseMeasureRepeat = 
+      MeasureRepeat
+        <$> (P.textContent >>= parsePositiveIntegerOrEmpty)
+        <*> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "slashes") >>= parsePositiveInteger)
+
 -- | Smart constructor for 'MeasureRepeat'
 mkMeasureRepeat :: PositiveIntegerOrEmpty -> StartStop -> MeasureRepeat
 mkMeasureRepeat a b = MeasureRepeat a b Nothing
@@ -3485,6 +5099,17 @@ instance EmitXml MeasureStyle where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         ([emitXml g])
+parseMeasureStyle :: P.XParser m => m MeasureStyle
+parseMeasureStyle = 
+      MeasureStyle
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> parseChxMeasureStyle
+
 -- | Smart constructor for 'MeasureStyle'
 mkMeasureStyle :: ChxMeasureStyle -> MeasureStyle
 mkMeasureStyle g = MeasureStyle Nothing Nothing Nothing Nothing Nothing Nothing g
@@ -3512,6 +5137,21 @@ instance EmitXml Metronome where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         ([emitXml k])
+parseMetronome :: P.XParser m => m Metronome
+parseMetronome = 
+      Metronome
+        <$> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> parseChxMetronome
+
 -- | Smart constructor for 'Metronome'
 mkMetronome :: ChxMetronome -> Metronome
 mkMetronome k = Metronome Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing k
@@ -3530,6 +5170,12 @@ instance EmitXml MetronomeBeam where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b])
         []
+parseMetronomeBeam :: P.XParser m => m MetronomeBeam
+parseMetronomeBeam = 
+      MetronomeBeam
+        <$> (P.textContent >>= parseBeamValue)
+        <*> P.optional (P.attr (P.name "number") >>= parseBeamLevel)
+
 -- | Smart constructor for 'MetronomeBeam'
 mkMetronomeBeam :: BeamValue -> MetronomeBeam
 mkMetronomeBeam a = MetronomeBeam a Nothing
@@ -3550,6 +5196,14 @@ instance EmitXml MetronomeNote where
       XContent XEmpty
         []
         ([XElement (QN "metronome-type" Nothing) (emitXml a)]++map (XElement (QN "metronome-dot" Nothing).emitXml) b++map (XElement (QN "metronome-beam" Nothing).emitXml) c++[maybe XEmpty (XElement (QN "metronome-tuplet" Nothing).emitXml) d])
+parseMetronomeNote :: P.XParser m => m MetronomeNote
+parseMetronomeNote = 
+      MetronomeNote
+        <$> P.oneChild ((P.atEl (P.name "metronome-type") >> P.textContent >>= parseNoteTypeValue))
+        <*> P.findChildren (P.name "metronome-dot") ((P.atEl (P.name "metronome-dot") >> parseEmpty))
+        <*> P.findChildren (P.name "metronome-beam") ((P.atEl (P.name "metronome-beam") >> parseMetronomeBeam))
+        <*> P.optional ((P.atEl (P.name "metronome-tuplet") >> parseMetronomeTuplet))
+
 -- | Smart constructor for 'MetronomeNote'
 mkMetronomeNote :: NoteTypeValue -> MetronomeNote
 mkMetronomeNote a = MetronomeNote a [] [] Nothing
@@ -3570,6 +5224,14 @@ instance EmitXml MetronomeTuplet where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d])
         ([emitXml a])
+parseMetronomeTuplet :: P.XParser m => m MetronomeTuplet
+parseMetronomeTuplet = 
+      MetronomeTuplet
+        <$> parseMetronomeTuplet
+        <*> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "bracket") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "show-number") >>= parseShowTuplet)
+
 -- | Smart constructor for 'MetronomeTuplet'
 mkMetronomeTuplet :: MetronomeTuplet -> StartStop -> MetronomeTuplet
 mkMetronomeTuplet a b = MetronomeTuplet a b Nothing Nothing
@@ -3588,6 +5250,12 @@ instance EmitXml MidiDevice where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "port" Nothing).emitXml) b])
         []
+parseMidiDevice :: P.XParser m => m MidiDevice
+parseMidiDevice = 
+      MidiDevice
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "port") >>= parseMidi16)
+
 -- | Smart constructor for 'MidiDevice'
 mkMidiDevice :: String -> MidiDevice
 mkMidiDevice a = MidiDevice a Nothing
@@ -3613,6 +5281,19 @@ instance EmitXml MidiInstrument where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([maybe XEmpty (XElement (QN "midi-channel" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "midi-name" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "midi-bank" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "midi-program" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "midi-unpitched" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "volume" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "pan" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "elevation" Nothing).emitXml) i])
+parseMidiInstrument :: P.XParser m => m MidiInstrument
+parseMidiInstrument = 
+      MidiInstrument
+        <$> (P.attr (P.name "id") >>= parseIDREF)
+        <*> P.optional ((P.atEl (P.name "midi-channel") >> P.textContent >>= parseMidi16))
+        <*> P.optional ((P.atEl (P.name "midi-name") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "midi-bank") >> P.textContent >>= parseMidi16384))
+        <*> P.optional ((P.atEl (P.name "midi-program") >> P.textContent >>= parseMidi128))
+        <*> P.optional ((P.atEl (P.name "midi-unpitched") >> P.textContent >>= parseMidi128))
+        <*> P.optional ((P.atEl (P.name "volume") >> P.textContent >>= parsePercent))
+        <*> P.optional ((P.atEl (P.name "pan") >> P.textContent >>= parseRotationDegrees))
+        <*> P.optional ((P.atEl (P.name "elevation") >> P.textContent >>= parseRotationDegrees))
+
 -- | Smart constructor for 'MidiInstrument'
 mkMidiInstrument :: IDREF -> MidiInstrument
 mkMidiInstrument a = MidiInstrument a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3630,6 +5311,11 @@ instance EmitXml Miscellaneous where
       XContent XEmpty
         []
         (map (XElement (QN "miscellaneous-field" Nothing).emitXml) a)
+parseMiscellaneous :: P.XParser m => m Miscellaneous
+parseMiscellaneous = 
+      Miscellaneous
+        <$> P.findChildren (P.name "miscellaneous-field") ((P.atEl (P.name "miscellaneous-field") >> parseMiscellaneousField))
+
 -- | Smart constructor for 'Miscellaneous'
 mkMiscellaneous :: Miscellaneous
 mkMiscellaneous = Miscellaneous []
@@ -3648,6 +5334,12 @@ instance EmitXml MiscellaneousField where
       XContent (emitXml a)
         ([XAttr (QN "name" Nothing) (emitXml b)])
         []
+parseMiscellaneousField :: P.XParser m => m MiscellaneousField
+parseMiscellaneousField = 
+      MiscellaneousField
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "name") >>= parseToken)
+
 -- | Smart constructor for 'MiscellaneousField'
 mkMiscellaneousField :: String -> Token -> MiscellaneousField
 mkMiscellaneousField a b = MiscellaneousField a b
@@ -3666,6 +5358,12 @@ instance EmitXml Mordent where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "long" Nothing).emitXml) b])
         ([emitXml a])
+parseMordent :: P.XParser m => m Mordent
+parseMordent = 
+      Mordent
+        <$> parseMordent
+        <*> P.optional (P.attr (P.name "long") >>= parseYesNo)
+
 -- | Smart constructor for 'Mordent'
 mkMordent :: Mordent -> Mordent
 mkMordent a = Mordent a Nothing
@@ -3684,6 +5382,12 @@ instance EmitXml MultipleRest where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "use-symbols" Nothing).emitXml) b])
         []
+parseMultipleRest :: P.XParser m => m MultipleRest
+parseMultipleRest = 
+      MultipleRest
+        <$> (P.textContent >>= parsePositiveIntegerOrEmpty)
+        <*> P.optional (P.attr (P.name "use-symbols") >>= parseYesNo)
+
 -- | Smart constructor for 'MultipleRest'
 mkMultipleRest :: PositiveIntegerOrEmpty -> MultipleRest
 mkMultipleRest a = MultipleRest a Nothing
@@ -3702,6 +5406,12 @@ instance EmitXml NameDisplay where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a])
         ([emitXml b])
+parseNameDisplay :: P.XParser m => m NameDisplay
+parseNameDisplay = 
+      NameDisplay
+        <$> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.many (parseChxNameDisplay)
+
 -- | Smart constructor for 'NameDisplay'
 mkNameDisplay :: NameDisplay
 mkNameDisplay = NameDisplay Nothing []
@@ -3726,6 +5436,18 @@ instance EmitXml NonArpeggiate where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
+parseNonArpeggiate :: P.XParser m => m NonArpeggiate
+parseNonArpeggiate = 
+      NonArpeggiate
+        <$> (P.attr (P.name "type") >>= parseTopBottom)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'NonArpeggiate'
 mkNonArpeggiate :: TopBottom -> NonArpeggiate
 mkNonArpeggiate a = NonArpeggiate a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3742,6 +5464,12 @@ data Notations =
 instance EmitXml Notations where
     emitXml (Notations a b) =
       XReps [emitXml a,emitXml b]
+parseNotations :: P.XParser m => m Notations
+parseNotations = 
+      Notations
+        <$> parseEditorial
+        <*> P.many (parseChxNotations)
+
 -- | Smart constructor for 'Notations'
 mkNotations :: Editorial -> Notations
 mkNotations a = Notations a []
@@ -3792,6 +5520,42 @@ instance EmitXml Note where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "end-dynamics" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "attack" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "release" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) s])
         ([emitXml t]++[maybe XEmpty (XElement (QN "instrument" Nothing).emitXml) u]++[emitXml v]++[maybe XEmpty (XElement (QN "type" Nothing).emitXml) w]++map (XElement (QN "dot" Nothing).emitXml) x++[maybe XEmpty (XElement (QN "accidental" Nothing).emitXml) y]++[maybe XEmpty (XElement (QN "time-modification" Nothing).emitXml) z]++[maybe XEmpty (XElement (QN "stem" Nothing).emitXml) a1]++[maybe XEmpty (XElement (QN "notehead" Nothing).emitXml) b1]++[emitXml c1]++map (XElement (QN "beam" Nothing).emitXml) d1++map (XElement (QN "notations" Nothing).emitXml) e1++map (XElement (QN "lyric" Nothing).emitXml) f1)
+parseNote :: P.XParser m => m Note
+parseNote = 
+      Note
+        <$> P.optional (P.attr (P.name "dynamics") >>= parseNonNegativeDecimal)
+        <*> P.optional (P.attr (P.name "end-dynamics") >>= parseNonNegativeDecimal)
+        <*> P.optional (P.attr (P.name "attack") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "release") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "time-only") >>= parseToken)
+        <*> P.optional (P.attr (P.name "pizzicato") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-dot") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-lyric") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
+        <*> parseChxNote
+        <*> P.optional ((P.atEl (P.name "instrument") >> parseInstrument))
+        <*> parseEditorialVoice
+        <*> P.optional ((P.atEl (P.name "type") >> parseNoteType))
+        <*> P.findChildren (P.name "dot") ((P.atEl (P.name "dot") >> parseEmptyPlacement))
+        <*> P.optional ((P.atEl (P.name "accidental") >> parseAccidental))
+        <*> P.optional ((P.atEl (P.name "time-modification") >> parseTimeModification))
+        <*> P.optional ((P.atEl (P.name "stem") >> parseStem))
+        <*> P.optional ((P.atEl (P.name "notehead") >> parseNotehead))
+        <*> P.optional (parseStaff)
+        <*> P.findChildren (P.name "beam") ((P.atEl (P.name "beam") >> parseBeam))
+        <*> P.findChildren (P.name "notations") ((P.atEl (P.name "notations") >> parseNotations))
+        <*> P.findChildren (P.name "lyric") ((P.atEl (P.name "lyric") >> parseLyric))
+
 -- | Smart constructor for 'Note'
 mkNote :: ChxNote -> EditorialVoice -> Note
 mkNote t v = Note Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing t Nothing v Nothing [] Nothing Nothing Nothing Nothing Nothing [] [] []
@@ -3810,6 +5574,12 @@ instance EmitXml NoteSize where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)])
         []
+parseNoteSize :: P.XParser m => m NoteSize
+parseNoteSize = 
+      NoteSize
+        <$> (P.textContent >>= parseNonNegativeDecimal)
+        <*> (P.attr (P.name "type") >>= parseNoteSizeType)
+
 -- | Smart constructor for 'NoteSize'
 mkNoteSize :: NonNegativeDecimal -> NoteSizeType -> NoteSize
 mkNoteSize a b = NoteSize a b
@@ -3828,6 +5598,12 @@ instance EmitXml NoteType where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "size" Nothing).emitXml) b])
         []
+parseNoteType :: P.XParser m => m NoteType
+parseNoteType = 
+      NoteType
+        <$> (P.textContent >>= parseNoteTypeValue)
+        <*> P.optional (P.attr (P.name "size") >>= parseSymbolSize)
+
 -- | Smart constructor for 'NoteType'
 mkNoteType :: NoteTypeValue -> NoteType
 mkNoteType a = NoteType a Nothing
@@ -3856,6 +5632,18 @@ instance EmitXml Notehead where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "filled" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
+parseNotehead :: P.XParser m => m Notehead
+parseNotehead = 
+      Notehead
+        <$> (P.textContent >>= parseNoteheadValue)
+        <*> P.optional (P.attr (P.name "filled") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Notehead'
 mkNotehead :: NoteheadValue -> Notehead
 mkNotehead a = Notehead a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3884,6 +5672,22 @@ instance EmitXml OctaveShift where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
+parseOctaveShift :: P.XParser m => m OctaveShift
+parseOctaveShift = 
+      OctaveShift
+        <$> (P.attr (P.name "type") >>= parseUpDownStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "size") >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'OctaveShift'
 mkOctaveShift :: UpDownStop -> OctaveShift
 mkOctaveShift a = OctaveShift a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -3902,6 +5706,12 @@ instance EmitXml Offset where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "sound" Nothing).emitXml) b])
         []
+parseOffset :: P.XParser m => m Offset
+parseOffset = 
+      Offset
+        <$> (P.textContent >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "sound") >>= parseYesNo)
+
 -- | Smart constructor for 'Offset'
 mkOffset :: Divisions -> Offset
 mkOffset a = Offset a Nothing
@@ -3924,6 +5734,16 @@ instance EmitXml Opus where
       XContent XEmpty
         ([XAttr (QN "href" (Just "xlink")) (emitXml a)]++[maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) b]++[maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) c]++[maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) d]++[maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) e]++[maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) f])
         []
+parseOpus :: P.XParser m => m Opus
+parseOpus = 
+      Opus
+        <$> (P.attr (P.name "xlink:href") >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xlink:type") >>= parseType)
+        <*> P.optional (P.attr (P.name "xlink:role") >>= parseToken)
+        <*> P.optional (P.attr (P.name "xlink:title") >>= parseToken)
+        <*> P.optional (P.attr (P.name "xlink:show") >>= parseSmpShow)
+        <*> P.optional (P.attr (P.name "xlink:actuate") >>= parseActuate)
+
 -- | Smart constructor for 'Opus'
 mkOpus :: String -> Opus
 mkOpus a = Opus a Nothing Nothing Nothing Nothing Nothing
@@ -3939,6 +5759,11 @@ data Ornaments =
 instance EmitXml Ornaments where
     emitXml (Ornaments a) =
       XReps [emitXml a]
+parseOrnaments :: P.XParser m => m Ornaments
+parseOrnaments = 
+      Ornaments
+        <$> P.many (parseSeqOrnaments)
+
 -- | Smart constructor for 'Ornaments'
 mkOrnaments :: Ornaments
 mkOrnaments = Ornaments []
@@ -3957,6 +5782,12 @@ instance EmitXml OtherAppearance where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)])
         []
+parseOtherAppearance :: P.XParser m => m OtherAppearance
+parseOtherAppearance = 
+      OtherAppearance
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseToken)
+
 -- | Smart constructor for 'OtherAppearance'
 mkOtherAppearance :: String -> Token -> OtherAppearance
 mkOtherAppearance a b = OtherAppearance a b
@@ -3984,6 +5815,21 @@ instance EmitXml OtherDirection where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseOtherDirection :: P.XParser m => m OtherDirection
+parseOtherDirection = 
+      OtherDirection
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'OtherDirection'
 mkOtherDirection :: String -> OtherDirection
 mkOtherDirection a = OtherDirection a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4014,6 +5860,24 @@ instance EmitXml OtherNotation where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) n])
         []
+parseOtherNotation :: P.XParser m => m OtherNotation
+parseOtherNotation = 
+      OtherNotation
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseStartStopSingle)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'OtherNotation'
 mkOtherNotation :: String -> StartStopSingle -> OtherNotation
 mkOtherNotation a b = OtherNotation a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4032,6 +5896,12 @@ instance EmitXml PageLayout where
       XContent XEmpty
         []
         ([emitXml a]++map (XElement (QN "page-margins" Nothing).emitXml) b)
+parsePageLayout :: P.XParser m => m PageLayout
+parsePageLayout = 
+      PageLayout
+        <$> P.optional (parseSeqPageLayout)
+        <*> P.findChildren (P.name "page-margins") ((P.atEl (P.name "page-margins") >> parsePageMargins))
+
 -- | Smart constructor for 'PageLayout'
 mkPageLayout :: PageLayout
 mkPageLayout = PageLayout Nothing []
@@ -4050,6 +5920,12 @@ instance EmitXml PageMargins where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a])
         ([emitXml b])
+parsePageMargins :: P.XParser m => m PageMargins
+parsePageMargins = 
+      PageMargins
+        <$> P.optional (P.attr (P.name "type") >>= parseMarginType)
+        <*> parseAllMargins
+
 -- | Smart constructor for 'PageMargins'
 mkPageMargins :: AllMargins -> PageMargins
 mkPageMargins b = PageMargins Nothing b
@@ -4066,6 +5942,12 @@ instance EmitXml CmpPart where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         (map (XElement (QN "measure" Nothing).emitXml) b)
+parseCmpPart :: P.XParser m => m CmpPart
+parseCmpPart = 
+      CmpPart
+        <$> (P.attr (P.name "id") >>= parseIDREF)
+        <*> P.findChildren (P.name "measure") ((P.atEl (P.name "measure") >> parseMeasure))
+
 -- | Smart constructor for 'CmpPart'
 mkCmpPart :: IDREF -> CmpPart
 mkCmpPart a = CmpPart a []
@@ -4084,6 +5966,12 @@ instance EmitXml Part where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([emitXml b])
+parsePart :: P.XParser m => m Part
+parsePart = 
+      Part
+        <$> (P.attr (P.name "id") >>= parseIDREF)
+        <*> parseMusicData
+
 -- | Smart constructor for 'Part'
 mkPart :: IDREF -> MusicData -> Part
 mkPart a b = Part a b
@@ -4114,6 +6002,20 @@ instance EmitXml PartGroup where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b])
         ([maybe XEmpty (XElement (QN "group-name" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "group-name-display" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "group-abbreviation" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "group-abbreviation-display" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "group-symbol" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "group-barline" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "group-time" Nothing).emitXml) i]++[emitXml j])
+parsePartGroup :: P.XParser m => m PartGroup
+parsePartGroup = 
+      PartGroup
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseToken)
+        <*> P.optional ((P.atEl (P.name "group-name") >> parseGroupName))
+        <*> P.optional ((P.atEl (P.name "group-name-display") >> parseNameDisplay))
+        <*> P.optional ((P.atEl (P.name "group-abbreviation") >> parseGroupName))
+        <*> P.optional ((P.atEl (P.name "group-abbreviation-display") >> parseNameDisplay))
+        <*> P.optional ((P.atEl (P.name "group-symbol") >> parseGroupSymbol))
+        <*> P.optional ((P.atEl (P.name "group-barline") >> parseGroupBarline))
+        <*> P.optional ((P.atEl (P.name "group-time") >> parseEmpty))
+        <*> parseEditorial
+
 -- | Smart constructor for 'PartGroup'
 mkPartGroup :: StartStop -> Editorial -> PartGroup
 mkPartGroup a j = PartGroup a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing j
@@ -4131,6 +6033,13 @@ data PartList =
 instance EmitXml PartList where
     emitXml (PartList a b c) =
       XReps [emitXml a,emitXml b,emitXml c]
+parsePartList :: P.XParser m => m PartList
+parsePartList = 
+      PartList
+        <$> P.many (parseGrpPartGroup)
+        <*> parseScorePart
+        <*> P.many (parseChxPartList)
+
 -- | Smart constructor for 'PartList'
 mkPartList :: ScorePart -> PartList
 mkPartList b = PartList [] b []
@@ -4159,6 +6068,22 @@ instance EmitXml PartName where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) l])
         []
+parsePartName :: P.XParser m => m PartName
+parsePartName = 
+      PartName
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "justify") >>= parseLeftCenterRight)
+
 -- | Smart constructor for 'PartName'
 mkPartName :: String -> PartName
 mkPartName a = PartName a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4183,6 +6108,18 @@ instance EmitXml PartSymbol where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "top-staff" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "bottom-staff" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
+parsePartSymbol :: P.XParser m => m PartSymbol
+parsePartSymbol = 
+      PartSymbol
+        <$> (P.textContent >>= parseGroupSymbolValue)
+        <*> P.optional (P.attr (P.name "top-staff") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "bottom-staff") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'PartSymbol'
 mkPartSymbol :: GroupSymbolValue -> PartSymbol
 mkPartSymbol a = PartSymbol a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4210,6 +6147,21 @@ instance EmitXml Pedal where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "line" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parsePedal :: P.XParser m => m Pedal
+parsePedal = 
+      Pedal
+        <$> (P.attr (P.name "type") >>= parseStartStopChange)
+        <*> P.optional (P.attr (P.name "line") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Pedal'
 mkPedal :: StartStopChange -> Pedal
 mkPedal a = Pedal a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4228,6 +6180,12 @@ instance EmitXml PedalTuning where
       XContent XEmpty
         []
         ([XElement (QN "pedal-step" Nothing) (emitXml a)]++[XElement (QN "pedal-alter" Nothing) (emitXml b)])
+parsePedalTuning :: P.XParser m => m PedalTuning
+parsePedalTuning = 
+      PedalTuning
+        <$> P.oneChild ((P.atEl (P.name "pedal-step") >> P.textContent >>= parseStep))
+        <*> P.oneChild ((P.atEl (P.name "pedal-alter") >> P.textContent >>= parseSemitones))
+
 -- | Smart constructor for 'PedalTuning'
 mkPedalTuning :: Step -> Semitones -> PedalTuning
 mkPedalTuning a b = PedalTuning a b
@@ -4249,6 +6207,15 @@ instance EmitXml PerMinute where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e])
         []
+parsePerMinute :: P.XParser m => m PerMinute
+parsePerMinute = 
+      PerMinute
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+
 -- | Smart constructor for 'PerMinute'
 mkPerMinute :: String -> PerMinute
 mkPerMinute a = PerMinute a Nothing Nothing Nothing Nothing
@@ -4268,6 +6235,13 @@ instance EmitXml Pitch where
       XContent XEmpty
         []
         ([XElement (QN "step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "alter" Nothing).emitXml) b]++[XElement (QN "octave" Nothing) (emitXml c)])
+parsePitch :: P.XParser m => m Pitch
+parsePitch = 
+      Pitch
+        <$> P.oneChild ((P.atEl (P.name "step") >> P.textContent >>= parseStep))
+        <*> P.optional ((P.atEl (P.name "alter") >> P.textContent >>= parseSemitones))
+        <*> P.oneChild ((P.atEl (P.name "octave") >> P.textContent >>= parseOctave))
+
 -- | Smart constructor for 'Pitch'
 mkPitch :: Step -> Octave -> Pitch
 mkPitch a c = Pitch a Nothing c
@@ -4295,6 +6269,21 @@ instance EmitXml PlacementText where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
+parsePlacementText :: P.XParser m => m PlacementText
+parsePlacementText = 
+      PlacementText
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'PlacementText'
 mkPlacementText :: String -> PlacementText
 mkPlacementText a = PlacementText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4323,6 +6312,20 @@ instance EmitXml Print where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "staff-spacing" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "new-system" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "new-page" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "blank-page" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "page-number" Nothing).emitXml) e])
         ([emitXml f]++[maybe XEmpty (XElement (QN "measure-layout" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "measure-numbering" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) i]++[maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) j])
+parsePrint :: P.XParser m => m Print
+parsePrint = 
+      Print
+        <$> P.optional (P.attr (P.name "staff-spacing") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "new-system") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "new-page") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "blank-page") >>= parsePositiveInteger)
+        <*> P.optional (P.attr (P.name "page-number") >>= parseToken)
+        <*> parseLayout
+        <*> P.optional ((P.atEl (P.name "measure-layout") >> parseMeasureLayout))
+        <*> P.optional ((P.atEl (P.name "measure-numbering") >> parseMeasureNumbering))
+        <*> P.optional ((P.atEl (P.name "part-name-display") >> parseNameDisplay))
+        <*> P.optional ((P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
+
 -- | Smart constructor for 'Print'
 mkPrint :: Layout -> Print
 mkPrint f = Print Nothing Nothing Nothing Nothing Nothing f Nothing Nothing Nothing Nothing
@@ -4356,6 +6359,27 @@ instance EmitXml Rehearsal where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) q])
         []
+parseRehearsal :: P.XParser m => m Rehearsal
+parseRehearsal = 
+      Rehearsal
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.attr (P.name "enclosure") >>= parseRehearsalEnclosure)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "dir") >>= parseTextDirection)
+        <*> P.optional (P.attr (P.name "rotation") >>= parseRotationDegrees)
+
 -- | Smart constructor for 'Rehearsal'
 mkRehearsal :: String -> Rehearsal
 mkRehearsal a = Rehearsal a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4374,6 +6398,12 @@ instance EmitXml Repeat where
       XContent XEmpty
         ([XAttr (QN "direction" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "times" Nothing).emitXml) b])
         []
+parseRepeat :: P.XParser m => m Repeat
+parseRepeat = 
+      Repeat
+        <$> (P.attr (P.name "direction") >>= parseBackwardForward)
+        <*> P.optional (P.attr (P.name "times") >>= parseNonNegativeInteger)
+
 -- | Smart constructor for 'Repeat'
 mkRepeat :: BackwardForward -> Repeat
 mkRepeat a = Repeat a Nothing
@@ -4392,6 +6422,12 @@ instance EmitXml Root where
       XContent XEmpty
         []
         ([XElement (QN "root-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "root-alter" Nothing).emitXml) b])
+parseRoot :: P.XParser m => m Root
+parseRoot = 
+      Root
+        <$> P.oneChild ((P.atEl (P.name "root-step") >> parseRootStep))
+        <*> P.optional ((P.atEl (P.name "root-alter") >> parseRootAlter))
+
 -- | Smart constructor for 'Root'
 mkRoot :: RootStep -> Root
 mkRoot a = Root a Nothing
@@ -4420,6 +6456,22 @@ instance EmitXml RootAlter where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
+parseRootAlter :: P.XParser m => m RootAlter
+parseRootAlter = 
+      RootAlter
+        <$> (P.textContent >>= parseSemitones)
+        <*> P.optional (P.attr (P.name "location") >>= parseLeftRight)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'RootAlter'
 mkRootAlter :: Semitones -> RootAlter
 mkRootAlter a = RootAlter a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4447,6 +6499,21 @@ instance EmitXml RootStep where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
+parseRootStep :: P.XParser m => m RootStep
+parseRootStep = 
+      RootStep
+        <$> (P.textContent >>= parseStep)
+        <*> P.optional (P.attr (P.name "text") >>= parseToken)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'RootStep'
 mkRootStep :: Step -> RootStep
 mkRootStep a = RootStep a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4465,6 +6532,12 @@ instance EmitXml Scaling where
       XContent XEmpty
         []
         ([XElement (QN "millimeters" Nothing) (emitXml a)]++[XElement (QN "tenths" Nothing) (emitXml b)])
+parseScaling :: P.XParser m => m Scaling
+parseScaling = 
+      Scaling
+        <$> P.oneChild ((P.atEl (P.name "millimeters") >> P.textContent >>= parseMillimeters))
+        <*> P.oneChild ((P.atEl (P.name "tenths") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'Scaling'
 mkScaling :: Millimeters -> Tenths -> Scaling
 mkScaling a b = Scaling a b
@@ -4482,6 +6555,11 @@ instance EmitXml Scordatura where
       XContent XEmpty
         []
         (map (XElement (QN "accord" Nothing).emitXml) a)
+parseScordatura :: P.XParser m => m Scordatura
+parseScordatura = 
+      Scordatura
+        <$> P.findChildren (P.name "accord") ((P.atEl (P.name "accord") >> parseAccord))
+
 -- | Smart constructor for 'Scordatura'
 mkScordatura :: Scordatura
 mkScordatura = Scordatura []
@@ -4504,6 +6582,14 @@ instance EmitXml ScoreInstrument where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([XElement (QN "instrument-name" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "instrument-abbreviation" Nothing).emitXml) c]++[emitXml d])
+parseScoreInstrument :: P.XParser m => m ScoreInstrument
+parseScoreInstrument = 
+      ScoreInstrument
+        <$> (P.attr (P.name "id") >>= parseID)
+        <*> P.oneChild ((P.atEl (P.name "instrument-name") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "instrument-abbreviation") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional (parseChxScoreInstrument)
+
 -- | Smart constructor for 'ScoreInstrument'
 mkScoreInstrument :: ID -> String -> ScoreInstrument
 mkScoreInstrument a b = ScoreInstrument a b Nothing Nothing
@@ -4530,6 +6616,20 @@ instance EmitXml CmpScorePart where
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([maybe XEmpty (XElement (QN "identification" Nothing).emitXml) b]++[XElement (QN "part-name" Nothing) (emitXml c)]++[maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "part-abbreviation" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) f]++map (XElement (QN "group" Nothing).emitXml) g++map (XElement (QN "score-instrument" Nothing).emitXml) h++[maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) i]++map (XElement (QN "midi-instrument" Nothing).emitXml) j)
+parseCmpScorePart :: P.XParser m => m CmpScorePart
+parseCmpScorePart = 
+      CmpScorePart
+        <$> (P.attr (P.name "id") >>= parseID)
+        <*> P.optional ((P.atEl (P.name "identification") >> parseIdentification))
+        <*> P.oneChild ((P.atEl (P.name "part-name") >> parsePartName))
+        <*> P.optional ((P.atEl (P.name "part-name-display") >> parseNameDisplay))
+        <*> P.optional ((P.atEl (P.name "part-abbreviation") >> parsePartName))
+        <*> P.optional ((P.atEl (P.name "part-abbreviation-display") >> parseNameDisplay))
+        <*> P.findChildren (P.name "group") ((P.atEl (P.name "group") >> P.textContent >>= (readParse "DefString")))
+        <*> P.findChildren (P.name "score-instrument") ((P.atEl (P.name "score-instrument") >> parseScoreInstrument))
+        <*> P.optional ((P.atEl (P.name "midi-device") >> parseMidiDevice))
+        <*> P.findChildren (P.name "midi-instrument") ((P.atEl (P.name "midi-instrument") >> parseMidiInstrument))
+
 -- | Smart constructor for 'CmpScorePart'
 mkCmpScorePart :: ID -> PartName -> CmpScorePart
 mkCmpScorePart a c = CmpScorePart a Nothing c Nothing Nothing Nothing [] [] Nothing []
@@ -4547,6 +6647,13 @@ instance EmitXml ScorePartwise where
       XElement (QN "score-partwise" Nothing) $ XContent XEmpty
         ([maybe XEmpty (XAttr (QN "version" Nothing).emitXml) a])
         ([emitXml b]++map (XElement (QN "part" Nothing).emitXml) c)
+parseScorePartwise :: P.XParser m => m ScorePartwise
+parseScorePartwise = 
+      ScorePartwise
+        <$> P.optional (P.attr (P.name "version") >>= parseToken)
+        <*> parseScoreHeader
+        <*> P.findChildren (P.name "part") ((P.atEl (P.name "part") >> parseCmpPart))
+
 -- | Smart constructor for 'ScorePartwise'
 mkScorePartwise :: ScoreHeader -> ScorePartwise
 mkScorePartwise b = ScorePartwise Nothing b []
@@ -4564,6 +6671,13 @@ instance EmitXml ScoreTimewise where
       XElement (QN "score-timewise" Nothing) $ XContent XEmpty
         ([maybe XEmpty (XAttr (QN "version" Nothing).emitXml) a])
         ([emitXml b]++map (XElement (QN "measure" Nothing).emitXml) c)
+parseScoreTimewise :: P.XParser m => m ScoreTimewise
+parseScoreTimewise = 
+      ScoreTimewise
+        <$> P.optional (P.attr (P.name "version") >>= parseToken)
+        <*> parseScoreHeader
+        <*> P.findChildren (P.name "measure") ((P.atEl (P.name "measure") >> parseCmpMeasure))
+
 -- | Smart constructor for 'ScoreTimewise'
 mkScoreTimewise :: ScoreHeader -> ScoreTimewise
 mkScoreTimewise b = ScoreTimewise Nothing b []
@@ -4584,6 +6698,14 @@ instance EmitXml CmpSlash where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "use-stems" Nothing).emitXml) c])
         ([emitXml d])
+parseCmpSlash :: P.XParser m => m CmpSlash
+parseCmpSlash = 
+      CmpSlash
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "use-dots") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "use-stems") >>= parseYesNo)
+        <*> P.optional (parseSlash)
+
 -- | Smart constructor for 'CmpSlash'
 mkCmpSlash :: StartStop -> CmpSlash
 mkCmpSlash a = CmpSlash a Nothing Nothing Nothing
@@ -4617,6 +6739,27 @@ instance EmitXml Slide where
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
         []
+parseSlide :: P.XParser m => m Slide
+parseSlide = 
+      Slide
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "accelerate") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "beats") >>= parseTrillBeats)
+        <*> P.optional (P.attr (P.name "first-beat") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "last-beat") >>= parsePercent)
+
 -- | Smart constructor for 'Slide'
 mkSlide :: String -> StartStop -> Slide
 mkSlide a b = Slide a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4649,6 +6792,26 @@ instance EmitXml Slur where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
+parseSlur :: P.XParser m => m Slur
+parseSlur = 
+      Slur
+        <$> (P.attr (P.name "type") >>= parseStartStopContinue)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "orientation") >>= parseOverUnder)
+        <*> P.optional (P.attr (P.name "bezier-offset") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "bezier-offset2") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "bezier-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-x2") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-y2") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Slur'
 mkSlur :: StartStopContinue -> Slur
 mkSlur a = Slur a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4713,6 +6876,29 @@ instance EmitXml Sound where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "tempo" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "dacapo" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "dalsegno" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "tocoda" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "forward-repeat" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "fine" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "pan" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "elevation" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "damper-pedal" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "soft-pedal" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "sostenuto-pedal" Nothing).emitXml) q])
         (map (XElement (QN "midi-instrument" Nothing).emitXml) r++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) s])
+parseSound :: P.XParser m => m Sound
+parseSound = 
+      Sound
+        <$> P.optional (P.attr (P.name "tempo") >>= parseNonNegativeDecimal)
+        <*> P.optional (P.attr (P.name "dynamics") >>= parseNonNegativeDecimal)
+        <*> P.optional (P.attr (P.name "dacapo") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "segno") >>= parseToken)
+        <*> P.optional (P.attr (P.name "dalsegno") >>= parseToken)
+        <*> P.optional (P.attr (P.name "coda") >>= parseToken)
+        <*> P.optional (P.attr (P.name "tocoda") >>= parseToken)
+        <*> P.optional (P.attr (P.name "divisions") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "forward-repeat") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "fine") >>= parseToken)
+        <*> P.optional (P.attr (P.name "time-only") >>= parseToken)
+        <*> P.optional (P.attr (P.name "pizzicato") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "pan") >>= parseRotationDegrees)
+        <*> P.optional (P.attr (P.name "elevation") >>= parseRotationDegrees)
+        <*> P.optional (P.attr (P.name "damper-pedal") >>= parseYesNoNumber)
+        <*> P.optional (P.attr (P.name "soft-pedal") >>= parseYesNoNumber)
+        <*> P.optional (P.attr (P.name "sostenuto-pedal") >>= parseYesNoNumber)
+        <*> P.findChildren (P.name "midi-instrument") ((P.atEl (P.name "midi-instrument") >> parseMidiInstrument))
+        <*> P.optional ((P.atEl (P.name "offset") >> parseOffset))
+
 -- | Smart constructor for 'Sound'
 mkSound :: Sound
 mkSound = Sound Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing
@@ -4738,6 +6924,19 @@ instance EmitXml StaffDetails where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "show-frets" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) d])
         ([maybe XEmpty (XElement (QN "staff-type" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "staff-lines" Nothing).emitXml) f]++map (XElement (QN "staff-tuning" Nothing).emitXml) g++[maybe XEmpty (XElement (QN "capo" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "staff-size" Nothing).emitXml) i])
+parseStaffDetails :: P.XParser m => m StaffDetails
+parseStaffDetails = 
+      StaffDetails
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "show-frets") >>= parseShowFrets)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "print-spacing") >>= parseYesNo)
+        <*> P.optional ((P.atEl (P.name "staff-type") >> P.textContent >>= parseStaffType))
+        <*> P.optional ((P.atEl (P.name "staff-lines") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.findChildren (P.name "staff-tuning") ((P.atEl (P.name "staff-tuning") >> parseStaffTuning))
+        <*> P.optional ((P.atEl (P.name "capo") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.optional ((P.atEl (P.name "staff-size") >> P.textContent >>= parseNonNegativeDecimal))
+
 -- | Smart constructor for 'StaffDetails'
 mkStaffDetails :: StaffDetails
 mkStaffDetails = StaffDetails Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing Nothing
@@ -4756,6 +6955,12 @@ instance EmitXml StaffLayout where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a])
         ([maybe XEmpty (XElement (QN "staff-distance" Nothing).emitXml) b])
+parseStaffLayout :: P.XParser m => m StaffLayout
+parseStaffLayout = 
+      StaffLayout
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional ((P.atEl (P.name "staff-distance") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'StaffLayout'
 mkStaffLayout :: StaffLayout
 mkStaffLayout = StaffLayout Nothing Nothing
@@ -4774,6 +6979,12 @@ instance EmitXml StaffTuning where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "line" Nothing).emitXml) a])
         ([emitXml b])
+parseStaffTuning :: P.XParser m => m StaffTuning
+parseStaffTuning = 
+      StaffTuning
+        <$> P.optional (P.attr (P.name "line") >>= parseStaffLine)
+        <*> parseTuning
+
 -- | Smart constructor for 'StaffTuning'
 mkStaffTuning :: Tuning -> StaffTuning
 mkStaffTuning b = StaffTuning Nothing b
@@ -4796,6 +7007,16 @@ instance EmitXml Stem where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseStem :: P.XParser m => m Stem
+parseStem = 
+      Stem
+        <$> (P.textContent >>= parseStemValue)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Stem'
 mkStem :: StemValue -> Stem
 mkStem a = Stem a Nothing Nothing Nothing Nothing Nothing
@@ -4823,6 +7044,21 @@ instance EmitXml CmpString where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
+parseCmpString :: P.XParser m => m CmpString
+parseCmpString = 
+      CmpString
+        <$> (P.textContent >>= parseStringNumber)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'CmpString'
 mkCmpString :: StringNumber -> CmpString
 mkCmpString a = CmpString a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4841,6 +7077,12 @@ instance EmitXml StrongAccent where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b])
         ([emitXml a])
+parseStrongAccent :: P.XParser m => m StrongAccent
+parseStrongAccent = 
+      StrongAccent
+        <$> parseStrongAccent
+        <*> P.optional (P.attr (P.name "type") >>= parseUpDown)
+
 -- | Smart constructor for 'StrongAccent'
 mkStrongAccent :: StrongAccent -> StrongAccent
 mkStrongAccent a = StrongAccent a Nothing
@@ -4867,6 +7109,20 @@ instance EmitXml StyleText where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
+parseStyleText :: P.XParser m => m StyleText
+parseStyleText = 
+      StyleText
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'StyleText'
 mkStyleText :: String -> StyleText
 mkStyleText a = StyleText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4887,6 +7143,14 @@ instance EmitXml Supports where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[XAttr (QN "element" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "attribute" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "value" Nothing).emitXml) d])
         []
+parseSupports :: P.XParser m => m Supports
+parseSupports = 
+      Supports
+        <$> (P.attr (P.name "type") >>= parseYesNo)
+        <*> (P.attr (P.name "element") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "attribute") >>= parseNMTOKEN)
+        <*> P.optional (P.attr (P.name "value") >>= parseToken)
+
 -- | Smart constructor for 'Supports'
 mkSupports :: YesNo -> NMTOKEN -> Supports
 mkSupports a b = Supports a b Nothing Nothing
@@ -4908,6 +7172,13 @@ instance EmitXml SystemLayout where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "system-margins" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "system-distance" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "top-system-distance" Nothing).emitXml) c])
+parseSystemLayout :: P.XParser m => m SystemLayout
+parseSystemLayout = 
+      SystemLayout
+        <$> P.optional ((P.atEl (P.name "system-margins") >> parseSystemMargins))
+        <*> P.optional ((P.atEl (P.name "system-distance") >> P.textContent >>= parseTenths))
+        <*> P.optional ((P.atEl (P.name "top-system-distance") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'SystemLayout'
 mkSystemLayout :: SystemLayout
 mkSystemLayout = SystemLayout Nothing Nothing Nothing
@@ -4923,6 +7194,11 @@ data SystemMargins =
 instance EmitXml SystemMargins where
     emitXml (SystemMargins a) =
       XReps [emitXml a]
+parseSystemMargins :: P.XParser m => m SystemMargins
+parseSystemMargins = 
+      SystemMargins
+        <$> parseLeftRightMargins
+
 -- | Smart constructor for 'SystemMargins'
 mkSystemMargins :: LeftRightMargins -> SystemMargins
 mkSystemMargins a = SystemMargins a
@@ -4938,6 +7214,11 @@ data Technical =
 instance EmitXml Technical where
     emitXml (Technical a) =
       XReps [emitXml a]
+parseTechnical :: P.XParser m => m Technical
+parseTechnical = 
+      Technical
+        <$> P.many (parseChxTechnical)
+
 -- | Smart constructor for 'Technical'
 mkTechnical :: Technical
 mkTechnical = Technical []
@@ -4967,6 +7248,23 @@ instance EmitXml TextElementData where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) m])
         []
+parseTextElementData :: P.XParser m => m TextElementData
+parseTextElementData = 
+      TextElementData
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.attr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.attr (P.name "letter-spacing") >>= parseNumberOrNormal)
+        <*> P.optional (P.attr (P.name "dir") >>= parseTextDirection)
+
 -- | Smart constructor for 'TextElementData'
 mkTextElementData :: String -> TextElementData
 mkTextElementData a = TextElementData a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -4984,6 +7282,11 @@ instance EmitXml Tie where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)])
         []
+parseTie :: P.XParser m => m Tie
+parseTie = 
+      Tie
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+
 -- | Smart constructor for 'Tie'
 mkTie :: StartStop -> Tie
 mkTie a = Tie a
@@ -5016,6 +7319,26 @@ instance EmitXml Tied where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
+parseTied :: P.XParser m => m Tied
+parseTied = 
+      Tied
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "orientation") >>= parseOverUnder)
+        <*> P.optional (P.attr (P.name "bezier-offset") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "bezier-offset2") >>= parseDivisions)
+        <*> P.optional (P.attr (P.name "bezier-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-x2") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "bezier-y2") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Tied'
 mkTied :: StartStop -> Tied
 mkTied a = Tied a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -5047,6 +7370,23 @@ instance EmitXml Time where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) l])
         ([emitXml m])
+parseTime :: P.XParser m => m Time
+parseTime = 
+      Time
+        <$> P.optional (P.attr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.attr (P.name "symbol") >>= parseTimeSymbol)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
+        <*> parseChxTime
+
 -- | Smart constructor for 'Time'
 mkTime :: ChxTime -> Time
 mkTime m = Time Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing m
@@ -5066,6 +7406,13 @@ instance EmitXml TimeModification where
       XContent XEmpty
         []
         ([XElement (QN "actual-notes" Nothing) (emitXml a)]++[XElement (QN "normal-notes" Nothing) (emitXml b)]++[emitXml c])
+parseTimeModification :: P.XParser m => m TimeModification
+parseTimeModification = 
+      TimeModification
+        <$> P.oneChild ((P.atEl (P.name "actual-notes") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.oneChild ((P.atEl (P.name "normal-notes") >> P.textContent >>= parseNonNegativeInteger))
+        <*> P.optional (parseSeqTimeModification)
+
 -- | Smart constructor for 'TimeModification'
 mkTimeModification :: NonNegativeInteger -> NonNegativeInteger -> TimeModification
 mkTimeModification a b = TimeModification a b Nothing
@@ -5086,6 +7433,14 @@ instance EmitXml Transpose where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "diatonic" Nothing).emitXml) a]++[XElement (QN "chromatic" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "octave-change" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "double" Nothing).emitXml) d])
+parseTranspose :: P.XParser m => m Transpose
+parseTranspose = 
+      Transpose
+        <$> P.optional ((P.atEl (P.name "diatonic") >> P.textContent >>= (readParse "Integer")))
+        <*> P.oneChild ((P.atEl (P.name "chromatic") >> P.textContent >>= parseSemitones))
+        <*> P.optional ((P.atEl (P.name "octave-change") >> P.textContent >>= (readParse "Integer")))
+        <*> P.optional ((P.atEl (P.name "double") >> parseEmpty))
+
 -- | Smart constructor for 'Transpose'
 mkTranspose :: Semitones -> Transpose
 mkTranspose b = Transpose Nothing b Nothing Nothing
@@ -5114,6 +7469,22 @@ instance EmitXml Tremolo where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
         []
+parseTremolo :: P.XParser m => m Tremolo
+parseTremolo = 
+      Tremolo
+        <$> (P.textContent >>= parseTremoloMarks)
+        <*> P.optional (P.attr (P.name "type") >>= parseStartStopSingle)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+
 -- | Smart constructor for 'Tremolo'
 mkTremolo :: TremoloMarks -> Tremolo
 mkTremolo a = Tremolo a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -5147,6 +7518,23 @@ instance EmitXml Tuplet where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "show-type" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         ([maybe XEmpty (XElement (QN "tuplet-actual" Nothing).emitXml) l]++[maybe XEmpty (XElement (QN "tuplet-normal" Nothing).emitXml) m])
+parseTuplet :: P.XParser m => m Tuplet
+parseTuplet = 
+      Tuplet
+        <$> (P.attr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "bracket") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "show-number") >>= parseShowTuplet)
+        <*> P.optional (P.attr (P.name "show-type") >>= parseShowTuplet)
+        <*> P.optional (P.attr (P.name "line-shape") >>= parseLineShape)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional ((P.atEl (P.name "tuplet-actual") >> parseTupletPortion))
+        <*> P.optional ((P.atEl (P.name "tuplet-normal") >> parseTupletPortion))
+
 -- | Smart constructor for 'Tuplet'
 mkTuplet :: StartStop -> Tuplet
 mkTuplet a = Tuplet a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -5168,6 +7556,15 @@ instance EmitXml TupletDot where
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
+parseTupletDot :: P.XParser m => m TupletDot
+parseTupletDot = 
+      TupletDot
+        <$> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'TupletDot'
 mkTupletDot :: TupletDot
 mkTupletDot = TupletDot Nothing Nothing Nothing Nothing Nothing
@@ -5190,6 +7587,16 @@ instance EmitXml TupletNumber where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseTupletNumber :: P.XParser m => m TupletNumber
+parseTupletNumber = 
+      TupletNumber
+        <$> (P.textContent >>= parseNonNegativeInteger)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'TupletNumber'
 mkTupletNumber :: NonNegativeInteger -> TupletNumber
 mkTupletNumber a = TupletNumber a Nothing Nothing Nothing Nothing Nothing
@@ -5209,6 +7616,13 @@ instance EmitXml TupletPortion where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "tuplet-number" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "tuplet-type" Nothing).emitXml) b]++map (XElement (QN "tuplet-dot" Nothing).emitXml) c)
+parseTupletPortion :: P.XParser m => m TupletPortion
+parseTupletPortion = 
+      TupletPortion
+        <$> P.optional ((P.atEl (P.name "tuplet-number") >> parseTupletNumber))
+        <*> P.optional ((P.atEl (P.name "tuplet-type") >> parseTupletType))
+        <*> P.findChildren (P.name "tuplet-dot") ((P.atEl (P.name "tuplet-dot") >> parseTupletDot))
+
 -- | Smart constructor for 'TupletPortion'
 mkTupletPortion :: TupletPortion
 mkTupletPortion = TupletPortion Nothing Nothing []
@@ -5231,6 +7645,16 @@ instance EmitXml TupletType where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
+parseTupletType :: P.XParser m => m TupletType
+parseTupletType = 
+      TupletType
+        <$> (P.textContent >>= parseNoteTypeValue)
+        <*> P.optional (P.attr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.attr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.attr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'TupletType'
 mkTupletType :: NoteTypeValue -> TupletType
 mkTupletType a = TupletType a Nothing Nothing Nothing Nothing Nothing
@@ -5249,6 +7673,12 @@ instance EmitXml TypedText where
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b])
         []
+parseTypedText :: P.XParser m => m TypedText
+parseTypedText = 
+      TypedText
+        <$> (P.textContent >>= (readParse "DefString"))
+        <*> P.optional (P.attr (P.name "type") >>= parseToken)
+
 -- | Smart constructor for 'TypedText'
 mkTypedText :: String -> TypedText
 mkTypedText a = TypedText a Nothing
@@ -5280,6 +7710,25 @@ instance EmitXml WavyLine where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) o])
         []
+parseWavyLine :: P.XParser m => m WavyLine
+parseWavyLine = 
+      WavyLine
+        <$> (P.attr (P.name "type") >>= parseStartStopContinue)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+        <*> P.optional (P.attr (P.name "start-note") >>= parseStartNote)
+        <*> P.optional (P.attr (P.name "trill-step") >>= parseTrillStep)
+        <*> P.optional (P.attr (P.name "two-note-turn") >>= parseTwoNoteTurn)
+        <*> P.optional (P.attr (P.name "accelerate") >>= parseYesNo)
+        <*> P.optional (P.attr (P.name "beats") >>= parseTrillBeats)
+        <*> P.optional (P.attr (P.name "second-beat") >>= parsePercent)
+        <*> P.optional (P.attr (P.name "last-beat") >>= parsePercent)
+
 -- | Smart constructor for 'WavyLine'
 mkWavyLine :: StartStopContinue -> WavyLine
 mkWavyLine a = WavyLine a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -5304,6 +7753,18 @@ instance EmitXml Wedge where
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "spread" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
+parseWedge :: P.XParser m => m Wedge
+parseWedge = 
+      Wedge
+        <$> (P.attr (P.name "type") >>= parseWedgeType)
+        <*> P.optional (P.attr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.attr (P.name "spread") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.attr (P.name "color") >>= parseColor)
+
 -- | Smart constructor for 'Wedge'
 mkWedge :: WedgeType -> Wedge
 mkWedge a = Wedge a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -5323,6 +7784,13 @@ instance EmitXml Work where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "work-number" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "work-title" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "opus" Nothing).emitXml) c])
+parseWork :: P.XParser m => m Work
+parseWork = 
+      Work
+        <$> P.optional ((P.atEl (P.name "work-number") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "work-title") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "opus") >> parseOpus))
+
 -- | Smart constructor for 'Work'
 mkWork :: Work
 mkWork = Work Nothing Nothing Nothing
@@ -5443,6 +7911,41 @@ instance EmitXml ChxArticulations where
       XContent XEmpty
         []
         ([XElement (QN "other-articulation" Nothing) (emitXml a)])
+parseChxArticulations :: P.XParser m => m ChxArticulations
+parseChxArticulations = 
+      ArticulationsAccent
+        <$> P.oneChild ((P.atEl (P.name "accent") >> parseEmptyPlacement))
+      <|> ArticulationsStrongAccent
+        <$> P.oneChild ((P.atEl (P.name "strong-accent") >> parseStrongAccent))
+      <|> ArticulationsStaccato
+        <$> P.oneChild ((P.atEl (P.name "staccato") >> parseEmptyPlacement))
+      <|> ArticulationsTenuto
+        <$> P.oneChild ((P.atEl (P.name "tenuto") >> parseEmptyPlacement))
+      <|> ArticulationsDetachedLegato
+        <$> P.oneChild ((P.atEl (P.name "detached-legato") >> parseEmptyPlacement))
+      <|> ArticulationsStaccatissimo
+        <$> P.oneChild ((P.atEl (P.name "staccatissimo") >> parseEmptyPlacement))
+      <|> ArticulationsSpiccato
+        <$> P.oneChild ((P.atEl (P.name "spiccato") >> parseEmptyPlacement))
+      <|> ArticulationsScoop
+        <$> P.oneChild ((P.atEl (P.name "scoop") >> parseEmptyLine))
+      <|> ArticulationsPlop
+        <$> P.oneChild ((P.atEl (P.name "plop") >> parseEmptyLine))
+      <|> ArticulationsDoit
+        <$> P.oneChild ((P.atEl (P.name "doit") >> parseEmptyLine))
+      <|> ArticulationsFalloff
+        <$> P.oneChild ((P.atEl (P.name "falloff") >> parseEmptyLine))
+      <|> ArticulationsBreathMark
+        <$> P.oneChild ((P.atEl (P.name "breath-mark") >> parseEmptyPlacement))
+      <|> ArticulationsCaesura
+        <$> P.oneChild ((P.atEl (P.name "caesura") >> parseEmptyPlacement))
+      <|> ArticulationsStress
+        <$> P.oneChild ((P.atEl (P.name "stress") >> parseEmptyPlacement))
+      <|> ArticulationsUnstress
+        <$> P.oneChild ((P.atEl (P.name "unstress") >> parseEmptyPlacement))
+      <|> ArticulationsOtherArticulation
+        <$> P.oneChild ((P.atEl (P.name "other-articulation") >> parsePlacementText))
+
 -- | Smart constructor for 'ArticulationsAccent'
 mkArticulationsAccent :: EmptyPlacement -> ChxArticulations
 mkArticulationsAccent a = ArticulationsAccent a
@@ -5510,6 +8013,13 @@ instance EmitXml ChxBend where
       XContent XEmpty
         []
         ([XElement (QN "release" Nothing) (emitXml a)])
+parseChxBend :: P.XParser m => m ChxBend
+parseChxBend = 
+      BendPreBend
+        <$> P.oneChild ((P.atEl (P.name "pre-bend") >> parseEmpty))
+      <|> BendRelease
+        <$> P.oneChild ((P.atEl (P.name "release") >> parseEmpty))
+
 -- | Smart constructor for 'BendPreBend'
 mkBendPreBend :: Empty -> ChxBend
 mkBendPreBend a = BendPreBend a
@@ -5536,6 +8046,14 @@ instance EmitXml ChxCredit where
       XContent XEmpty
         []
         ([XElement (QN "credit-words" Nothing) (emitXml a)]++[emitXml b])
+parseChxCredit :: P.XParser m => m ChxCredit
+parseChxCredit = 
+      CreditCreditImage
+        <$> P.oneChild ((P.atEl (P.name "credit-image") >> parseImage))
+      <|> CreditCreditWords
+        <$> P.oneChild ((P.atEl (P.name "credit-words") >> parseFormattedText))
+        <*> P.many (parseSeqCredit)
+
 -- | Smart constructor for 'CreditCreditImage'
 mkCreditCreditImage :: Image -> ChxCredit
 mkCreditCreditImage a = CreditCreditImage a
@@ -5680,6 +8198,47 @@ instance EmitXml ChxDirectionType where
       XContent XEmpty
         []
         ([XElement (QN "other-direction" Nothing) (emitXml a)])
+parseChxDirectionType :: P.XParser m => m ChxDirectionType
+parseChxDirectionType = 
+      DirectionTypeRehearsal
+        <$> P.findChildren (P.name "rehearsal") ((P.atEl (P.name "rehearsal") >> parseRehearsal))
+      <|> DirectionTypeSegno
+        <$> P.findChildren (P.name "segno") ((P.atEl (P.name "segno") >> parseEmptyPrintStyle))
+      <|> DirectionTypeWords
+        <$> P.findChildren (P.name "words") ((P.atEl (P.name "words") >> parseFormattedText))
+      <|> DirectionTypeCoda
+        <$> P.findChildren (P.name "coda") ((P.atEl (P.name "coda") >> parseEmptyPrintStyle))
+      <|> DirectionTypeWedge
+        <$> P.oneChild ((P.atEl (P.name "wedge") >> parseWedge))
+      <|> DirectionTypeDynamics
+        <$> P.findChildren (P.name "dynamics") ((P.atEl (P.name "dynamics") >> parseDynamics))
+      <|> DirectionTypeDashes
+        <$> P.oneChild ((P.atEl (P.name "dashes") >> parseDashes))
+      <|> DirectionTypeBracket
+        <$> P.oneChild ((P.atEl (P.name "bracket") >> parseBracket))
+      <|> DirectionTypePedal
+        <$> P.oneChild ((P.atEl (P.name "pedal") >> parsePedal))
+      <|> DirectionTypeMetronome
+        <$> P.oneChild ((P.atEl (P.name "metronome") >> parseMetronome))
+      <|> DirectionTypeOctaveShift
+        <$> P.oneChild ((P.atEl (P.name "octave-shift") >> parseOctaveShift))
+      <|> DirectionTypeHarpPedals
+        <$> P.oneChild ((P.atEl (P.name "harp-pedals") >> parseHarpPedals))
+      <|> DirectionTypeDamp
+        <$> P.oneChild ((P.atEl (P.name "damp") >> parseEmptyPrintStyle))
+      <|> DirectionTypeDampAll
+        <$> P.oneChild ((P.atEl (P.name "damp-all") >> parseEmptyPrintStyle))
+      <|> DirectionTypeEyeglasses
+        <$> P.oneChild ((P.atEl (P.name "eyeglasses") >> parseEmptyPrintStyle))
+      <|> DirectionTypeScordatura
+        <$> P.oneChild ((P.atEl (P.name "scordatura") >> parseScordatura))
+      <|> DirectionTypeImage
+        <$> P.oneChild ((P.atEl (P.name "image") >> parseImage))
+      <|> DirectionTypeAccordionRegistration
+        <$> P.oneChild ((P.atEl (P.name "accordion-registration") >> parseAccordionRegistration))
+      <|> DirectionTypeOtherDirection
+        <$> P.oneChild ((P.atEl (P.name "other-direction") >> parseOtherDirection))
+
 -- | Smart constructor for 'DirectionTypeRehearsal'
 mkDirectionTypeRehearsal :: ChxDirectionType
 mkDirectionTypeRehearsal = DirectionTypeRehearsal []
@@ -5910,6 +8469,57 @@ instance EmitXml ChxDynamics where
       XContent XEmpty
         []
         ([XElement (QN "other-dynamics" Nothing) (emitXml a)])
+parseChxDynamics :: P.XParser m => m ChxDynamics
+parseChxDynamics = 
+      DynamicsP
+        <$> P.oneChild ((P.atEl (P.name "p") >> parseEmpty))
+      <|> DynamicsPp
+        <$> P.oneChild ((P.atEl (P.name "pp") >> parseEmpty))
+      <|> DynamicsPpp
+        <$> P.oneChild ((P.atEl (P.name "ppp") >> parseEmpty))
+      <|> DynamicsPppp
+        <$> P.oneChild ((P.atEl (P.name "pppp") >> parseEmpty))
+      <|> DynamicsPpppp
+        <$> P.oneChild ((P.atEl (P.name "ppppp") >> parseEmpty))
+      <|> DynamicsPppppp
+        <$> P.oneChild ((P.atEl (P.name "pppppp") >> parseEmpty))
+      <|> DynamicsF
+        <$> P.oneChild ((P.atEl (P.name "f") >> parseEmpty))
+      <|> DynamicsFf
+        <$> P.oneChild ((P.atEl (P.name "ff") >> parseEmpty))
+      <|> DynamicsFff
+        <$> P.oneChild ((P.atEl (P.name "fff") >> parseEmpty))
+      <|> DynamicsFfff
+        <$> P.oneChild ((P.atEl (P.name "ffff") >> parseEmpty))
+      <|> DynamicsFffff
+        <$> P.oneChild ((P.atEl (P.name "fffff") >> parseEmpty))
+      <|> DynamicsFfffff
+        <$> P.oneChild ((P.atEl (P.name "ffffff") >> parseEmpty))
+      <|> DynamicsMp
+        <$> P.oneChild ((P.atEl (P.name "mp") >> parseEmpty))
+      <|> DynamicsMf
+        <$> P.oneChild ((P.atEl (P.name "mf") >> parseEmpty))
+      <|> DynamicsSf
+        <$> P.oneChild ((P.atEl (P.name "sf") >> parseEmpty))
+      <|> DynamicsSfp
+        <$> P.oneChild ((P.atEl (P.name "sfp") >> parseEmpty))
+      <|> DynamicsSfpp
+        <$> P.oneChild ((P.atEl (P.name "sfpp") >> parseEmpty))
+      <|> DynamicsFp
+        <$> P.oneChild ((P.atEl (P.name "fp") >> parseEmpty))
+      <|> DynamicsRf
+        <$> P.oneChild ((P.atEl (P.name "rf") >> parseEmpty))
+      <|> DynamicsRfz
+        <$> P.oneChild ((P.atEl (P.name "rfz") >> parseEmpty))
+      <|> DynamicsSfz
+        <$> P.oneChild ((P.atEl (P.name "sfz") >> parseEmpty))
+      <|> DynamicsSffz
+        <$> P.oneChild ((P.atEl (P.name "sffz") >> parseEmpty))
+      <|> DynamicsFz
+        <$> P.oneChild ((P.atEl (P.name "fz") >> parseEmpty))
+      <|> DynamicsOtherDynamics
+        <$> P.oneChild ((P.atEl (P.name "other-dynamics") >> P.textContent >>= (readParse "DefString")))
+
 -- | Smart constructor for 'DynamicsP'
 mkDynamicsP :: Empty -> ChxDynamics
 mkDynamicsP a = DynamicsP a
@@ -6022,6 +8632,19 @@ instance EmitXml ChxEncoding where
       XContent XEmpty
         []
         ([XElement (QN "supports" Nothing) (emitXml a)])
+parseChxEncoding :: P.XParser m => m ChxEncoding
+parseChxEncoding = 
+      EncodingEncodingDate
+        <$> P.oneChild ((P.atEl (P.name "encoding-date") >> P.textContent >>= parseYyyyMmDd))
+      <|> EncodingEncoder
+        <$> P.oneChild ((P.atEl (P.name "encoder") >> parseTypedText))
+      <|> EncodingSoftware
+        <$> P.oneChild ((P.atEl (P.name "software") >> P.textContent >>= (readParse "DefString")))
+      <|> EncodingEncodingDescription
+        <$> P.oneChild ((P.atEl (P.name "encoding-description") >> P.textContent >>= (readParse "DefString")))
+      <|> EncodingSupports
+        <$> P.oneChild ((P.atEl (P.name "supports") >> parseSupports))
+
 -- | Smart constructor for 'EncodingEncodingDate'
 mkEncodingEncodingDate :: YyyyMmDd -> ChxEncoding
 mkEncodingEncodingDate a = EncodingEncodingDate a
@@ -6063,6 +8686,15 @@ instance EmitXml FullNote where
       XContent XEmpty
         []
         ([XElement (QN "rest" Nothing) (emitXml a)])
+parseFullNote :: P.XParser m => m FullNote
+parseFullNote = 
+      FullNotePitch
+        <$> P.oneChild ((P.atEl (P.name "pitch") >> parsePitch))
+      <|> FullNoteUnpitched
+        <$> P.oneChild ((P.atEl (P.name "unpitched") >> parseDisplayStepOctave))
+      <|> FullNoteRest
+        <$> P.oneChild ((P.atEl (P.name "rest") >> parseDisplayStepOctave))
+
 -- | Smart constructor for 'FullNotePitch'
 mkFullNotePitch :: Pitch -> FullNote
 mkFullNotePitch a = FullNotePitch a
@@ -6091,6 +8723,13 @@ instance EmitXml ChxHarmonic where
       XContent XEmpty
         []
         ([XElement (QN "artificial" Nothing) (emitXml a)])
+parseChxHarmonic :: P.XParser m => m ChxHarmonic
+parseChxHarmonic = 
+      HarmonicNatural
+        <$> P.oneChild ((P.atEl (P.name "natural") >> parseEmpty))
+      <|> HarmonicArtificial
+        <$> P.oneChild ((P.atEl (P.name "artificial") >> parseEmpty))
+
 -- | Smart constructor for 'HarmonicNatural'
 mkHarmonicNatural :: Empty -> ChxHarmonic
 mkHarmonicNatural a = HarmonicNatural a
@@ -6125,6 +8764,15 @@ instance EmitXml ChxHarmonic1 where
       XContent XEmpty
         []
         ([XElement (QN "sounding-pitch" Nothing) (emitXml a)])
+parseChxHarmonic1 :: P.XParser m => m ChxHarmonic1
+parseChxHarmonic1 = 
+      HarmonicBasePitch
+        <$> P.oneChild ((P.atEl (P.name "base-pitch") >> parseEmpty))
+      <|> HarmonicTouchingPitch
+        <$> P.oneChild ((P.atEl (P.name "touching-pitch") >> parseEmpty))
+      <|> HarmonicSoundingPitch
+        <$> P.oneChild ((P.atEl (P.name "sounding-pitch") >> parseEmpty))
+
 -- | Smart constructor for 'HarmonicBasePitch'
 mkHarmonicBasePitch :: Empty -> ChxHarmonic1
 mkHarmonicBasePitch a = HarmonicBasePitch a
@@ -6153,6 +8801,13 @@ instance EmitXml ChxHarmonyChord where
       XContent XEmpty
         []
         ([XElement (QN "function" Nothing) (emitXml a)])
+parseChxHarmonyChord :: P.XParser m => m ChxHarmonyChord
+parseChxHarmonyChord = 
+      HarmonyChordRoot
+        <$> P.oneChild ((P.atEl (P.name "root") >> parseRoot))
+      <|> HarmonyChordFunction
+        <$> P.oneChild ((P.atEl (P.name "function") >> parseStyleText))
+
 -- | Smart constructor for 'HarmonyChordRoot'
 mkHarmonyChordRoot :: Root -> ChxHarmonyChord
 mkHarmonyChordRoot a = HarmonyChordRoot a
@@ -6174,6 +8829,13 @@ instance EmitXml ChxKey where
       XReps [emitXml a]
     emitXml (KeyNonTraditionalKey a) =
       XReps [emitXml a]
+parseChxKey :: P.XParser m => m ChxKey
+parseChxKey = 
+      KeyTraditionalKey
+        <$> parseTraditionalKey
+      <|> KeyNonTraditionalKey
+        <$> P.many (parseNonTraditionalKey)
+
 -- | Smart constructor for 'KeyTraditionalKey'
 mkKeyTraditionalKey :: TraditionalKey -> ChxKey
 mkKeyTraditionalKey a = KeyTraditionalKey a
@@ -6216,6 +8878,20 @@ instance EmitXml ChxLyric where
       XContent XEmpty
         []
         ([XElement (QN "humming" Nothing) (emitXml a)])
+parseChxLyric :: P.XParser m => m ChxLyric
+parseChxLyric = 
+      LyricSyllabic
+        <$> P.optional ((P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
+        <*> P.oneChild ((P.atEl (P.name "text") >> parseTextElementData))
+        <*> P.many (parseSeqLyric)
+        <*> P.optional ((P.atEl (P.name "extend") >> parseExtend))
+      <|> LyricExtend
+        <$> P.oneChild ((P.atEl (P.name "extend") >> parseExtend))
+      <|> LyricLaughing
+        <$> P.oneChild ((P.atEl (P.name "laughing") >> parseEmpty))
+      <|> LyricHumming
+        <$> P.oneChild ((P.atEl (P.name "humming") >> parseEmpty))
+
 -- | Smart constructor for 'LyricSyllabic'
 mkLyricSyllabic :: TextElementData -> ChxLyric
 mkLyricSyllabic b = LyricSyllabic Nothing b [] Nothing
@@ -6261,6 +8937,17 @@ instance EmitXml ChxMeasureStyle where
       XContent XEmpty
         []
         ([XElement (QN "slash" Nothing) (emitXml a)])
+parseChxMeasureStyle :: P.XParser m => m ChxMeasureStyle
+parseChxMeasureStyle = 
+      MeasureStyleMultipleRest
+        <$> P.oneChild ((P.atEl (P.name "multiple-rest") >> parseMultipleRest))
+      <|> MeasureStyleMeasureRepeat
+        <$> P.oneChild ((P.atEl (P.name "measure-repeat") >> parseMeasureRepeat))
+      <|> MeasureStyleBeatRepeat
+        <$> P.oneChild ((P.atEl (P.name "beat-repeat") >> parseBeatRepeat))
+      <|> MeasureStyleSlash
+        <$> P.oneChild ((P.atEl (P.name "slash") >> parseCmpSlash))
+
 -- | Smart constructor for 'MeasureStyleMultipleRest'
 mkMeasureStyleMultipleRest :: MultipleRest -> ChxMeasureStyle
 mkMeasureStyleMultipleRest a = MeasureStyleMultipleRest a
@@ -6290,6 +8977,13 @@ instance EmitXml ChxMetronome0 where
         ([XElement (QN "per-minute" Nothing) (emitXml a)])
     emitXml (MetronomeBeatUnit a) =
       XReps [emitXml a]
+parseChxMetronome0 :: P.XParser m => m ChxMetronome0
+parseChxMetronome0 = 
+      MetronomePerMinute
+        <$> P.oneChild ((P.atEl (P.name "per-minute") >> parsePerMinute))
+      <|> MetronomeBeatUnit
+        <$> parseBeatUnit
+
 -- | Smart constructor for 'MetronomePerMinute'
 mkMetronomePerMinute :: PerMinute -> ChxMetronome0
 mkMetronomePerMinute a = MetronomePerMinute a
@@ -6317,6 +9011,15 @@ instance EmitXml ChxMetronome where
       XContent XEmpty
         []
         (map (XElement (QN "metronome-note" Nothing).emitXml) a++[emitXml b])
+parseChxMetronome :: P.XParser m => m ChxMetronome
+parseChxMetronome = 
+      ChxMetronomeBeatUnit
+        <$> parseBeatUnit
+        <*> parseChxMetronome0
+      <|> MetronomeMetronomeNote
+        <$> P.findChildren (P.name "metronome-note") ((P.atEl (P.name "metronome-note") >> parseMetronomeNote))
+        <*> P.optional (parseSeqMetronome)
+
 -- | Smart constructor for 'ChxMetronomeBeatUnit'
 mkChxMetronomeBeatUnit :: BeatUnit -> ChxMetronome0 -> ChxMetronome
 mkChxMetronomeBeatUnit a b = ChxMetronomeBeatUnit a b
@@ -6419,6 +9122,35 @@ instance EmitXml ChxMusicData where
       XContent XEmpty
         []
         ([XElement (QN "bookmark" Nothing) (emitXml a)])
+parseChxMusicData :: P.XParser m => m ChxMusicData
+parseChxMusicData = 
+      MusicDataNote
+        <$> P.oneChild ((P.atEl (P.name "note") >> parseNote))
+      <|> MusicDataBackup
+        <$> P.oneChild ((P.atEl (P.name "backup") >> parseBackup))
+      <|> MusicDataForward
+        <$> P.oneChild ((P.atEl (P.name "forward") >> parseForward))
+      <|> MusicDataDirection
+        <$> P.oneChild ((P.atEl (P.name "direction") >> parseDirection))
+      <|> MusicDataAttributes
+        <$> P.oneChild ((P.atEl (P.name "attributes") >> parseAttributes))
+      <|> MusicDataHarmony
+        <$> P.oneChild ((P.atEl (P.name "harmony") >> parseHarmony))
+      <|> MusicDataFiguredBass
+        <$> P.oneChild ((P.atEl (P.name "figured-bass") >> parseFiguredBass))
+      <|> MusicDataPrint
+        <$> P.oneChild ((P.atEl (P.name "print") >> parsePrint))
+      <|> MusicDataSound
+        <$> P.oneChild ((P.atEl (P.name "sound") >> parseSound))
+      <|> MusicDataBarline
+        <$> P.oneChild ((P.atEl (P.name "barline") >> parseBarline))
+      <|> MusicDataGrouping
+        <$> P.oneChild ((P.atEl (P.name "grouping") >> parseGrouping))
+      <|> MusicDataLink
+        <$> P.oneChild ((P.atEl (P.name "link") >> parseLink))
+      <|> MusicDataBookmark
+        <$> P.oneChild ((P.atEl (P.name "bookmark") >> parseBookmark))
+
 -- | Smart constructor for 'MusicDataNote'
 mkMusicDataNote :: Note -> ChxMusicData
 mkMusicDataNote a = MusicDataNote a
@@ -6477,6 +9209,13 @@ instance EmitXml ChxNameDisplay where
       XContent XEmpty
         []
         ([XElement (QN "accidental-text" Nothing) (emitXml a)])
+parseChxNameDisplay :: P.XParser m => m ChxNameDisplay
+parseChxNameDisplay = 
+      NameDisplayDisplayText
+        <$> P.oneChild ((P.atEl (P.name "display-text") >> parseFormattedText))
+      <|> NameDisplayAccidentalText
+        <$> P.oneChild ((P.atEl (P.name "accidental-text") >> parseAccidentalText))
+
 -- | Smart constructor for 'NameDisplayDisplayText'
 mkNameDisplayDisplayText :: FormattedText -> ChxNameDisplay
 mkNameDisplayDisplayText a = NameDisplayDisplayText a
@@ -6586,6 +9325,37 @@ instance EmitXml ChxNotations where
       XContent XEmpty
         []
         ([XElement (QN "other-notation" Nothing) (emitXml a)])
+parseChxNotations :: P.XParser m => m ChxNotations
+parseChxNotations = 
+      NotationsTied
+        <$> P.oneChild ((P.atEl (P.name "tied") >> parseTied))
+      <|> NotationsSlur
+        <$> P.oneChild ((P.atEl (P.name "slur") >> parseSlur))
+      <|> NotationsTuplet
+        <$> P.oneChild ((P.atEl (P.name "tuplet") >> parseTuplet))
+      <|> NotationsGlissando
+        <$> P.oneChild ((P.atEl (P.name "glissando") >> parseGlissando))
+      <|> NotationsSlide
+        <$> P.oneChild ((P.atEl (P.name "slide") >> parseSlide))
+      <|> NotationsOrnaments
+        <$> P.oneChild ((P.atEl (P.name "ornaments") >> parseOrnaments))
+      <|> NotationsTechnical
+        <$> P.oneChild ((P.atEl (P.name "technical") >> parseTechnical))
+      <|> NotationsArticulations
+        <$> P.oneChild ((P.atEl (P.name "articulations") >> parseArticulations))
+      <|> NotationsDynamics
+        <$> P.oneChild ((P.atEl (P.name "dynamics") >> parseDynamics))
+      <|> NotationsFermata
+        <$> P.oneChild ((P.atEl (P.name "fermata") >> parseFermata))
+      <|> NotationsArpeggiate
+        <$> P.oneChild ((P.atEl (P.name "arpeggiate") >> parseArpeggiate))
+      <|> NotationsNonArpeggiate
+        <$> P.oneChild ((P.atEl (P.name "non-arpeggiate") >> parseNonArpeggiate))
+      <|> NotationsAccidentalMark
+        <$> P.oneChild ((P.atEl (P.name "accidental-mark") >> parseAccidentalMark))
+      <|> NotationsOtherNotation
+        <$> P.oneChild ((P.atEl (P.name "other-notation") >> parseOtherNotation))
+
 -- | Smart constructor for 'NotationsTied'
 mkNotationsTied :: Tied -> ChxNotations
 mkNotationsTied a = NotationsTied a
@@ -6660,6 +9430,21 @@ instance EmitXml ChxNote where
       XContent XEmpty
         []
         ([emitXml a]++[emitXml b]++map (XElement (QN "tie" Nothing).emitXml) c)
+parseChxNote :: P.XParser m => m ChxNote
+parseChxNote = 
+      NoteGrace
+        <$> P.oneChild ((P.atEl (P.name "grace") >> parseGrace))
+        <*> parseGrpFullNote
+        <*> P.findChildren (P.name "tie") ((P.atEl (P.name "tie") >> parseTie))
+      <|> NoteCue
+        <$> P.oneChild ((P.atEl (P.name "cue") >> parseEmpty))
+        <*> parseGrpFullNote
+        <*> parseDuration
+      <|> NoteFullNote
+        <$> parseGrpFullNote
+        <*> parseDuration
+        <*> P.findChildren (P.name "tie") ((P.atEl (P.name "tie") >> parseTie))
+
 -- | Smart constructor for 'NoteGrace'
 mkNoteGrace :: Grace -> GrpFullNote -> ChxNote
 mkNoteGrace a b = NoteGrace a b []
@@ -6751,6 +9536,31 @@ instance EmitXml ChxOrnaments where
       XContent XEmpty
         []
         ([XElement (QN "other-ornament" Nothing) (emitXml a)])
+parseChxOrnaments :: P.XParser m => m ChxOrnaments
+parseChxOrnaments = 
+      OrnamentsTrillMark
+        <$> P.oneChild ((P.atEl (P.name "trill-mark") >> parseEmptyTrillSound))
+      <|> OrnamentsTurn
+        <$> P.oneChild ((P.atEl (P.name "turn") >> parseEmptyTrillSound))
+      <|> OrnamentsDelayedTurn
+        <$> P.oneChild ((P.atEl (P.name "delayed-turn") >> parseEmptyTrillSound))
+      <|> OrnamentsInvertedTurn
+        <$> P.oneChild ((P.atEl (P.name "inverted-turn") >> parseEmptyTrillSound))
+      <|> OrnamentsShake
+        <$> P.oneChild ((P.atEl (P.name "shake") >> parseEmptyTrillSound))
+      <|> OrnamentsWavyLine
+        <$> P.oneChild ((P.atEl (P.name "wavy-line") >> parseWavyLine))
+      <|> OrnamentsMordent
+        <$> P.oneChild ((P.atEl (P.name "mordent") >> parseMordent))
+      <|> OrnamentsInvertedMordent
+        <$> P.oneChild ((P.atEl (P.name "inverted-mordent") >> parseMordent))
+      <|> OrnamentsSchleifer
+        <$> P.oneChild ((P.atEl (P.name "schleifer") >> parseEmptyPlacement))
+      <|> OrnamentsTremolo
+        <$> P.oneChild ((P.atEl (P.name "tremolo") >> parseTremolo))
+      <|> OrnamentsOtherOrnament
+        <$> P.oneChild ((P.atEl (P.name "other-ornament") >> parsePlacementText))
+
 -- | Smart constructor for 'OrnamentsTrillMark'
 mkOrnamentsTrillMark :: EmptyTrillSound -> ChxOrnaments
 mkOrnamentsTrillMark a = OrnamentsTrillMark a
@@ -6799,6 +9609,13 @@ instance EmitXml ChxPartList where
       XReps [emitXml a]
     emitXml (PartListScorePart a) =
       XReps [emitXml a]
+parseChxPartList :: P.XParser m => m ChxPartList
+parseChxPartList = 
+      PartListPartGroup
+        <$> parseGrpPartGroup
+      <|> PartListScorePart
+        <$> parseScorePart
+
 -- | Smart constructor for 'PartListPartGroup'
 mkPartListPartGroup :: GrpPartGroup -> ChxPartList
 mkPartListPartGroup a = PartListPartGroup a
@@ -6824,6 +9641,13 @@ instance EmitXml ChxScoreInstrument where
       XContent XEmpty
         []
         ([XElement (QN "ensemble" Nothing) (emitXml a)])
+parseChxScoreInstrument :: P.XParser m => m ChxScoreInstrument
+parseChxScoreInstrument = 
+      ScoreInstrumentSolo
+        <$> P.oneChild ((P.atEl (P.name "solo") >> parseEmpty))
+      <|> ScoreInstrumentEnsemble
+        <$> P.oneChild ((P.atEl (P.name "ensemble") >> P.textContent >>= parsePositiveIntegerOrEmpty))
+
 -- | Smart constructor for 'ScoreInstrumentSolo'
 mkScoreInstrumentSolo :: Empty -> ChxScoreInstrument
 mkScoreInstrumentSolo a = ScoreInstrumentSolo a
@@ -6982,6 +9806,51 @@ instance EmitXml ChxTechnical where
       XContent XEmpty
         []
         ([XElement (QN "other-technical" Nothing) (emitXml a)])
+parseChxTechnical :: P.XParser m => m ChxTechnical
+parseChxTechnical = 
+      TechnicalUpBow
+        <$> P.oneChild ((P.atEl (P.name "up-bow") >> parseEmptyPlacement))
+      <|> TechnicalDownBow
+        <$> P.oneChild ((P.atEl (P.name "down-bow") >> parseEmptyPlacement))
+      <|> TechnicalHarmonic
+        <$> P.oneChild ((P.atEl (P.name "harmonic") >> parseHarmonic))
+      <|> TechnicalOpenString
+        <$> P.oneChild ((P.atEl (P.name "open-string") >> parseEmptyPlacement))
+      <|> TechnicalThumbPosition
+        <$> P.oneChild ((P.atEl (P.name "thumb-position") >> parseEmptyPlacement))
+      <|> TechnicalFingering
+        <$> P.oneChild ((P.atEl (P.name "fingering") >> parseFingering))
+      <|> TechnicalPluck
+        <$> P.oneChild ((P.atEl (P.name "pluck") >> parsePlacementText))
+      <|> TechnicalDoubleTongue
+        <$> P.oneChild ((P.atEl (P.name "double-tongue") >> parseEmptyPlacement))
+      <|> TechnicalTripleTongue
+        <$> P.oneChild ((P.atEl (P.name "triple-tongue") >> parseEmptyPlacement))
+      <|> TechnicalStopped
+        <$> P.oneChild ((P.atEl (P.name "stopped") >> parseEmptyPlacement))
+      <|> TechnicalSnapPizzicato
+        <$> P.oneChild ((P.atEl (P.name "snap-pizzicato") >> parseEmptyPlacement))
+      <|> TechnicalFret
+        <$> P.oneChild ((P.atEl (P.name "fret") >> parseFret))
+      <|> TechnicalString
+        <$> P.oneChild ((P.atEl (P.name "string") >> parseCmpString))
+      <|> TechnicalHammerOn
+        <$> P.oneChild ((P.atEl (P.name "hammer-on") >> parseHammerOnPullOff))
+      <|> TechnicalPullOff
+        <$> P.oneChild ((P.atEl (P.name "pull-off") >> parseHammerOnPullOff))
+      <|> TechnicalBend
+        <$> P.oneChild ((P.atEl (P.name "bend") >> parseBend))
+      <|> TechnicalTap
+        <$> P.oneChild ((P.atEl (P.name "tap") >> parsePlacementText))
+      <|> TechnicalHeel
+        <$> P.oneChild ((P.atEl (P.name "heel") >> parseHeelToe))
+      <|> TechnicalToe
+        <$> P.oneChild ((P.atEl (P.name "toe") >> parseHeelToe))
+      <|> TechnicalFingernails
+        <$> P.oneChild ((P.atEl (P.name "fingernails") >> parseEmptyPlacement))
+      <|> TechnicalOtherTechnical
+        <$> P.oneChild ((P.atEl (P.name "other-technical") >> parsePlacementText))
+
 -- | Smart constructor for 'TechnicalUpBow'
 mkTechnicalUpBow :: EmptyPlacement -> ChxTechnical
 mkTechnicalUpBow a = TechnicalUpBow a
@@ -7062,6 +9931,13 @@ instance EmitXml ChxTime where
       XContent XEmpty
         []
         ([XElement (QN "senza-misura" Nothing) (emitXml a)])
+parseChxTime :: P.XParser m => m ChxTime
+parseChxTime = 
+      TimeTime
+        <$> P.many (parseSeqTime)
+      <|> TimeSenzaMisura
+        <$> P.oneChild ((P.atEl (P.name "senza-misura") >> parseEmpty))
+
 -- | Smart constructor for 'TimeTime'
 mkTimeTime :: ChxTime
 mkTimeTime = TimeTime []
@@ -7082,6 +9958,13 @@ instance EmitXml SeqCredit where
       XContent XEmpty
         []
         (map (XElement (QN "link" Nothing).emitXml) a++map (XElement (QN "bookmark" Nothing).emitXml) b++[XElement (QN "credit-words" Nothing) (emitXml c)])
+parseSeqCredit :: P.XParser m => m SeqCredit
+parseSeqCredit = 
+      SeqCredit
+        <$> P.findChildren (P.name "link") ((P.atEl (P.name "link") >> parseLink))
+        <*> P.findChildren (P.name "bookmark") ((P.atEl (P.name "bookmark") >> parseBookmark))
+        <*> P.oneChild ((P.atEl (P.name "credit-words") >> parseFormattedText))
+
 -- | Smart constructor for 'SeqCredit'
 mkSeqCredit :: FormattedText -> SeqCredit
 mkSeqCredit c = SeqCredit [] [] c
@@ -7098,6 +9981,12 @@ instance EmitXml SeqDisplayStepOctave where
       XContent XEmpty
         []
         ([XElement (QN "display-step" Nothing) (emitXml a)]++[XElement (QN "display-octave" Nothing) (emitXml b)])
+parseSeqDisplayStepOctave :: P.XParser m => m SeqDisplayStepOctave
+parseSeqDisplayStepOctave = 
+      SeqDisplayStepOctave
+        <$> P.oneChild ((P.atEl (P.name "display-step") >> P.textContent >>= parseStep))
+        <*> P.oneChild ((P.atEl (P.name "display-octave") >> P.textContent >>= parseOctave))
+
 -- | Smart constructor for 'SeqDisplayStepOctave'
 mkSeqDisplayStepOctave :: Step -> Octave -> SeqDisplayStepOctave
 mkSeqDisplayStepOctave a b = SeqDisplayStepOctave a b
@@ -7114,6 +10003,12 @@ instance EmitXml SeqLyric0 where
       XContent XEmpty
         []
         ([XElement (QN "elision" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "syllabic" Nothing).emitXml) b])
+parseSeqLyric0 :: P.XParser m => m SeqLyric0
+parseSeqLyric0 = 
+      SeqLyric0
+        <$> P.oneChild ((P.atEl (P.name "elision") >> parseElision))
+        <*> P.optional ((P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
+
 -- | Smart constructor for 'SeqLyric0'
 mkSeqLyric0 :: Elision -> SeqLyric0
 mkSeqLyric0 a = SeqLyric0 a Nothing
@@ -7132,6 +10027,12 @@ instance EmitXml SeqLyric where
       XContent XEmpty
         []
         ([emitXml a]++[XElement (QN "text" Nothing) (emitXml b)])
+parseSeqLyric :: P.XParser m => m SeqLyric
+parseSeqLyric = 
+      SeqLyric
+        <$> P.optional (parseSeqLyric0)
+        <*> P.oneChild ((P.atEl (P.name "text") >> parseTextElementData))
+
 -- | Smart constructor for 'SeqLyric'
 mkSeqLyric :: TextElementData -> SeqLyric
 mkSeqLyric b = SeqLyric Nothing b
@@ -7148,6 +10049,12 @@ instance EmitXml SeqMetronome where
       XContent XEmpty
         []
         ([XElement (QN "metronome-relation" Nothing) (emitXml a)]++map (XElement (QN "metronome-note" Nothing).emitXml) b)
+parseSeqMetronome :: P.XParser m => m SeqMetronome
+parseSeqMetronome = 
+      SeqMetronome
+        <$> P.oneChild ((P.atEl (P.name "metronome-relation") >> P.textContent >>= (readParse "DefString")))
+        <*> P.findChildren (P.name "metronome-note") ((P.atEl (P.name "metronome-note") >> parseMetronomeNote))
+
 -- | Smart constructor for 'SeqMetronome'
 mkSeqMetronome :: String -> SeqMetronome
 mkSeqMetronome a = SeqMetronome a []
@@ -7164,6 +10071,12 @@ instance EmitXml SeqMetronomeTuplet where
       XContent XEmpty
         []
         ([XElement (QN "normal-type" Nothing) (emitXml a)]++map (XElement (QN "normal-dot" Nothing).emitXml) b)
+parseSeqMetronomeTuplet :: P.XParser m => m SeqMetronomeTuplet
+parseSeqMetronomeTuplet = 
+      SeqMetronomeTuplet
+        <$> P.oneChild ((P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue))
+        <*> P.findChildren (P.name "normal-dot") ((P.atEl (P.name "normal-dot") >> parseEmpty))
+
 -- | Smart constructor for 'SeqMetronomeTuplet'
 mkSeqMetronomeTuplet :: NoteTypeValue -> SeqMetronomeTuplet
 mkSeqMetronomeTuplet a = SeqMetronomeTuplet a []
@@ -7180,6 +10093,12 @@ instance EmitXml SeqOrnaments where
       XContent XEmpty
         []
         ([emitXml a]++map (XElement (QN "accidental-mark" Nothing).emitXml) b)
+parseSeqOrnaments :: P.XParser m => m SeqOrnaments
+parseSeqOrnaments = 
+      SeqOrnaments
+        <$> parseChxOrnaments
+        <*> P.findChildren (P.name "accidental-mark") ((P.atEl (P.name "accidental-mark") >> parseAccidentalMark))
+
 -- | Smart constructor for 'SeqOrnaments'
 mkSeqOrnaments :: ChxOrnaments -> SeqOrnaments
 mkSeqOrnaments a = SeqOrnaments a []
@@ -7196,6 +10115,12 @@ instance EmitXml SeqPageLayout where
       XContent XEmpty
         []
         ([XElement (QN "page-height" Nothing) (emitXml a)]++[XElement (QN "page-width" Nothing) (emitXml b)])
+parseSeqPageLayout :: P.XParser m => m SeqPageLayout
+parseSeqPageLayout = 
+      SeqPageLayout
+        <$> P.oneChild ((P.atEl (P.name "page-height") >> P.textContent >>= parseTenths))
+        <*> P.oneChild ((P.atEl (P.name "page-width") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'SeqPageLayout'
 mkSeqPageLayout :: Tenths -> Tenths -> SeqPageLayout
 mkSeqPageLayout a b = SeqPageLayout a b
@@ -7212,6 +10137,12 @@ instance EmitXml SeqTime where
       XContent XEmpty
         []
         ([XElement (QN "beats" Nothing) (emitXml a)]++[XElement (QN "beat-type" Nothing) (emitXml b)])
+parseSeqTime :: P.XParser m => m SeqTime
+parseSeqTime = 
+      SeqTime
+        <$> P.oneChild ((P.atEl (P.name "beats") >> P.textContent >>= (readParse "DefString")))
+        <*> P.oneChild ((P.atEl (P.name "beat-type") >> P.textContent >>= (readParse "DefString")))
+
 -- | Smart constructor for 'SeqTime'
 mkSeqTime :: String -> String -> SeqTime
 mkSeqTime a b = SeqTime a b
@@ -7228,6 +10159,12 @@ instance EmitXml SeqTimeModification where
       XContent XEmpty
         []
         ([XElement (QN "normal-type" Nothing) (emitXml a)]++map (XElement (QN "normal-dot" Nothing).emitXml) b)
+parseSeqTimeModification :: P.XParser m => m SeqTimeModification
+parseSeqTimeModification = 
+      SeqTimeModification
+        <$> P.oneChild ((P.atEl (P.name "normal-type") >> P.textContent >>= parseNoteTypeValue))
+        <*> P.findChildren (P.name "normal-dot") ((P.atEl (P.name "normal-dot") >> parseEmpty))
+
 -- | Smart constructor for 'SeqTimeModification'
 mkSeqTimeModification :: NoteTypeValue -> SeqTimeModification
 mkSeqTimeModification a = SeqTimeModification a []
@@ -7245,6 +10182,13 @@ instance EmitXml AllMargins where
       XContent XEmpty
         []
         ([emitXml a]++[XElement (QN "top-margin" Nothing) (emitXml b)]++[XElement (QN "bottom-margin" Nothing) (emitXml c)])
+parseAllMargins :: P.XParser m => m AllMargins
+parseAllMargins = 
+      AllMargins
+        <$> parseLeftRightMargins
+        <*> P.oneChild ((P.atEl (P.name "top-margin") >> P.textContent >>= parseTenths))
+        <*> P.oneChild ((P.atEl (P.name "bottom-margin") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'AllMargins'
 mkAllMargins :: LeftRightMargins -> Tenths -> Tenths -> AllMargins
 mkAllMargins a b c = AllMargins a b c
@@ -7261,6 +10205,12 @@ instance EmitXml BeatUnit where
       XContent XEmpty
         []
         ([XElement (QN "beat-unit" Nothing) (emitXml a)]++map (XElement (QN "beat-unit-dot" Nothing).emitXml) b)
+parseBeatUnit :: P.XParser m => m BeatUnit
+parseBeatUnit = 
+      BeatUnit
+        <$> P.oneChild ((P.atEl (P.name "beat-unit") >> P.textContent >>= parseNoteTypeValue))
+        <*> P.findChildren (P.name "beat-unit-dot") ((P.atEl (P.name "beat-unit-dot") >> parseEmpty))
+
 -- | Smart constructor for 'BeatUnit'
 mkBeatUnit :: NoteTypeValue -> BeatUnit
 mkBeatUnit a = BeatUnit a []
@@ -7276,6 +10226,11 @@ instance EmitXml Duration where
       XContent XEmpty
         []
         ([XElement (QN "duration" Nothing) (emitXml a)])
+parseDuration :: P.XParser m => m Duration
+parseDuration = 
+      Duration
+        <$> P.oneChild ((P.atEl (P.name "duration") >> P.textContent >>= parsePositiveDivisions))
+
 -- | Smart constructor for 'Duration'
 mkDuration :: PositiveDivisions -> Duration
 mkDuration a = Duration a
@@ -7290,6 +10245,12 @@ data Editorial =
 instance EmitXml Editorial where
     emitXml (Editorial a b) =
       XReps [emitXml a,emitXml b]
+parseEditorial :: P.XParser m => m Editorial
+parseEditorial = 
+      Editorial
+        <$> P.optional (parseFootnote)
+        <*> P.optional (parseGrpLevel)
+
 -- | Smart constructor for 'Editorial'
 mkEditorial :: Editorial
 mkEditorial = Editorial Nothing Nothing
@@ -7305,6 +10266,13 @@ data EditorialVoice =
 instance EmitXml EditorialVoice where
     emitXml (EditorialVoice a b c) =
       XReps [emitXml a,emitXml b,emitXml c]
+parseEditorialVoice :: P.XParser m => m EditorialVoice
+parseEditorialVoice = 
+      EditorialVoice
+        <$> P.optional (parseFootnote)
+        <*> P.optional (parseGrpLevel)
+        <*> P.optional (parseVoice)
+
 -- | Smart constructor for 'EditorialVoice'
 mkEditorialVoice :: EditorialVoice
 mkEditorialVoice = EditorialVoice Nothing Nothing Nothing
@@ -7320,6 +10288,13 @@ data EditorialVoiceDirection =
 instance EmitXml EditorialVoiceDirection where
     emitXml (EditorialVoiceDirection a b c) =
       XReps [emitXml a,emitXml b,emitXml c]
+parseEditorialVoiceDirection :: P.XParser m => m EditorialVoiceDirection
+parseEditorialVoiceDirection = 
+      EditorialVoiceDirection
+        <$> P.optional (parseFootnote)
+        <*> P.optional (parseGrpLevel)
+        <*> P.optional (parseVoice)
+
 -- | Smart constructor for 'EditorialVoiceDirection'
 mkEditorialVoiceDirection :: EditorialVoiceDirection
 mkEditorialVoiceDirection = EditorialVoiceDirection Nothing Nothing Nothing
@@ -7335,6 +10310,11 @@ instance EmitXml Footnote where
       XContent XEmpty
         []
         ([XElement (QN "footnote" Nothing) (emitXml a)])
+parseFootnote :: P.XParser m => m Footnote
+parseFootnote = 
+      Footnote
+        <$> P.oneChild ((P.atEl (P.name "footnote") >> parseFormattedText))
+
 -- | Smart constructor for 'Footnote'
 mkFootnote :: FormattedText -> Footnote
 mkFootnote a = Footnote a
@@ -7351,6 +10331,12 @@ instance EmitXml GrpFullNote where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "chord" Nothing).emitXml) a]++[emitXml b])
+parseGrpFullNote :: P.XParser m => m GrpFullNote
+parseGrpFullNote = 
+      GrpFullNote
+        <$> P.optional ((P.atEl (P.name "chord") >> parseEmpty))
+        <*> parseFullNote
+
 -- | Smart constructor for 'GrpFullNote'
 mkGrpFullNote :: FullNote -> GrpFullNote
 mkGrpFullNote b = GrpFullNote Nothing b
@@ -7370,6 +10356,15 @@ instance EmitXml HarmonyChord where
       XContent XEmpty
         []
         ([emitXml a]++[XElement (QN "kind" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "inversion" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "bass" Nothing).emitXml) d]++map (XElement (QN "degree" Nothing).emitXml) e)
+parseHarmonyChord :: P.XParser m => m HarmonyChord
+parseHarmonyChord = 
+      HarmonyChord
+        <$> parseChxHarmonyChord
+        <*> P.oneChild ((P.atEl (P.name "kind") >> parseKind))
+        <*> P.optional ((P.atEl (P.name "inversion") >> parseInversion))
+        <*> P.optional ((P.atEl (P.name "bass") >> parseBass))
+        <*> P.findChildren (P.name "degree") ((P.atEl (P.name "degree") >> parseDegree))
+
 -- | Smart constructor for 'HarmonyChord'
 mkHarmonyChord :: ChxHarmonyChord -> Kind -> HarmonyChord
 mkHarmonyChord a b = HarmonyChord a b Nothing Nothing []
@@ -7387,6 +10382,13 @@ instance EmitXml Layout where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "page-layout" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "system-layout" Nothing).emitXml) b]++map (XElement (QN "staff-layout" Nothing).emitXml) c)
+parseLayout :: P.XParser m => m Layout
+parseLayout = 
+      Layout
+        <$> P.optional ((P.atEl (P.name "page-layout") >> parsePageLayout))
+        <*> P.optional ((P.atEl (P.name "system-layout") >> parseSystemLayout))
+        <*> P.findChildren (P.name "staff-layout") ((P.atEl (P.name "staff-layout") >> parseStaffLayout))
+
 -- | Smart constructor for 'Layout'
 mkLayout :: Layout
 mkLayout = Layout Nothing Nothing []
@@ -7403,6 +10405,12 @@ instance EmitXml LeftRightMargins where
       XContent XEmpty
         []
         ([XElement (QN "left-margin" Nothing) (emitXml a)]++[XElement (QN "right-margin" Nothing) (emitXml b)])
+parseLeftRightMargins :: P.XParser m => m LeftRightMargins
+parseLeftRightMargins = 
+      LeftRightMargins
+        <$> P.oneChild ((P.atEl (P.name "left-margin") >> P.textContent >>= parseTenths))
+        <*> P.oneChild ((P.atEl (P.name "right-margin") >> P.textContent >>= parseTenths))
+
 -- | Smart constructor for 'LeftRightMargins'
 mkLeftRightMargins :: Tenths -> Tenths -> LeftRightMargins
 mkLeftRightMargins a b = LeftRightMargins a b
@@ -7418,6 +10426,11 @@ instance EmitXml GrpLevel where
       XContent XEmpty
         []
         ([XElement (QN "level" Nothing) (emitXml a)])
+parseGrpLevel :: P.XParser m => m GrpLevel
+parseGrpLevel = 
+      GrpLevel
+        <$> P.oneChild ((P.atEl (P.name "level") >> parseLevel))
+
 -- | Smart constructor for 'GrpLevel'
 mkGrpLevel :: Level -> GrpLevel
 mkGrpLevel a = GrpLevel a
@@ -7431,6 +10444,11 @@ data MusicData =
 instance EmitXml MusicData where
     emitXml (MusicData a) =
       XReps [emitXml a]
+parseMusicData :: P.XParser m => m MusicData
+parseMusicData = 
+      MusicData
+        <$> P.many (parseChxMusicData)
+
 -- | Smart constructor for 'MusicData'
 mkMusicData :: MusicData
 mkMusicData = MusicData []
@@ -7447,6 +10465,12 @@ instance EmitXml NonTraditionalKey where
       XContent XEmpty
         []
         ([XElement (QN "key-step" Nothing) (emitXml a)]++[XElement (QN "key-alter" Nothing) (emitXml b)])
+parseNonTraditionalKey :: P.XParser m => m NonTraditionalKey
+parseNonTraditionalKey = 
+      NonTraditionalKey
+        <$> P.oneChild ((P.atEl (P.name "key-step") >> P.textContent >>= parseStep))
+        <*> P.oneChild ((P.atEl (P.name "key-alter") >> P.textContent >>= parseSemitones))
+
 -- | Smart constructor for 'NonTraditionalKey'
 mkNonTraditionalKey :: Step -> Semitones -> NonTraditionalKey
 mkNonTraditionalKey a b = NonTraditionalKey a b
@@ -7462,6 +10486,11 @@ instance EmitXml GrpPartGroup where
       XContent XEmpty
         []
         ([XElement (QN "part-group" Nothing) (emitXml a)])
+parseGrpPartGroup :: P.XParser m => m GrpPartGroup
+parseGrpPartGroup = 
+      GrpPartGroup
+        <$> P.oneChild ((P.atEl (P.name "part-group") >> parsePartGroup))
+
 -- | Smart constructor for 'GrpPartGroup'
 mkGrpPartGroup :: PartGroup -> GrpPartGroup
 mkGrpPartGroup a = GrpPartGroup a
@@ -7483,6 +10512,17 @@ instance EmitXml ScoreHeader where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "work" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "movement-number" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "movement-title" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "identification" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "defaults" Nothing).emitXml) e]++map (XElement (QN "credit" Nothing).emitXml) f++[XElement (QN "part-list" Nothing) (emitXml g)])
+parseScoreHeader :: P.XParser m => m ScoreHeader
+parseScoreHeader = 
+      ScoreHeader
+        <$> P.optional ((P.atEl (P.name "work") >> parseWork))
+        <*> P.optional ((P.atEl (P.name "movement-number") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "movement-title") >> P.textContent >>= (readParse "DefString")))
+        <*> P.optional ((P.atEl (P.name "identification") >> parseIdentification))
+        <*> P.optional ((P.atEl (P.name "defaults") >> parseDefaults))
+        <*> P.findChildren (P.name "credit") ((P.atEl (P.name "credit") >> parseCredit))
+        <*> P.oneChild ((P.atEl (P.name "part-list") >> parsePartList))
+
 -- | Smart constructor for 'ScoreHeader'
 mkScoreHeader :: PartList -> ScoreHeader
 mkScoreHeader g = ScoreHeader Nothing Nothing Nothing Nothing Nothing [] g
@@ -7498,6 +10538,11 @@ instance EmitXml ScorePart where
       XContent XEmpty
         []
         ([XElement (QN "score-part" Nothing) (emitXml a)])
+parseScorePart :: P.XParser m => m ScorePart
+parseScorePart = 
+      ScorePart
+        <$> P.oneChild ((P.atEl (P.name "score-part") >> parseCmpScorePart))
+
 -- | Smart constructor for 'ScorePart'
 mkScorePart :: CmpScorePart -> ScorePart
 mkScorePart a = ScorePart a
@@ -7514,6 +10559,12 @@ instance EmitXml Slash where
       XContent XEmpty
         []
         ([XElement (QN "slash-type" Nothing) (emitXml a)]++map (XElement (QN "slash-dot" Nothing).emitXml) b)
+parseSlash :: P.XParser m => m Slash
+parseSlash = 
+      Slash
+        <$> P.oneChild ((P.atEl (P.name "slash-type") >> P.textContent >>= parseNoteTypeValue))
+        <*> P.findChildren (P.name "slash-dot") ((P.atEl (P.name "slash-dot") >> parseEmpty))
+
 -- | Smart constructor for 'Slash'
 mkSlash :: NoteTypeValue -> Slash
 mkSlash a = Slash a []
@@ -7529,6 +10580,11 @@ instance EmitXml Staff where
       XContent XEmpty
         []
         ([XElement (QN "staff" Nothing) (emitXml a)])
+parseStaff :: P.XParser m => m Staff
+parseStaff = 
+      Staff
+        <$> P.oneChild ((P.atEl (P.name "staff") >> P.textContent >>= parsePositiveInteger))
+
 -- | Smart constructor for 'Staff'
 mkStaff :: PositiveInteger -> Staff
 mkStaff a = Staff a
@@ -7546,6 +10602,13 @@ instance EmitXml TraditionalKey where
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "cancel" Nothing).emitXml) a]++[XElement (QN "fifths" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "mode" Nothing).emitXml) c])
+parseTraditionalKey :: P.XParser m => m TraditionalKey
+parseTraditionalKey = 
+      TraditionalKey
+        <$> P.optional ((P.atEl (P.name "cancel") >> parseCancel))
+        <*> P.oneChild ((P.atEl (P.name "fifths") >> P.textContent >>= parseFifths))
+        <*> P.optional ((P.atEl (P.name "mode") >> P.textContent >>= parseMode))
+
 -- | Smart constructor for 'TraditionalKey'
 mkTraditionalKey :: Fifths -> TraditionalKey
 mkTraditionalKey b = TraditionalKey Nothing b Nothing
@@ -7563,6 +10626,13 @@ instance EmitXml Tuning where
       XContent XEmpty
         []
         ([XElement (QN "tuning-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "tuning-alter" Nothing).emitXml) b]++[XElement (QN "tuning-octave" Nothing) (emitXml c)])
+parseTuning :: P.XParser m => m Tuning
+parseTuning = 
+      Tuning
+        <$> P.oneChild ((P.atEl (P.name "tuning-step") >> P.textContent >>= parseStep))
+        <*> P.optional ((P.atEl (P.name "tuning-alter") >> P.textContent >>= parseSemitones))
+        <*> P.oneChild ((P.atEl (P.name "tuning-octave") >> P.textContent >>= parseOctave))
+
 -- | Smart constructor for 'Tuning'
 mkTuning :: Step -> Octave -> Tuning
 mkTuning a c = Tuning a Nothing c
@@ -7578,6 +10648,11 @@ instance EmitXml Voice where
       XContent XEmpty
         []
         ([XElement (QN "voice" Nothing) (emitXml a)])
+parseVoice :: P.XParser m => m Voice
+parseVoice = 
+      Voice
+        <$> P.oneChild ((P.atEl (P.name "voice") >> P.textContent >>= (readParse "DefString")))
+
 -- | Smart constructor for 'Voice'
 mkVoice :: String -> Voice
 mkVoice a = Voice a

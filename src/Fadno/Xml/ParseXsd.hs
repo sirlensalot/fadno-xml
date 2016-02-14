@@ -481,9 +481,9 @@ qnParser = P.try ((\p _ l -> QN l (Just p)) <$> many (P.letter <|> P.oneOf "_") 
 -- | Match documentation, always optional.
 documentation :: XParser m => m (Maybe Documentation)
 documentation = (check.concat.concat) <$>
-                (findChildren (xsName "annotation") $
-                findChildren (xsName "documentation") $
-                textContent)
+                findChildren (xsName "annotation")
+                (findChildren (xsName "documentation")
+                 textContent)
     where check [] = Nothing
           check s = Just (Documentation s)
 

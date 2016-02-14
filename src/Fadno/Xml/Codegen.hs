@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -102,38 +103,40 @@ outputType :: Type -> Output ()
 outputType (BuiltIn {}) = return ()
 
 -- NEWTYPE --
-outputType nt@(NewType n t ds is doc) = do
-  header n doc
-  mn <- mangleType n
-  mf <- mangleField n "" 0
-  rt <- refType t
+outputType nt@(NewType {..}) = do
+  header _typeName _typeDoc
+  mn <- mangleType nt
+  mf <- mangleField _typeName "" 0
+  rt <- refType _typeType
   outStrLn $ "newtype " ++ mn ++ " = " ++ mn ++
                " { " ++ mf ++ " :: " ++ rt ++ " }"
-  outStrLn $ "    deriving (" ++ outputDerives ds ++ ")"
-  mapM_ (outputImpls nt) is
+  outStrLn $ "    deriving (" ++ outputDerives _typeDerives ++ ")"
+  mapM_ (outputImpls nt) _typeImpls
   outputEmitXml mn
   outStrLn $ "    emitXml = emitXml . " ++ mf
-
+  -- PARSING
+  outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+  outStrLn $ "parse" ++ mn ++ " = readParse \"" ++ mn ++ "\""
 
 
 -- DATA --
-outputType dt@(DataType n ctors ds is dtemit doc) = do
-  header n doc
-  mn <- mangleType n
+outputType dt@(DataType {..}) = do
+  header _typeName _typeDoc
+  mn <- mangleType dt
   outStrLn $ "data " ++ mn ++ " = "
-  forM_ (zip [(0 :: Int)..] ctors) $ \(i,Ctor cn fs) ->
+  forM_ (zip [(0 :: Int)..] _typeCtors) $ \(i,Ctor {..}) ->
       do
         outStr (if i > 0 then "    | " else "      ")
-        mangleCtor n cn >>= outStr
-        if null fs then outStrLn ""
+        mangleCtor _typeName _ctorName >>= outStr
+        if null _ctorFields then outStrLn ""
         else do
           outStrLn " {"
-          forM_ (zip [(0 :: Int)..] fs) $ \(j,Field fn ft fc femit fi) ->
+          forM_ (zip [(0 :: Int)..] _ctorFields) $ \(j,Field fn ft fc femit fi) ->
             do
               outStr (if j > 0 then "        , " else "          ")
               rt <- refType ft
-              mf <- mangleField n (_qLocal fn) fi
-              let docs = if dtemit == DataTypeSimple then ""
+              mf <- mangleField _typeName (_qLocal fn) fi
+              let docs = if _typeEmit == DataTypeSimple then ""
                          else case femit of
                            FieldAttribute -> " -- ^ /" ++ show fn ++ "/ attribute"
                            FieldElement -> " -- ^ /" ++ show fn ++ "/ child element"
@@ -142,16 +145,16 @@ outputType dt@(DataType n ctors ds is dtemit doc) = do
 
               outStrLn $ mf ++ " :: " ++ card fc rt ++ docs
           outStrLn "       }"
-  outStrLn $ "    deriving (" ++ outputDerives ds ++ ")"
+  outStrLn $ "    deriving (" ++ outputDerives _typeDerives ++ ")"
   -- EmitXml instance
   outputEmitXml mn
-  forM_ ctors $ \(Ctor cn fs) -> do
-    mcn <- mangleCtor n cn
-    case dtemit of
+  forM_ _typeCtors $ \(Ctor {..}) -> do
+    mcn <- mangleCtor _typeName _ctorName
+    case _typeEmit of
       DataTypeSimple ->
           outStrLn $ "    emitXml (" ++ mcn ++ " a) = emitXml a"
       _ -> do
-        let fas = zip fieldArgs fs
+        let fas = zip fieldArgs _ctorFields
             genEls [] = "[]"
             genEls es = "(" ++ intercalate "++"
                         (map (\f -> genEl (_fieldXmlEmit (snd f)) f) es) ++ ")"
@@ -176,8 +179,8 @@ outputType dt@(DataType n ctors ds is dtemit doc) = do
         if length oths < length fas  -- heuristic for "passthrough" compositors
         then do
           indent 6
-          if elem TopLevel $ _typeImpls dt
-          then outStr ("XElement " ++ genqn (nName n) ++ " $ XContent ")
+          if TopLevel `elem` _typeImpls
+          then outStr ("XElement " ++ genqn (nName _typeName) ++ " $ XContent ")
           else outStr "XContent "
           case map fst $ findFields (==FieldText) of
             [c] -> outStrLn $ "(emitXml " ++ c ++ ")"
@@ -186,16 +189,58 @@ outputType dt@(DataType n ctors ds is dtemit doc) = do
           indent 8 >> outStrLn (genParts "XAttr" (findFields (==FieldAttribute)))
           indent 8 >> outStrLn (genEls (findFields (`elem` [FieldElement,FieldOther])))
 
-          -- indent 8 >> outStrLn ("(" ++ genParts "XElement" (findFields (==FieldElement)))
-          -- indent 8 >> outStrLn (" ++ " ++ genreps (findFields (==FieldOther)) ++ ")")
         else
           indent 6 >> outStrLn ("XReps " ++ genreps fas)
+  -- PARSING
+
+  if _typeEmit == DataTypeSimple
+  then do
+    outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+    outStrLn $ "parse" ++ mn ++ " s = "
+  else do
+    outStrLn $ "parse" ++ mn ++ " :: P.XParser m => m " ++ mn
+    outStrLn $ "parse" ++ mn ++ " = "
+  forM_ (zip [(0 :: Int)..] _typeCtors) $ \(j,Ctor {..}) -> do
+    mcn <- mangleCtor _typeName _ctorName
+    outStr "      "
+    when (j > 0) $ outStr "<|> "
+    if null _ctorFields
+    then outStrLn $ "return " ++ mcn
+    else outStrLn mcn
+    forM_ (zip [(0 :: Int) ..] _ctorFields) $ \(i,Field {..}) ->
+      do
+        outStr $ "        " ++ (if i == 0 then "<$> " else "<*> ")
+        ftn <- mangleType _fieldType
+        case _typeEmit of
+          DataTypeSimple -> outStrLn $ parseFun ftn ++ " s"
+          _ ->
+            do
+              let pname = "(P.name \"" ++ show _fieldName ++ "\")"
+                  parser = parseFun ftn
+                  attrParse = "(P.attr " ++ pname ++ " >>= " ++ parser ++ ")"
+                  elParse = parseEl parser pname _fieldType
+              outStrLn $ case (_fieldXmlEmit,_fieldCardinality) of
+                (FieldAttribute,ZeroOrOne) -> "P.optional " ++ attrParse
+                (FieldAttribute,_) -> attrParse
+                (FieldText,_) -> "(P.textContent >>= " ++ parser ++ ")"
+                (FieldElement,Many) ->
+                    "P.findChildren " ++ pname ++ " (" ++ elParse ++ ")"
+                (FieldElement,ZeroOrOne) ->
+                    "P.optional (" ++ elParse ++ ")"
+                (FieldElement,One) ->
+                    "P.oneChild (" ++ elParse ++ ")"
+                (FieldOther,ZeroOrOne) -> "P.optional (" ++ parser ++ ")"
+                (FieldOther,Many) -> "P.many (" ++ parser ++ ")"
+                (FieldOther,_) -> parser
+
+
+  outStrLn ""
   -- smart ctors
-  unless (dtemit == DataTypeSimple) $
-         forM_ ctors $ \(Ctor cn fs) ->
+  unless (_typeEmit == DataTypeSimple) $
+         forM_ _typeCtors $ \(Ctor {..}) ->
            do
-             mcn <- mangleCtor n cn
-             let fas = zip fieldArgs fs
+             mcn <- mangleCtor _typeName _ctorName
+             let fas = zip fieldArgs _ctorFields
              mfs <- forM fas $ \(c,Field _ ft fc _ _) ->
                      case fc of
                        One -> (c,) . Just . (c,) <$> refType ft
@@ -204,26 +249,51 @@ outputType dt@(DataType n ctors ds is dtemit doc) = do
              let args = mapMaybe snd mfs
              outStrLn $ "-- | Smart constructor for '" ++ mcn ++ "'"
              outStrLn $ "mk" ++ mcn ++ " :: " ++ concatMap ((++ " -> ") . snd) args ++ mn
-             outStrLn $ "mk" ++ mcn ++ " " ++ concatMap ((++ " ") . fst) args ++ "= " ++ mcn ++ " " ++
-                      unwords (map fst mfs)
-  mapM_ (outputImpls dt) is
+             outStrLn $ "mk" ++ mcn ++ " " ++ concatMap ((++ " ") . fst) args ++
+                          "= " ++ mcn ++ " " ++ unwords (map fst mfs)
+  mapM_ (outputImpls dt) _typeImpls
 
 
 -- ENUM --
-outputType et@(EnumType n vals ds is doc) = do
-  header n doc
-  mn <- mangleType n
+outputType et@(EnumType {..}) = do
+  header _typeName _typeDoc
+  mn <- mangleType et
   outStrLn $ "data " ++ mn ++ " = "
-  forM_ (zip [(0 :: Int)..] vals) $ \(i,s) ->
+  forM_ (zip [(0 :: Int)..] _typeEnumValues) $ \(i,s) ->
       do
         outStr (if i > 0 then "    | " else "      ")
-        mangleCtor n s >>= \e -> outStrLn $ e ++ " -- ^ /" ++ s ++ "/"
-  outStrLn $ "    deriving (" ++ outputDerives ds  ++ ")"
-  mapM_ (outputImpls et) is
+        mangleCtor _typeName s >>= \e -> outStrLn $ e ++ " -- ^ /" ++ s ++ "/"
+  outStrLn $ "    deriving (" ++ outputDerives _typeDerives  ++ ")"
+  mapM_ (outputImpls et) _typeImpls
   outputEmitXml mn
-  forM_ vals $ \s -> do
-    cn <- mangleCtor n s
+  forM_ _typeEnumValues $ \s -> do
+    cn <- mangleCtor _typeName s
     outStrLn $ "    emitXml " ++ cn ++ " = XLit \"" ++ s ++ "\""
+  -- PARSING
+  outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+  outStrLn $ "parse" ++ mn ++ " s"
+  forM_ (zip [(0 :: Int)..] _typeEnumValues) $ \(i,s) ->
+      do
+        cn <- mangleCtor _typeName s
+        outStrLn $ "        | s == \"" ++ s ++ "\" = return $ " ++ cn
+  outStrLn $ "        | otherwise = P.throwError $ \"" ++ mn ++ ": \" ++ s"
+
+
+-- | breaking off because RecordWildCards breaks haskell
+parseEl :: String -> String -> Type -> String
+parseEl parser pname fType =
+    case firstOf typeEmit fType of
+      Just DataTypeSimple -> simpleEl
+      Nothing -> simpleEl
+      _ -> "(P.atEl " ++ pname ++ " >> " ++ parser ++ ")"
+    where simpleEl = "(P.atEl " ++ pname ++ " >> P.textContent >>= " ++ parser ++ ")"
+
+parseFun :: String -> String
+parseFun tn | tn == "Decimal" = rp
+            | tn == "DefString" = rp
+            | tn == "Integer" = rp
+            | otherwise = "parse" ++ tn
+            where rp = "(readParse \"" ++ tn ++ "\")"
 
 -- | List of usable field arguments.
 fieldArgs :: [String]
@@ -241,8 +311,9 @@ card ZeroOrOne s = "(Maybe " ++ s ++ ")"
 card Many s = "[" ++ s ++ "]"
 
 -- | Mangling for type names.
-mangleType :: Name -> Output String
-mangleType n@(Name _ bare _) = mangle n (firstUpper $ fixChars (_qLocal bare)) firstUpper
+mangleType :: Type -> Output String
+mangleType = m . _typeName where
+    m n@(Name _ bare _) = mangle n (firstUpper $ fixChars (_qLocal bare)) firstUpper
 
 
 -- | Run mangling rules.
@@ -303,7 +374,7 @@ fixChars = reverse . snd . foldl fc (True,"")
 -- | Get referred type name, handling builtins.
 refType :: Type -> Output String
 refType t@(BuiltIn {}) = return $ drop 2 $ show (_coreType t)
-refType t = mangleType $ _typeName t
+refType t = mangleType t
 
 -- | Output derive types.
 outputDerives :: DerivesFamily -> String
@@ -323,26 +394,36 @@ outputImpls :: Type -> Impl -> Output ()
 outputImpls t NewTypeShow = do
   tn <- refType t
   outStrLn $ "instance Show " ++ tn ++ " where show (" ++ tn ++ " a) = show a"
+  outStrLn $ "instance Read " ++ tn ++ " where readsPrec i = map (A.first " ++ tn ++ ") . readsPrec i"
 outputImpls _ _ = return ()
 
 -- | Output pragmas, module, imports.
 outputHeader :: String -> Output ()
-outputHeader moduleName = do
-    outStrLn "{-# LANGUAGE TupleSections #-}"
-    outStrLn "{-# LANGUAGE DeriveGeneric #-}"
-    outStrLn "{-# LANGUAGE FlexibleContexts #-}"
-    outStrLn "{-# LANGUAGE DeriveDataTypeable #-}"
-    outStrLn "{-# LANGUAGE TemplateHaskell #-}"
-    outStrLn "{-# LANGUAGE OverloadedStrings #-}"
-    outStrLn "{-# LANGUAGE GeneralizedNewtypeDeriving #-}"
-    outStrLn "{-# LANGUAGE DeriveDataTypeable #-}"
-    outStrLn "{-# LANGUAGE MultiParamTypeClasses #-}"
-    outStrLn ""
-    outStrLn $ "module " ++ moduleName ++ " where"
-    outStrLn ""
-    outStrLn "import GHC.Generics"
-    outStrLn "import Data.Data"
-    outStrLn "import Data.Decimal"
-    outStrLn "import Data.String"
-    outStrLn "import Fadno.Xml.EmitXml"
-    outStrLn ""
+outputHeader moduleName = mapM_ outStrLn
+    [ "{-# LANGUAGE TupleSections #-}"
+    , "{-# LANGUAGE DeriveGeneric #-}"
+    , "{-# LANGUAGE FlexibleContexts #-}"
+    , "{-# LANGUAGE DeriveDataTypeable #-}"
+    , "{-# LANGUAGE TemplateHaskell #-}"
+    , "{-# LANGUAGE OverloadedStrings #-}"
+    , "{-# LANGUAGE GeneralizedNewtypeDeriving #-}"
+    , "{-# LANGUAGE DeriveDataTypeable #-}"
+    , "{-# LANGUAGE MultiParamTypeClasses #-}"
+    , ""
+    , "module " ++ moduleName ++ " where"
+    , ""
+    , "import GHC.Generics"
+    , "import Data.Data"
+    , "import Data.Decimal"
+    , "import Data.String"
+    , "import Fadno.Xml.EmitXml"
+    , "import qualified Fadno.Xml.XParser as P"
+    , "import qualified Control.Applicative as P"
+    , "import Control.Applicative ((<|>))"
+    , "import qualified Text.Read as P"
+    , "import qualified Control.Monad.Except as P"
+    , "import qualified Control.Arrow as A"
+    , ""
+    , "readParse :: (P.XParser m, Read a) => String -> String -> m a"
+    , "readParse t s = maybe (P.throwError $ t ++ \": \" ++ s) return $ P.readMaybe s"
+    ]
