@@ -28,26 +28,37 @@ import Data.Either
 import Control.Applicative
 import Prelude hiding (sequence)
 import Data.Maybe
+import qualified Data.Set as S
+
+-- | Stack entry tracking identified elements.
+data Entry = Entry { _el :: X.Element,
+                     _consumed :: S.Set X.QName }
+entry :: X.Element -> Entry
+entry e = Entry e S.empty
 
 -- | XParser constraint kind. Stack state + alternative + errors.
-type XParser m = (Alternative m, MonadState [X.Element] m, MonadError String m)
+type XParser m = (Alternative m, MonadState [Entry] m, MonadError String m)
 
 -- | run XParser on an element.
-parseX :: (Monad m) => StateT [X.Element] (ExceptT String m) b -> X.Element -> m (Either String b)
-parseX sel e = runExceptT (evalStateT sel [e])
+parseX :: (Monad m) => StateT [Entry] (ExceptT String m) b -> X.Element -> m (Either String b)
+parseX sel e = runExceptT (evalStateT sel [entry e])
 
 -- | Stack peek.
 peek :: XParser m => m X.Element
-peek = head <$> checkStack
+peek = _el <$> peek'
+
+-- | Stack peek.
+peek' :: XParser m => m Entry
+peek' = head <$> checkStack
 
 -- | Verify populated stack.
-checkStack :: XParser m => m [X.Element]
+checkStack :: XParser m => m [Entry]
 checkStack = get >>= \s ->
              if null s then throwError "Invalid stack" else return s
 
 -- | Stack push.
 push :: XParser m => X.Element -> m ()
-push e = modify (e:)
+push e = modify (entry e:)
 
 -- | Stack pop.
 pop :: XParser m => m ()
@@ -63,11 +74,15 @@ attr n = do
 textContent :: XParser m => m String
 textContent = X.strContent <$> peek
 
--- | Verify current element.
+-- | Verify and "consume" current element.
 atEl :: XParser m => X.QName -> m ()
 atEl n = do
   e <- X.elName <$> peek
-  when (n /= e) $ throwError ("Wrong element name: " ++ show e)
+  if n /= e
+  then throwError ("Wrong element name: " ++ show e)
+  else modify (consumeChild e)
+       where consumeChild child (h:Entry p c:r) = h:Entry p (S.insert child c):r
+             consumeChild _ s = s
 
 -- | Find child element and act on it.
 findChild :: XParser m => X.QName -> m a -> m a
@@ -93,9 +108,12 @@ dropTo act e = push e >> act >>= \r -> pop >> return r
 findChildren :: XParser m => X.QName -> m a -> m [a]
 findChildren n act = X.findChildren n <$> peek >>= mapM (dropTo act)
 
--- | Act on all children.
+-- | Act on all "unconsumed" children.
 allChildren :: XParser m => m a -> m [a]
-allChildren act = X.elChildren <$> peek >>= mapM (dropTo act)
+allChildren act = do
+  (Entry h seen) <- peek'
+  let unseen = filter (\e -> not (S.member (X.elName e) seen)) $ X.elChildren h
+  mapM (dropTo act) unseen
 
 -- | Run optional action on all children.
 anyChildren :: XParser m => m a -> m [a]
