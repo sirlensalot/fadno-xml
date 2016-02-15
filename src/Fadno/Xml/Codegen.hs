@@ -158,13 +158,13 @@ outputType dt@(DataType {..}) = do
       _ -> do
         let fas = zip fieldArgs _ctorFields
             genEls [] = "[]"
-            genEls es = "(" ++ intercalate "++"
+            genEls es = "(" ++ intercalate " ++\n        "
                         (map (\f -> genEl (_fieldXmlEmit (snd f)) f) es) ++ ")"
             genEl FieldElement f = genPart "XElement" f
             genEl FieldOther (c,_) = "[emitXml " ++ c ++ "]"
             genEl _ f = error "c'est impossible: " ++ show f
             genParts _ [] = "[]"
-            genParts xctor ffs = "(" ++ intercalate "++" (map (genPart xctor) ffs) ++ ")"
+            genParts xctor ffs = "(" ++ intercalate " ++\n        " (map (genPart xctor) ffs) ++ ")"
             genPart xctor (c,Field fn _ fc _ _) =
                 case fc of
                   One -> "[" ++ genct xctor fn ++ " (emitXml " ++ c ++ ")]"
@@ -221,11 +221,14 @@ outputType dt@(DataType {..}) = do
                   parser = parseFun ftn
                   attrParse = "(P.xattr " ++ pname ++ " >>= " ++ parser ++ ")"
                   elParse = parseEl parser pname _fieldType
+                  -- gross heuristic to handle horrible musicxml things
+                  pmany | length _ctorFields == 1 && length _typeCtors > 1 = "P.some"
+                        | otherwise = "P.many"
               outStrLn $ case (_fieldXmlEmit,_fieldCardinality) of
                 (FieldAttribute,ZeroOrOne) -> "P.optional " ++ attrParse
                 (FieldAttribute,_) -> attrParse
                 (FieldText,_) -> "(P.xtext >>= " ++ parser ++ ")"
-                (FieldElement,Many) -> "P.many " ++ elParse
+                (FieldElement,Many) -> pmany ++ " " ++ elParse
                 (FieldElement,ZeroOrOne) -> "P.optional " ++ elParse
                 (FieldElement,One) -> elParse
                 (FieldOther,ZeroOrOne) -> "P.optional (" ++ parser ++ ")"

@@ -2034,7 +2034,20 @@ data Accidental =
 instance EmitXml Accidental where
     emitXml (Accidental a b c d e f g h i j k l m n o) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "cautionary" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "editorial" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o])
+        ([maybe XEmpty (XAttr (QN "cautionary" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "editorial" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o])
         []
 parseAccidental :: P.XParse Accidental
 parseAccidental = 
@@ -2080,7 +2093,16 @@ data AccidentalMark =
 instance EmitXml AccidentalMark where
     emitXml (AccidentalMark a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
 parseAccidentalMark :: P.XParse AccidentalMark
 parseAccidentalMark = 
@@ -2133,7 +2155,27 @@ data AccidentalText =
 instance EmitXml AccidentalText where
     emitXml (AccidentalText a b c d e f g h i j k l m n o p q r s t u v) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t]++[maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
         []
 parseAccidentalText :: P.XParse AccidentalText
 parseAccidentalText = 
@@ -2211,8 +2253,18 @@ data AccordionRegistration =
 instance EmitXml AccordionRegistration where
     emitXml (AccordionRegistration a b c d e f g h i j k l) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
-        ([maybe XEmpty (XElement (QN "accordion-high" Nothing).emitXml) j]++[maybe XEmpty (XElement (QN "accordion-middle" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "accordion-low" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
+        ([maybe XEmpty (XElement (QN "accordion-high" Nothing).emitXml) j] ++
+        [maybe XEmpty (XElement (QN "accordion-middle" Nothing).emitXml) k] ++
+        [maybe XEmpty (XElement (QN "accordion-low" Nothing).emitXml) l])
 parseAccordionRegistration :: P.XParse AccordionRegistration
 parseAccordionRegistration = 
       AccordionRegistration
@@ -2247,7 +2299,9 @@ instance EmitXml Appearance where
     emitXml (Appearance a b c) =
       XContent XEmpty
         []
-        (map (XElement (QN "line-width" Nothing).emitXml) a++map (XElement (QN "note-size" Nothing).emitXml) b++map (XElement (QN "other-appearance" Nothing).emitXml) c)
+        (map (XElement (QN "line-width" Nothing).emitXml) a ++
+        map (XElement (QN "note-size" Nothing).emitXml) b ++
+        map (XElement (QN "other-appearance" Nothing).emitXml) c)
 parseAppearance :: P.XParse Appearance
 parseAppearance = 
       Appearance
@@ -2277,7 +2331,14 @@ data Arpeggiate =
 instance EmitXml Arpeggiate where
     emitXml (Arpeggiate a b c d e f g h) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "direction" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "direction" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
 parseArpeggiate :: P.XParse Arpeggiate
 parseArpeggiate = 
@@ -2338,7 +2399,18 @@ instance EmitXml Attributes where
     emitXml (Attributes a b c d e f g h i j k l) =
       XContent XEmpty
         []
-        ([emitXml a]++[maybe XEmpty (XElement (QN "divisions" Nothing).emitXml) b]++map (XElement (QN "key" Nothing).emitXml) c++map (XElement (QN "time" Nothing).emitXml) d++[maybe XEmpty (XElement (QN "staves" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "part-symbol" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "instruments" Nothing).emitXml) g]++map (XElement (QN "clef" Nothing).emitXml) h++map (XElement (QN "staff-details" Nothing).emitXml) i++[maybe XEmpty (XElement (QN "transpose" Nothing).emitXml) j]++map (XElement (QN "directive" Nothing).emitXml) k++map (XElement (QN "measure-style" Nothing).emitXml) l)
+        ([emitXml a] ++
+        [maybe XEmpty (XElement (QN "divisions" Nothing).emitXml) b] ++
+        map (XElement (QN "key" Nothing).emitXml) c ++
+        map (XElement (QN "time" Nothing).emitXml) d ++
+        [maybe XEmpty (XElement (QN "staves" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "part-symbol" Nothing).emitXml) f] ++
+        [maybe XEmpty (XElement (QN "instruments" Nothing).emitXml) g] ++
+        map (XElement (QN "clef" Nothing).emitXml) h ++
+        map (XElement (QN "staff-details" Nothing).emitXml) i ++
+        [maybe XEmpty (XElement (QN "transpose" Nothing).emitXml) j] ++
+        map (XElement (QN "directive" Nothing).emitXml) k ++
+        map (XElement (QN "measure-style" Nothing).emitXml) l)
 parseAttributes :: P.XParse Attributes
 parseAttributes = 
       Attributes
@@ -2429,8 +2501,18 @@ data Barline =
 instance EmitXml Barline where
     emitXml (Barline a b c d e f g h i j k l) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) d])
-        ([maybe XEmpty (XElement (QN "bar-style" Nothing).emitXml) e]++[emitXml f]++[maybe XEmpty (XElement (QN "wavy-line" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "segno" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "coda" Nothing).emitXml) i]++map (XElement (QN "fermata" Nothing).emitXml) j++[maybe XEmpty (XElement (QN "ending" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "repeat" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) d])
+        ([maybe XEmpty (XElement (QN "bar-style" Nothing).emitXml) e] ++
+        [emitXml f] ++
+        [maybe XEmpty (XElement (QN "wavy-line" Nothing).emitXml) g] ++
+        [maybe XEmpty (XElement (QN "segno" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "coda" Nothing).emitXml) i] ++
+        map (XElement (QN "fermata" Nothing).emitXml) j ++
+        [maybe XEmpty (XElement (QN "ending" Nothing).emitXml) k] ++
+        [maybe XEmpty (XElement (QN "repeat" Nothing).emitXml) l])
 parseBarline :: P.XParse Barline
 parseBarline = 
       Barline
@@ -2463,7 +2545,8 @@ data Barre =
 instance EmitXml Barre where
     emitXml (Barre a b) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) b])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) b])
         []
 parseBarre :: P.XParse Barre
 parseBarre = 
@@ -2488,7 +2571,8 @@ instance EmitXml Bass where
     emitXml (Bass a b) =
       XContent XEmpty
         []
-        ([XElement (QN "bass-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "bass-alter" Nothing).emitXml) b])
+        ([XElement (QN "bass-step" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "bass-alter" Nothing).emitXml) b])
 parseBass :: P.XParse Bass
 parseBass = 
       Bass
@@ -2521,7 +2605,17 @@ data BassAlter =
 instance EmitXml BassAlter where
     emitXml (BassAlter a b c d e f g h i j k l) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
 parseBassAlter :: P.XParse BassAlter
 parseBassAlter = 
@@ -2564,7 +2658,16 @@ data BassStep =
 instance EmitXml BassStep where
     emitXml (BassStep a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseBassStep :: P.XParse BassStep
 parseBassStep = 
@@ -2602,7 +2705,10 @@ data Beam =
 instance EmitXml Beam where
     emitXml (Beam a b c d e) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "repeater" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "fan" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "repeater" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "fan" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
 parseBeam :: P.XParse Beam
 parseBeam = 
@@ -2633,7 +2739,9 @@ data BeatRepeat =
 instance EmitXml BeatRepeat where
     emitXml (BeatRepeat a b c d) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) c])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) c])
         ([emitXml d])
 parseBeatRepeat :: P.XParse BeatRepeat
 parseBeatRepeat = 
@@ -2673,8 +2781,22 @@ data Bend =
 instance EmitXml Bend where
     emitXml (Bend a b c d e f g h i j k l m n o p) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) m])
-        ([XElement (QN "bend-alter" Nothing) (emitXml n)]++[emitXml o]++[maybe XEmpty (XElement (QN "with-bar" Nothing).emitXml) p])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) m])
+        ([XElement (QN "bend-alter" Nothing) (emitXml n)] ++
+        [emitXml o] ++
+        [maybe XEmpty (XElement (QN "with-bar" Nothing).emitXml) p])
 parseBend :: P.XParse Bend
 parseBend = 
       Bend
@@ -2713,7 +2835,10 @@ data Bookmark =
 instance EmitXml Bookmark where
     emitXml (Bookmark a b c d) =
       XContent XEmpty
-        ([XAttr (QN "id" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "element" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "position" Nothing).emitXml) d])
+        ([XAttr (QN "id" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "element" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "position" Nothing).emitXml) d])
         []
 parseBookmark :: P.XParse Bookmark
 parseBookmark = 
@@ -2747,7 +2872,16 @@ data Bracket =
 instance EmitXml Bracket where
     emitXml (Bracket a b c d e f g h i j) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[XAttr (QN "line-end" Nothing) (emitXml c)]++[maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [XAttr (QN "line-end" Nothing) (emitXml c)] ++
+        [maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
 parseBracket :: P.XParse Bracket
 parseBracket = 
@@ -2819,8 +2953,22 @@ data Clef =
 instance EmitXml Clef where
     emitXml (Clef a b c d e f g h i j k l m n o p) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "additional" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m])
-        ([XElement (QN "sign" Nothing) (emitXml n)]++[maybe XEmpty (XElement (QN "line" Nothing).emitXml) o]++[maybe XEmpty (XElement (QN "clef-octave-change" Nothing).emitXml) p])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "additional" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m])
+        ([XElement (QN "sign" Nothing) (emitXml n)] ++
+        [maybe XEmpty (XElement (QN "line" Nothing).emitXml) o] ++
+        [maybe XEmpty (XElement (QN "clef-octave-change" Nothing).emitXml) p])
 parseClef :: P.XParse Clef
 parseClef = 
       Clef
@@ -2864,7 +3012,9 @@ instance EmitXml Credit where
     emitXml (Credit a b c d) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "page" Nothing).emitXml) a])
-        (map (XElement (QN "link" Nothing).emitXml) b++map (XElement (QN "bookmark" Nothing).emitXml) c++[emitXml d])
+        (map (XElement (QN "link" Nothing).emitXml) b ++
+        map (XElement (QN "bookmark" Nothing).emitXml) c ++
+        [emitXml d])
 parseCredit :: P.XParse Credit
 parseCredit = 
       Credit
@@ -2894,7 +3044,13 @@ data Dashes =
 instance EmitXml Dashes where
     emitXml (Dashes a b c d e f g) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g])
         []
 parseDashes :: P.XParse Dashes
 parseDashes = 
@@ -2929,7 +3085,13 @@ instance EmitXml Defaults where
     emitXml (Defaults a b c d e f g) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "scaling" Nothing).emitXml) a]++[emitXml b]++[maybe XEmpty (XElement (QN "appearance" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "music-font" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "word-font" Nothing).emitXml) e]++map (XElement (QN "lyric-font" Nothing).emitXml) f++map (XElement (QN "lyric-language" Nothing).emitXml) g)
+        ([maybe XEmpty (XElement (QN "scaling" Nothing).emitXml) a] ++
+        [emitXml b] ++
+        [maybe XEmpty (XElement (QN "appearance" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "music-font" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "word-font" Nothing).emitXml) e] ++
+        map (XElement (QN "lyric-font" Nothing).emitXml) f ++
+        map (XElement (QN "lyric-language" Nothing).emitXml) g)
 parseDefaults :: P.XParse Defaults
 parseDefaults = 
       Defaults
@@ -2962,7 +3124,9 @@ instance EmitXml Degree where
     emitXml (Degree a b c d) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a])
-        ([XElement (QN "degree-value" Nothing) (emitXml b)]++[XElement (QN "degree-alter" Nothing) (emitXml c)]++[XElement (QN "degree-type" Nothing) (emitXml d)])
+        ([XElement (QN "degree-value" Nothing) (emitXml b)] ++
+        [XElement (QN "degree-alter" Nothing) (emitXml c)] ++
+        [XElement (QN "degree-type" Nothing) (emitXml d)])
 parseDegree :: P.XParse Degree
 parseDegree = 
       Degree
@@ -2996,7 +3160,16 @@ data DegreeAlter =
 instance EmitXml DegreeAlter where
     emitXml (DegreeAlter a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "plus-minus" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "plus-minus" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseDegreeAlter :: P.XParse DegreeAlter
 parseDegreeAlter = 
@@ -3038,7 +3211,16 @@ data DegreeType =
 instance EmitXml DegreeType where
     emitXml (DegreeType a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseDegreeType :: P.XParse DegreeType
 parseDegreeType = 
@@ -3080,7 +3262,16 @@ data DegreeValue =
 instance EmitXml DegreeValue where
     emitXml (DegreeValue a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseDegreeValue :: P.XParse DegreeValue
 parseDegreeValue = 
@@ -3120,8 +3311,13 @@ data Direction =
 instance EmitXml Direction where
     emitXml (Direction a b c d e f g) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "directive" Nothing).emitXml) b])
-        (map (XElement (QN "direction-type" Nothing).emitXml) c++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) d]++[emitXml e]++[emitXml f]++[maybe XEmpty (XElement (QN "sound" Nothing).emitXml) g])
+        ([maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "directive" Nothing).emitXml) b])
+        (map (XElement (QN "direction-type" Nothing).emitXml) c ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) d] ++
+        [emitXml e] ++
+        [emitXml f] ++
+        [maybe XEmpty (XElement (QN "sound" Nothing).emitXml) g])
 parseDirection :: P.XParse Direction
 parseDirection = 
       Direction
@@ -3176,7 +3372,16 @@ data Directive =
 instance EmitXml Directive where
     emitXml (Directive a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseDirective :: P.XParse Directive
 parseDirective = 
@@ -3240,7 +3445,16 @@ data Dynamics =
 instance EmitXml Dynamics where
     emitXml (Dynamics a b c d e f g h i j k) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
         ([emitXml k])
 parseDynamics :: P.XParse Dynamics
 parseDynamics = 
@@ -3277,7 +3491,11 @@ data Elision =
 instance EmitXml Elision where
     emitXml (Elision a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseElision :: P.XParse Elision
 parseElision = 
@@ -3324,7 +3542,10 @@ data EmptyFont =
 instance EmitXml EmptyFont where
     emitXml (EmptyFont a b c d) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d])
         []
 parseEmptyFont :: P.XParse EmptyFont
 parseEmptyFont = 
@@ -3360,7 +3581,18 @@ data EmptyLine =
 instance EmitXml EmptyLine where
     emitXml (EmptyLine a b c d e f g h i j k l) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
         []
 parseEmptyLine :: P.XParse EmptyLine
 parseEmptyLine = 
@@ -3402,7 +3634,16 @@ data EmptyPlacement =
 instance EmitXml EmptyPlacement where
     emitXml (EmptyPlacement a b c d e f g h i j) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
         []
 parseEmptyPlacement :: P.XParse EmptyPlacement
 parseEmptyPlacement = 
@@ -3441,7 +3682,15 @@ data EmptyPrintStyle =
 instance EmitXml EmptyPrintStyle where
     emitXml (EmptyPrintStyle a b c d e f g h i) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         []
 parseEmptyPrintStyle :: P.XParse EmptyPrintStyle
 parseEmptyPrintStyle = 
@@ -3487,7 +3736,23 @@ data EmptyTrillSound =
 instance EmitXml EmptyTrillSound where
     emitXml (EmptyTrillSound a b c d e f g h i j k l m n o p q) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
         []
 parseEmptyTrillSound :: P.XParse EmptyTrillSound
 parseEmptyTrillSound = 
@@ -3562,7 +3827,21 @@ data Ending =
 instance EmitXml Ending where
     emitXml (Ending a b c d e f g h i j k l m n o p) =
       XContent (emitXml a)
-        ([XAttr (QN "number" Nothing) (emitXml b)]++[XAttr (QN "type" Nothing) (emitXml c)]++[maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "text-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "text-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
+        ([XAttr (QN "number" Nothing) (emitXml b)] ++
+        [XAttr (QN "type" Nothing) (emitXml c)] ++
+        [maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "text-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "text-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
 parseEnding :: P.XParse Ending
 parseEnding = 
@@ -3603,7 +3882,11 @@ data Extend =
 instance EmitXml Extend where
     emitXml (Extend a b c d e) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
 parseExtend :: P.XParse Extend
 parseExtend = 
@@ -3663,7 +3946,16 @@ data Fermata =
 instance EmitXml Fermata where
     emitXml (Fermata a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseFermata :: P.XParse Fermata
 parseFermata = 
@@ -3699,7 +3991,10 @@ instance EmitXml Figure where
     emitXml (Figure a b c d) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "prefix" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "figure-number" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "suffix" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
+        ([maybe XEmpty (XElement (QN "prefix" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "figure-number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "suffix" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
 parseFigure :: P.XParse Figure
 parseFigure = 
       Figure
@@ -3739,8 +4034,23 @@ data FiguredBass =
 instance EmitXml FiguredBass where
     emitXml (FiguredBass a b c d e f g h i j k l m n o p q) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) n])
-        (map (XElement (QN "figure" Nothing).emitXml) o++[emitXml p]++[emitXml q])
+        ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) n])
+        (map (XElement (QN "figure" Nothing).emitXml) o ++
+        [emitXml p] ++
+        [emitXml q])
 parseFiguredBass :: P.XParse FiguredBass
 parseFiguredBass = 
       FiguredBass
@@ -3789,7 +4099,18 @@ data Fingering =
 instance EmitXml Fingering where
     emitXml (Fingering a b c d e f g h i j k l m) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "substitution" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "alternate" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
+        ([maybe XEmpty (XAttr (QN "substitution" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "alternate" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
         []
 parseFingering :: P.XParse Fingering
 parseFingering = 
@@ -3825,7 +4146,8 @@ data FirstFret =
 instance EmitXml FirstFret where
     emitXml (FirstFret a b c) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "location" Nothing).emitXml) c])
+        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "location" Nothing).emitXml) c])
         []
 parseFirstFret :: P.XParse FirstFret
 parseFirstFret = 
@@ -3870,7 +4192,27 @@ data FormattedText =
 instance EmitXml FormattedText where
     emitXml (FormattedText a b c d e f g h i j k l m n o p q r s t u v) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t]++[maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
         []
 parseFormattedText :: P.XParse FormattedText
 parseFormattedText = 
@@ -3949,8 +4291,19 @@ data Frame =
 instance EmitXml Frame where
     emitXml (Frame a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "height" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) i])
-        ([XElement (QN "frame-strings" Nothing) (emitXml j)]++[XElement (QN "frame-frets" Nothing) (emitXml k)]++[maybe XEmpty (XElement (QN "first-fret" Nothing).emitXml) l]++map (XElement (QN "frame-note" Nothing).emitXml) m)
+        ([maybe XEmpty (XAttr (QN "height" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) i])
+        ([XElement (QN "frame-strings" Nothing) (emitXml j)] ++
+        [XElement (QN "frame-frets" Nothing) (emitXml k)] ++
+        [maybe XEmpty (XElement (QN "first-fret" Nothing).emitXml) l] ++
+        map (XElement (QN "frame-note" Nothing).emitXml) m)
 parseFrame :: P.XParse Frame
 parseFrame = 
       Frame
@@ -3987,7 +4340,10 @@ instance EmitXml FrameNote where
     emitXml (FrameNote a b c d) =
       XContent XEmpty
         []
-        ([XElement (QN "string" Nothing) (emitXml a)]++[XElement (QN "fret" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "fingering" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "barre" Nothing).emitXml) d])
+        ([XElement (QN "string" Nothing) (emitXml a)] ++
+        [XElement (QN "fret" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "fingering" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "barre" Nothing).emitXml) d])
 parseFrameNote :: P.XParse FrameNote
 parseFrameNote = 
       FrameNote
@@ -4016,7 +4372,11 @@ data Fret =
 instance EmitXml Fret where
     emitXml (Fret a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseFret :: P.XParse Fret
 parseFret = 
@@ -4055,7 +4415,18 @@ data Glissando =
 instance EmitXml Glissando where
     emitXml (Glissando a b c d e f g h i j k l m) =
       XContent (emitXml a)
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m])
         []
 parseGlissando :: P.XParse Glissando
 parseGlissando = 
@@ -4092,7 +4463,10 @@ data Grace =
 instance EmitXml Grace where
     emitXml (Grace a b c d) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "steal-time-previous" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "steal-time-following" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "make-time" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "slash" Nothing).emitXml) d])
+        ([maybe XEmpty (XAttr (QN "steal-time-previous" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "steal-time-following" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "make-time" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "slash" Nothing).emitXml) d])
         []
 parseGrace :: P.XParse Grace
 parseGrace = 
@@ -4151,7 +4525,16 @@ data GroupName =
 instance EmitXml GroupName where
     emitXml (GroupName a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) k])
         []
 parseGroupName :: P.XParse GroupName
 parseGroupName = 
@@ -4188,7 +4571,11 @@ data GroupSymbol =
 instance EmitXml GroupSymbol where
     emitXml (GroupSymbol a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseGroupSymbol :: P.XParse GroupSymbol
 parseGroupSymbol = 
@@ -4220,7 +4607,9 @@ data Grouping =
 instance EmitXml Grouping where
     emitXml (Grouping a b c d) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "member-of" Nothing).emitXml) c])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "member-of" Nothing).emitXml) c])
         (map (XElement (QN "feature" Nothing).emitXml) d)
 parseGrouping :: P.XParse Grouping
 parseGrouping = 
@@ -4257,7 +4646,18 @@ data HammerOnPullOff =
 instance EmitXml HammerOnPullOff where
     emitXml (HammerOnPullOff a b c d e f g h i j k l m) =
       XContent (emitXml a)
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
         []
 parseHammerOnPullOff :: P.XParse HammerOnPullOff
 parseHammerOnPullOff = 
@@ -4303,8 +4703,19 @@ data Harmonic =
 instance EmitXml Harmonic where
     emitXml (Harmonic a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
-        ([emitXml l]++[emitXml m])
+        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([emitXml l] ++
+        [emitXml m])
 parseHarmonic :: P.XParse Harmonic
 parseHarmonic = 
       Harmonic
@@ -4358,8 +4769,24 @@ data Harmony =
 instance EmitXml Harmony where
     emitXml (Harmony a b c d e f g h i j k l m n o p q r) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "print-frame" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
-        ([emitXml n]++[maybe XEmpty (XElement (QN "frame" Nothing).emitXml) o]++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) p]++[emitXml q]++[emitXml r])
+        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "print-frame" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
+        ([emitXml n] ++
+        [maybe XEmpty (XElement (QN "frame" Nothing).emitXml) o] ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) p] ++
+        [emitXml q] ++
+        [emitXml r])
 parseHarmony :: P.XParse Harmony
 parseHarmony = 
       Harmony
@@ -4406,7 +4833,15 @@ data HarpPedals =
 instance EmitXml HarpPedals where
     emitXml (HarpPedals a b c d e f g h i j) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
         (map (XElement (QN "pedal-tuning" Nothing).emitXml) j)
 parseHarpPedals :: P.XParse HarpPedals
 parseHarpPedals = 
@@ -4467,7 +4902,12 @@ instance EmitXml Identification where
     emitXml (Identification a b c d e f) =
       XContent XEmpty
         []
-        (map (XElement (QN "creator" Nothing).emitXml) a++map (XElement (QN "rights" Nothing).emitXml) b++[maybe XEmpty (XElement (QN "encoding" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "source" Nothing).emitXml) d]++map (XElement (QN "relation" Nothing).emitXml) e++[maybe XEmpty (XElement (QN "miscellaneous" Nothing).emitXml) f])
+        (map (XElement (QN "creator" Nothing).emitXml) a ++
+        map (XElement (QN "rights" Nothing).emitXml) b ++
+        [maybe XEmpty (XElement (QN "encoding" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "source" Nothing).emitXml) d] ++
+        map (XElement (QN "relation" Nothing).emitXml) e ++
+        [maybe XEmpty (XElement (QN "miscellaneous" Nothing).emitXml) f])
 parseIdentification :: P.XParse Identification
 parseIdentification = 
       Identification
@@ -4500,7 +4940,14 @@ data Image =
 instance EmitXml Image where
     emitXml (Image a b c d e f g h) =
       XContent XEmpty
-        ([XAttr (QN "source" Nothing) (emitXml a)]++[XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) h])
+        ([XAttr (QN "source" Nothing) (emitXml a)] ++
+        [XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) h])
         []
 parseImage :: P.XParse Image
 parseImage = 
@@ -4560,7 +5007,15 @@ data Inversion =
 instance EmitXml Inversion where
     emitXml (Inversion a b c d e f g h i j) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
 parseInversion :: P.XParse Inversion
 parseInversion = 
@@ -4603,8 +5058,19 @@ data Key =
 instance EmitXml Key where
     emitXml (Key a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k])
-        ([emitXml l]++map (XElement (QN "key-octave" Nothing).emitXml) m)
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k])
+        ([emitXml l] ++
+        map (XElement (QN "key-octave" Nothing).emitXml) m)
 parseKey :: P.XParse Key
 parseKey = 
       Key
@@ -4639,7 +5105,8 @@ data KeyOctave =
 instance EmitXml KeyOctave where
     emitXml (KeyOctave a b c) =
       XContent (emitXml a)
-        ([XAttr (QN "number" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "cancel" Nothing).emitXml) c])
+        ([XAttr (QN "number" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "cancel" Nothing).emitXml) c])
         []
 parseKeyOctave :: P.XParse KeyOctave
 parseKeyOctave = 
@@ -4694,7 +5161,22 @@ data Kind =
 instance EmitXml Kind where
     emitXml (Kind a b c d e f g h i j k l m n o p q) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "use-symbols" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "text" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "stack-degrees" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "parentheses-degrees" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "bracket-degrees" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) q])
+        ([maybe XEmpty (XAttr (QN "use-symbols" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "text" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "stack-degrees" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "parentheses-degrees" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "bracket-degrees" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) q])
         []
 parseKind :: P.XParse Kind
 parseKind = 
@@ -4736,7 +5218,10 @@ data Level =
 instance EmitXml Level where
     emitXml (Level a b c d e) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "reference" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "reference" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) e])
         []
 parseLevel :: P.XParse Level
 parseLevel = 
@@ -4798,7 +5283,19 @@ data Link =
 instance EmitXml Link where
     emitXml (Link a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "name" Nothing).emitXml) a]++[XAttr (QN "href" (Just "xlink")) (emitXml b)]++[maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) c]++[maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) d]++[maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) e]++[maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) f]++[maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) g]++[maybe XEmpty (XAttr (QN "element" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "position" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) m])
+        ([maybe XEmpty (XAttr (QN "name" Nothing).emitXml) a] ++
+        [XAttr (QN "href" (Just "xlink")) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "element" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "position" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) m])
         []
 parseLink :: P.XParse Link
 parseLink = 
@@ -4844,8 +5341,19 @@ data Lyric =
 instance EmitXml Lyric where
     emitXml (Lyric a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
-        ([emitXml j]++[maybe XEmpty (XElement (QN "end-line" Nothing).emitXml) k]++[maybe XEmpty (XElement (QN "end-paragraph" Nothing).emitXml) l]++[emitXml m])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
+        ([emitXml j] ++
+        [maybe XEmpty (XElement (QN "end-line" Nothing).emitXml) k] ++
+        [maybe XEmpty (XElement (QN "end-paragraph" Nothing).emitXml) l] ++
+        [emitXml m])
 parseLyric :: P.XParse Lyric
 parseLyric = 
       Lyric
@@ -4883,7 +5391,12 @@ data LyricFont =
 instance EmitXml LyricFont where
     emitXml (LyricFont a b c d e f) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f])
         []
 parseLyricFont :: P.XParse LyricFont
 parseLyricFont = 
@@ -4912,7 +5425,9 @@ data LyricLanguage =
 instance EmitXml LyricLanguage where
     emitXml (LyricLanguage a b c) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b]++[XAttr (QN "lang" (Just "xml")) (emitXml c)])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b] ++
+        [XAttr (QN "lang" (Just "xml")) (emitXml c)])
         []
 parseLyricLanguage :: P.XParse LyricLanguage
 parseLyricLanguage = 
@@ -4938,7 +5453,10 @@ data Measure =
 instance EmitXml Measure where
     emitXml (Measure a b c d e) =
       XContent XEmpty
-        ([XAttr (QN "number" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
+        ([XAttr (QN "number" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
         ([emitXml e])
 parseMeasure :: P.XParse Measure
 parseMeasure = 
@@ -4968,7 +5486,10 @@ data CmpMeasure =
 instance EmitXml CmpMeasure where
     emitXml (CmpMeasure a b c d e) =
       XContent XEmpty
-        ([XAttr (QN "number" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
+        ([XAttr (QN "number" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
         (map (XElement (QN "part" Nothing).emitXml) e)
 parseCmpMeasure :: P.XParse CmpMeasure
 parseCmpMeasure = 
@@ -5025,7 +5546,15 @@ data MeasureNumbering =
 instance EmitXml MeasureNumbering where
     emitXml (MeasureNumbering a b c d e f g h i j) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
 parseMeasureNumbering :: P.XParse MeasureNumbering
 parseMeasureNumbering = 
@@ -5060,7 +5589,8 @@ data MeasureRepeat =
 instance EmitXml MeasureRepeat where
     emitXml (MeasureRepeat a b c) =
       XContent (emitXml a)
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) c])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "slashes" Nothing).emitXml) c])
         []
 parseMeasureRepeat :: P.XParse MeasureRepeat
 parseMeasureRepeat = 
@@ -5092,7 +5622,12 @@ data MeasureStyle =
 instance EmitXml MeasureStyle where
     emitXml (MeasureStyle a b c d e f g) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         ([emitXml g])
 parseMeasureStyle :: P.XParse MeasureStyle
 parseMeasureStyle = 
@@ -5130,7 +5665,16 @@ data Metronome =
 instance EmitXml Metronome where
     emitXml (Metronome a b c d e f g h i j k) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         ([emitXml k])
 parseMetronome :: P.XParse Metronome
 parseMetronome = 
@@ -5190,7 +5734,10 @@ instance EmitXml MetronomeNote where
     emitXml (MetronomeNote a b c d) =
       XContent XEmpty
         []
-        ([XElement (QN "metronome-type" Nothing) (emitXml a)]++map (XElement (QN "metronome-dot" Nothing).emitXml) b++map (XElement (QN "metronome-beam" Nothing).emitXml) c++[maybe XEmpty (XElement (QN "metronome-tuplet" Nothing).emitXml) d])
+        ([XElement (QN "metronome-type" Nothing) (emitXml a)] ++
+        map (XElement (QN "metronome-dot" Nothing).emitXml) b ++
+        map (XElement (QN "metronome-beam" Nothing).emitXml) c ++
+        [maybe XEmpty (XElement (QN "metronome-tuplet" Nothing).emitXml) d])
 parseMetronomeNote :: P.XParse MetronomeNote
 parseMetronomeNote = 
       MetronomeNote
@@ -5217,7 +5764,9 @@ data MetronomeTuplet =
 instance EmitXml MetronomeTuplet where
     emitXml (MetronomeTuplet a b c d) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d])
         ([emitXml a])
 parseMetronomeTuplet :: P.XParse MetronomeTuplet
 parseMetronomeTuplet = 
@@ -5275,7 +5824,14 @@ instance EmitXml MidiInstrument where
     emitXml (MidiInstrument a b c d e f g h i) =
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
-        ([maybe XEmpty (XElement (QN "midi-channel" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "midi-name" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "midi-bank" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "midi-program" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "midi-unpitched" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "volume" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "pan" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "elevation" Nothing).emitXml) i])
+        ([maybe XEmpty (XElement (QN "midi-channel" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "midi-name" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "midi-bank" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "midi-program" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "midi-unpitched" Nothing).emitXml) f] ++
+        [maybe XEmpty (XElement (QN "volume" Nothing).emitXml) g] ++
+        [maybe XEmpty (XElement (QN "pan" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "elevation" Nothing).emitXml) i])
 parseMidiInstrument :: P.XParse MidiInstrument
 parseMidiInstrument = 
       MidiInstrument
@@ -5429,7 +5985,14 @@ data NonArpeggiate =
 instance EmitXml NonArpeggiate where
     emitXml (NonArpeggiate a b c d e f g h) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
 parseNonArpeggiate :: P.XParse NonArpeggiate
 parseNonArpeggiate = 
@@ -5513,8 +6076,38 @@ data Note =
 instance EmitXml Note where
     emitXml (Note a b c d e f g h i j k l m n o p q r s t u v w x y z a1 b1 c1 d1 e1 f1) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "end-dynamics" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "attack" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "release" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) q]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) r]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) s])
-        ([emitXml t]++[maybe XEmpty (XElement (QN "instrument" Nothing).emitXml) u]++[emitXml v]++[maybe XEmpty (XElement (QN "type" Nothing).emitXml) w]++map (XElement (QN "dot" Nothing).emitXml) x++[maybe XEmpty (XElement (QN "accidental" Nothing).emitXml) y]++[maybe XEmpty (XElement (QN "time-modification" Nothing).emitXml) z]++[maybe XEmpty (XElement (QN "stem" Nothing).emitXml) a1]++[maybe XEmpty (XElement (QN "notehead" Nothing).emitXml) b1]++[emitXml c1]++map (XElement (QN "beam" Nothing).emitXml) d1++map (XElement (QN "notations" Nothing).emitXml) e1++map (XElement (QN "lyric" Nothing).emitXml) f1)
+        ([maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "end-dynamics" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "attack" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "release" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) s])
+        ([emitXml t] ++
+        [maybe XEmpty (XElement (QN "instrument" Nothing).emitXml) u] ++
+        [emitXml v] ++
+        [maybe XEmpty (XElement (QN "type" Nothing).emitXml) w] ++
+        map (XElement (QN "dot" Nothing).emitXml) x ++
+        [maybe XEmpty (XElement (QN "accidental" Nothing).emitXml) y] ++
+        [maybe XEmpty (XElement (QN "time-modification" Nothing).emitXml) z] ++
+        [maybe XEmpty (XElement (QN "stem" Nothing).emitXml) a1] ++
+        [maybe XEmpty (XElement (QN "notehead" Nothing).emitXml) b1] ++
+        [emitXml c1] ++
+        map (XElement (QN "beam" Nothing).emitXml) d1 ++
+        map (XElement (QN "notations" Nothing).emitXml) e1 ++
+        map (XElement (QN "lyric" Nothing).emitXml) f1)
 parseNote :: P.XParse Note
 parseNote = 
       Note
@@ -5625,7 +6218,13 @@ data Notehead =
 instance EmitXml Notehead where
     emitXml (Notehead a b c d e f g h) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "filled" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        ([maybe XEmpty (XAttr (QN "filled" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
 parseNotehead :: P.XParse Notehead
 parseNotehead = 
@@ -5665,7 +6264,18 @@ data OctaveShift =
 instance EmitXml OctaveShift where
     emitXml (OctaveShift a b c d e f g h i j k l) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
 parseOctaveShift :: P.XParse OctaveShift
 parseOctaveShift = 
@@ -5727,7 +6337,12 @@ data Opus =
 instance EmitXml Opus where
     emitXml (Opus a b c d e f) =
       XContent XEmpty
-        ([XAttr (QN "href" (Just "xlink")) (emitXml a)]++[maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) b]++[maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) c]++[maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) d]++[maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) e]++[maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) f])
+        ([XAttr (QN "href" (Just "xlink")) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "type" (Just "xlink")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "role" (Just "xlink")).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "title" (Just "xlink")).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "show" (Just "xlink")).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "actuate" (Just "xlink")).emitXml) f])
         []
 parseOpus :: P.XParse Opus
 parseOpus = 
@@ -5808,7 +6423,16 @@ data OtherDirection =
 instance EmitXml OtherDirection where
     emitXml (OtherDirection a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseOtherDirection :: P.XParse OtherDirection
 parseOtherDirection = 
@@ -5853,7 +6477,19 @@ data OtherNotation =
 instance EmitXml OtherNotation where
     emitXml (OtherNotation a b c d e f g h i j k l m n) =
       XContent (emitXml a)
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) n])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) n])
         []
 parseOtherNotation :: P.XParse OtherNotation
 parseOtherNotation = 
@@ -5890,7 +6526,8 @@ instance EmitXml PageLayout where
     emitXml (PageLayout a b) =
       XContent XEmpty
         []
-        ([emitXml a]++map (XElement (QN "page-margins" Nothing).emitXml) b)
+        ([emitXml a] ++
+        map (XElement (QN "page-margins" Nothing).emitXml) b)
 parsePageLayout :: P.XParse PageLayout
 parsePageLayout = 
       PageLayout
@@ -5995,8 +6632,16 @@ data PartGroup =
 instance EmitXml PartGroup where
     emitXml (PartGroup a b c d e f g h i j) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b])
-        ([maybe XEmpty (XElement (QN "group-name" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "group-name-display" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "group-abbreviation" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "group-abbreviation-display" Nothing).emitXml) f]++[maybe XEmpty (XElement (QN "group-symbol" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "group-barline" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "group-time" Nothing).emitXml) i]++[emitXml j])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b])
+        ([maybe XEmpty (XElement (QN "group-name" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "group-name-display" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "group-abbreviation" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "group-abbreviation-display" Nothing).emitXml) f] ++
+        [maybe XEmpty (XElement (QN "group-symbol" Nothing).emitXml) g] ++
+        [maybe XEmpty (XElement (QN "group-barline" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "group-time" Nothing).emitXml) i] ++
+        [emitXml j])
 parsePartGroup :: P.XParse PartGroup
 parsePartGroup = 
       PartGroup
@@ -6061,7 +6706,17 @@ data PartName =
 instance EmitXml PartName where
     emitXml (PartName a b c d e f g h i j k l) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) l])
         []
 parsePartName :: P.XParse PartName
 parsePartName = 
@@ -6101,7 +6756,13 @@ data PartSymbol =
 instance EmitXml PartSymbol where
     emitXml (PartSymbol a b c d e f g h) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "top-staff" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "bottom-staff" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        ([maybe XEmpty (XAttr (QN "top-staff" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "bottom-staff" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
 parsePartSymbol :: P.XParse PartSymbol
 parsePartSymbol = 
@@ -6140,7 +6801,17 @@ data Pedal =
 instance EmitXml Pedal where
     emitXml (Pedal a b c d e f g h i j k) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "line" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "line" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parsePedal :: P.XParse Pedal
 parsePedal = 
@@ -6174,7 +6845,8 @@ instance EmitXml PedalTuning where
     emitXml (PedalTuning a b) =
       XContent XEmpty
         []
-        ([XElement (QN "pedal-step" Nothing) (emitXml a)]++[XElement (QN "pedal-alter" Nothing) (emitXml b)])
+        ([XElement (QN "pedal-step" Nothing) (emitXml a)] ++
+        [XElement (QN "pedal-alter" Nothing) (emitXml b)])
 parsePedalTuning :: P.XParse PedalTuning
 parsePedalTuning = 
       PedalTuning
@@ -6200,7 +6872,10 @@ data PerMinute =
 instance EmitXml PerMinute where
     emitXml (PerMinute a b c d e) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e])
         []
 parsePerMinute :: P.XParse PerMinute
 parsePerMinute = 
@@ -6229,7 +6904,9 @@ instance EmitXml Pitch where
     emitXml (Pitch a b c) =
       XContent XEmpty
         []
-        ([XElement (QN "step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "alter" Nothing).emitXml) b]++[XElement (QN "octave" Nothing) (emitXml c)])
+        ([XElement (QN "step" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "alter" Nothing).emitXml) b] ++
+        [XElement (QN "octave" Nothing) (emitXml c)])
 parsePitch :: P.XParse Pitch
 parsePitch = 
       Pitch
@@ -6262,7 +6939,16 @@ data PlacementText =
 instance EmitXml PlacementText where
     emitXml (PlacementText a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
 parsePlacementText :: P.XParse PlacementText
 parsePlacementText = 
@@ -6305,8 +6991,16 @@ data Print =
 instance EmitXml Print where
     emitXml (Print a b c d e f g h i j) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "staff-spacing" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "new-system" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "new-page" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "blank-page" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "page-number" Nothing).emitXml) e])
-        ([emitXml f]++[maybe XEmpty (XElement (QN "measure-layout" Nothing).emitXml) g]++[maybe XEmpty (XElement (QN "measure-numbering" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) i]++[maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "staff-spacing" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "new-system" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "new-page" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "blank-page" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "page-number" Nothing).emitXml) e])
+        ([emitXml f] ++
+        [maybe XEmpty (XElement (QN "measure-layout" Nothing).emitXml) g] ++
+        [maybe XEmpty (XElement (QN "measure-numbering" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) i] ++
+        [maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) j])
 parsePrint :: P.XParse Print
 parsePrint = 
       Print
@@ -6352,7 +7046,22 @@ data Rehearsal =
 instance EmitXml Rehearsal where
     emitXml (Rehearsal a b c d e f g h i j k l m n o p q) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) q])
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) q])
         []
 parseRehearsal :: P.XParse Rehearsal
 parseRehearsal = 
@@ -6391,7 +7100,8 @@ data Repeat =
 instance EmitXml Repeat where
     emitXml (Repeat a b) =
       XContent XEmpty
-        ([XAttr (QN "direction" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "times" Nothing).emitXml) b])
+        ([XAttr (QN "direction" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "times" Nothing).emitXml) b])
         []
 parseRepeat :: P.XParse Repeat
 parseRepeat = 
@@ -6416,7 +7126,8 @@ instance EmitXml Root where
     emitXml (Root a b) =
       XContent XEmpty
         []
-        ([XElement (QN "root-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "root-alter" Nothing).emitXml) b])
+        ([XElement (QN "root-step" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "root-alter" Nothing).emitXml) b])
 parseRoot :: P.XParse Root
 parseRoot = 
       Root
@@ -6449,7 +7160,17 @@ data RootAlter =
 instance EmitXml RootAlter where
     emitXml (RootAlter a b c d e f g h i j k l) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
 parseRootAlter :: P.XParse RootAlter
 parseRootAlter = 
@@ -6492,7 +7213,16 @@ data RootStep =
 instance EmitXml RootStep where
     emitXml (RootStep a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
         []
 parseRootStep :: P.XParse RootStep
 parseRootStep = 
@@ -6526,7 +7256,8 @@ instance EmitXml Scaling where
     emitXml (Scaling a b) =
       XContent XEmpty
         []
-        ([XElement (QN "millimeters" Nothing) (emitXml a)]++[XElement (QN "tenths" Nothing) (emitXml b)])
+        ([XElement (QN "millimeters" Nothing) (emitXml a)] ++
+        [XElement (QN "tenths" Nothing) (emitXml b)])
 parseScaling :: P.XParse Scaling
 parseScaling = 
       Scaling
@@ -6576,7 +7307,9 @@ instance EmitXml ScoreInstrument where
     emitXml (ScoreInstrument a b c d) =
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
-        ([XElement (QN "instrument-name" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "instrument-abbreviation" Nothing).emitXml) c]++[emitXml d])
+        ([XElement (QN "instrument-name" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "instrument-abbreviation" Nothing).emitXml) c] ++
+        [emitXml d])
 parseScoreInstrument :: P.XParse ScoreInstrument
 parseScoreInstrument = 
       ScoreInstrument
@@ -6610,7 +7343,15 @@ instance EmitXml CmpScorePart where
     emitXml (CmpScorePart a b c d e f g h i j) =
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
-        ([maybe XEmpty (XElement (QN "identification" Nothing).emitXml) b]++[XElement (QN "part-name" Nothing) (emitXml c)]++[maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "part-abbreviation" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) f]++map (XElement (QN "group" Nothing).emitXml) g++map (XElement (QN "score-instrument" Nothing).emitXml) h++[maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) i]++map (XElement (QN "midi-instrument" Nothing).emitXml) j)
+        ([maybe XEmpty (XElement (QN "identification" Nothing).emitXml) b] ++
+        [XElement (QN "part-name" Nothing) (emitXml c)] ++
+        [maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "part-abbreviation" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) f] ++
+        map (XElement (QN "group" Nothing).emitXml) g ++
+        map (XElement (QN "score-instrument" Nothing).emitXml) h ++
+        [maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) i] ++
+        map (XElement (QN "midi-instrument" Nothing).emitXml) j)
 parseCmpScorePart :: P.XParse CmpScorePart
 parseCmpScorePart = 
       CmpScorePart
@@ -6641,7 +7382,8 @@ instance EmitXml ScorePartwise where
     emitXml (ScorePartwise a b c) =
       XElement (QN "score-partwise" Nothing) $ XContent XEmpty
         ([maybe XEmpty (XAttr (QN "version" Nothing).emitXml) a])
-        ([emitXml b]++map (XElement (QN "part" Nothing).emitXml) c)
+        ([emitXml b] ++
+        map (XElement (QN "part" Nothing).emitXml) c)
 parseScorePartwise :: P.XParse ScorePartwise
 parseScorePartwise = 
       ScorePartwise
@@ -6665,7 +7407,8 @@ instance EmitXml ScoreTimewise where
     emitXml (ScoreTimewise a b c) =
       XElement (QN "score-timewise" Nothing) $ XContent XEmpty
         ([maybe XEmpty (XAttr (QN "version" Nothing).emitXml) a])
-        ([emitXml b]++map (XElement (QN "measure" Nothing).emitXml) c)
+        ([emitXml b] ++
+        map (XElement (QN "measure" Nothing).emitXml) c)
 parseScoreTimewise :: P.XParse ScoreTimewise
 parseScoreTimewise = 
       ScoreTimewise
@@ -6691,7 +7434,9 @@ data CmpSlash =
 instance EmitXml CmpSlash where
     emitXml (CmpSlash a b c d) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "use-stems" Nothing).emitXml) c])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "use-dots" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "use-stems" Nothing).emitXml) c])
         ([emitXml d])
 parseCmpSlash :: P.XParse CmpSlash
 parseCmpSlash = 
@@ -6732,7 +7477,22 @@ data Slide =
 instance EmitXml Slide where
     emitXml (Slide a b c d e f g h i j k l m n o p q) =
       XContent (emitXml a)
-        ([XAttr (QN "type" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
         []
 parseSlide :: P.XParse Slide
 parseSlide = 
@@ -6785,7 +7545,22 @@ data Slur =
 instance EmitXml Slur where
     emitXml (Slur a b c d e f g h i j k l m n o p) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
 parseSlur :: P.XParse Slur
 parseSlur = 
@@ -6869,8 +7644,25 @@ data Sound =
 instance EmitXml Sound where
     emitXml (Sound a b c d e f g h i j k l m n o p q r s) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "tempo" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "dacapo" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "dalsegno" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "tocoda" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "forward-repeat" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "fine" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "pan" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "elevation" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "damper-pedal" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "soft-pedal" Nothing).emitXml) p]++[maybe XEmpty (XAttr (QN "sostenuto-pedal" Nothing).emitXml) q])
-        (map (XElement (QN "midi-instrument" Nothing).emitXml) r++[maybe XEmpty (XElement (QN "offset" Nothing).emitXml) s])
+        ([maybe XEmpty (XAttr (QN "tempo" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "dacapo" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "dalsegno" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "tocoda" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "forward-repeat" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "fine" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "pan" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "elevation" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "damper-pedal" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "soft-pedal" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "sostenuto-pedal" Nothing).emitXml) q])
+        (map (XElement (QN "midi-instrument" Nothing).emitXml) r ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) s])
 parseSound :: P.XParse Sound
 parseSound = 
       Sound
@@ -6917,8 +7709,15 @@ data StaffDetails =
 instance EmitXml StaffDetails where
     emitXml (StaffDetails a b c d e f g h i) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "show-frets" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) d])
-        ([maybe XEmpty (XElement (QN "staff-type" Nothing).emitXml) e]++[maybe XEmpty (XElement (QN "staff-lines" Nothing).emitXml) f]++map (XElement (QN "staff-tuning" Nothing).emitXml) g++[maybe XEmpty (XElement (QN "capo" Nothing).emitXml) h]++[maybe XEmpty (XElement (QN "staff-size" Nothing).emitXml) i])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "show-frets" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) d])
+        ([maybe XEmpty (XElement (QN "staff-type" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "staff-lines" Nothing).emitXml) f] ++
+        map (XElement (QN "staff-tuning" Nothing).emitXml) g ++
+        [maybe XEmpty (XElement (QN "capo" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "staff-size" Nothing).emitXml) i])
 parseStaffDetails :: P.XParse StaffDetails
 parseStaffDetails = 
       StaffDetails
@@ -7000,7 +7799,11 @@ data Stem =
 instance EmitXml Stem where
     emitXml (Stem a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseStem :: P.XParse Stem
 parseStem = 
@@ -7037,7 +7840,16 @@ data CmpString =
 instance EmitXml CmpString where
     emitXml (CmpString a b c d e f g h i j k) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
         []
 parseCmpString :: P.XParse CmpString
 parseCmpString = 
@@ -7102,7 +7914,15 @@ data StyleText =
 instance EmitXml StyleText where
     emitXml (StyleText a b c d e f g h i j) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
         []
 parseStyleText :: P.XParse StyleText
 parseStyleText = 
@@ -7136,7 +7956,10 @@ data Supports =
 instance EmitXml Supports where
     emitXml (Supports a b c d) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[XAttr (QN "element" Nothing) (emitXml b)]++[maybe XEmpty (XAttr (QN "attribute" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "value" Nothing).emitXml) d])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [XAttr (QN "element" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XAttr (QN "attribute" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "value" Nothing).emitXml) d])
         []
 parseSupports :: P.XParse Supports
 parseSupports = 
@@ -7166,7 +7989,9 @@ instance EmitXml SystemLayout where
     emitXml (SystemLayout a b c) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "system-margins" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "system-distance" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "top-system-distance" Nothing).emitXml) c])
+        ([maybe XEmpty (XElement (QN "system-margins" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "system-distance" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "top-system-distance" Nothing).emitXml) c])
 parseSystemLayout :: P.XParse SystemLayout
 parseSystemLayout = 
       SystemLayout
@@ -7241,7 +8066,18 @@ data TextElementData =
 instance EmitXml TextElementData where
     emitXml (TextElementData a b c d e f g h i j k l m) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) m])
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) m])
         []
 parseTextElementData :: P.XParse TextElementData
 parseTextElementData = 
@@ -7312,7 +8148,22 @@ data Tied =
 instance EmitXml Tied where
     emitXml (Tied a b c d e f g h i j k l m n o p) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
 parseTied :: P.XParse Tied
 parseTied = 
@@ -7363,7 +8214,18 @@ data Time =
 instance EmitXml Time where
     emitXml (Time a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) l])
         ([emitXml m])
 parseTime :: P.XParse Time
 parseTime = 
@@ -7400,7 +8262,9 @@ instance EmitXml TimeModification where
     emitXml (TimeModification a b c) =
       XContent XEmpty
         []
-        ([XElement (QN "actual-notes" Nothing) (emitXml a)]++[XElement (QN "normal-notes" Nothing) (emitXml b)]++[emitXml c])
+        ([XElement (QN "actual-notes" Nothing) (emitXml a)] ++
+        [XElement (QN "normal-notes" Nothing) (emitXml b)] ++
+        [emitXml c])
 parseTimeModification :: P.XParse TimeModification
 parseTimeModification = 
       TimeModification
@@ -7427,7 +8291,10 @@ instance EmitXml Transpose where
     emitXml (Transpose a b c d) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "diatonic" Nothing).emitXml) a]++[XElement (QN "chromatic" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "octave-change" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "double" Nothing).emitXml) d])
+        ([maybe XEmpty (XElement (QN "diatonic" Nothing).emitXml) a] ++
+        [XElement (QN "chromatic" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "octave-change" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "double" Nothing).emitXml) d])
 parseTranspose :: P.XParse Transpose
 parseTranspose = 
       Transpose
@@ -7462,7 +8329,17 @@ data Tremolo =
 instance EmitXml Tremolo where
     emitXml (Tremolo a b c d e f g h i j k l) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
+        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
         []
 parseTremolo :: P.XParse Tremolo
 parseTremolo = 
@@ -7511,8 +8388,19 @@ data Tuplet =
 instance EmitXml Tuplet where
     emitXml (Tuplet a b c d e f g h i j k l m) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "show-type" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
-        ([maybe XEmpty (XElement (QN "tuplet-actual" Nothing).emitXml) l]++[maybe XEmpty (XElement (QN "tuplet-normal" Nothing).emitXml) m])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "show-number" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "show-type" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([maybe XEmpty (XElement (QN "tuplet-actual" Nothing).emitXml) l] ++
+        [maybe XEmpty (XElement (QN "tuplet-normal" Nothing).emitXml) m])
 parseTuplet :: P.XParse Tuplet
 parseTuplet = 
       Tuplet
@@ -7549,7 +8437,11 @@ data TupletDot =
 instance EmitXml TupletDot where
     emitXml (TupletDot a b c d e) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
         []
 parseTupletDot :: P.XParse TupletDot
 parseTupletDot = 
@@ -7580,7 +8472,11 @@ data TupletNumber =
 instance EmitXml TupletNumber where
     emitXml (TupletNumber a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseTupletNumber :: P.XParse TupletNumber
 parseTupletNumber = 
@@ -7610,7 +8506,9 @@ instance EmitXml TupletPortion where
     emitXml (TupletPortion a b c) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "tuplet-number" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "tuplet-type" Nothing).emitXml) b]++map (XElement (QN "tuplet-dot" Nothing).emitXml) c)
+        ([maybe XEmpty (XElement (QN "tuplet-number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "tuplet-type" Nothing).emitXml) b] ++
+        map (XElement (QN "tuplet-dot" Nothing).emitXml) c)
 parseTupletPortion :: P.XParse TupletPortion
 parseTupletPortion = 
       TupletPortion
@@ -7638,7 +8536,11 @@ data TupletType =
 instance EmitXml TupletType where
     emitXml (TupletType a b c d e f) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseTupletType :: P.XParse TupletType
 parseTupletType = 
@@ -7703,7 +8605,21 @@ data WavyLine =
 instance EmitXml WavyLine where
     emitXml (WavyLine a b c d e f g h i j k l m n o) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h]++[maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) i]++[maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) j]++[maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) k]++[maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) l]++[maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) m]++[maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) n]++[maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) o])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) o])
         []
 parseWavyLine :: P.XParse WavyLine
 parseWavyLine = 
@@ -7746,7 +8662,14 @@ data Wedge =
 instance EmitXml Wedge where
     emitXml (Wedge a b c d e f g h) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)]++[maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b]++[maybe XEmpty (XAttr (QN "spread" Nothing).emitXml) c]++[maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d]++[maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e]++[maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f]++[maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g]++[maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "spread" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
         []
 parseWedge :: P.XParse Wedge
 parseWedge = 
@@ -7778,7 +8701,9 @@ instance EmitXml Work where
     emitXml (Work a b c) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "work-number" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "work-title" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "opus" Nothing).emitXml) c])
+        ([maybe XEmpty (XElement (QN "work-number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "work-title" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "opus" Nothing).emitXml) c])
 parseWork :: P.XParse Work
 parseWork = 
       Work
@@ -8040,7 +8965,8 @@ instance EmitXml ChxCredit where
     emitXml (CreditCreditWords a b) =
       XContent XEmpty
         []
-        ([XElement (QN "credit-words" Nothing) (emitXml a)]++[emitXml b])
+        ([XElement (QN "credit-words" Nothing) (emitXml a)] ++
+        [emitXml b])
 parseChxCredit :: P.XParse ChxCredit
 parseChxCredit = 
       CreditCreditImage
@@ -8196,17 +9122,17 @@ instance EmitXml ChxDirectionType where
 parseChxDirectionType :: P.XParse ChxDirectionType
 parseChxDirectionType = 
       DirectionTypeRehearsal
-        <$> P.many (P.xchild (P.name "rehearsal") (parseRehearsal))
+        <$> P.some (P.xchild (P.name "rehearsal") (parseRehearsal))
       <|> DirectionTypeSegno
-        <$> P.many (P.xchild (P.name "segno") (parseEmptyPrintStyle))
+        <$> P.some (P.xchild (P.name "segno") (parseEmptyPrintStyle))
       <|> DirectionTypeWords
-        <$> P.many (P.xchild (P.name "words") (parseFormattedText))
+        <$> P.some (P.xchild (P.name "words") (parseFormattedText))
       <|> DirectionTypeCoda
-        <$> P.many (P.xchild (P.name "coda") (parseEmptyPrintStyle))
+        <$> P.some (P.xchild (P.name "coda") (parseEmptyPrintStyle))
       <|> DirectionTypeWedge
         <$> (P.xchild (P.name "wedge") (parseWedge))
       <|> DirectionTypeDynamics
-        <$> P.many (P.xchild (P.name "dynamics") (parseDynamics))
+        <$> P.some (P.xchild (P.name "dynamics") (parseDynamics))
       <|> DirectionTypeDashes
         <$> (P.xchild (P.name "dashes") (parseDashes))
       <|> DirectionTypeBracket
@@ -8860,7 +9786,10 @@ instance EmitXml ChxLyric where
     emitXml (LyricSyllabic a b c d) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "syllabic" Nothing).emitXml) a]++[XElement (QN "text" Nothing) (emitXml b)]++[emitXml c]++[maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
+        ([maybe XEmpty (XElement (QN "syllabic" Nothing).emitXml) a] ++
+        [XElement (QN "text" Nothing) (emitXml b)] ++
+        [emitXml c] ++
+        [maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
     emitXml (LyricExtend a) =
       XContent XEmpty
         []
@@ -9005,7 +9934,8 @@ instance EmitXml ChxMetronome where
     emitXml (MetronomeMetronomeNote a b) =
       XContent XEmpty
         []
-        (map (XElement (QN "metronome-note" Nothing).emitXml) a++[emitXml b])
+        (map (XElement (QN "metronome-note" Nothing).emitXml) a ++
+        [emitXml b])
 parseChxMetronome :: P.XParse ChxMetronome
 parseChxMetronome = 
       ChxMetronomeBeatUnit
@@ -9416,15 +10346,21 @@ instance EmitXml ChxNote where
     emitXml (NoteGrace a b c) =
       XContent XEmpty
         []
-        ([XElement (QN "grace" Nothing) (emitXml a)]++[emitXml b]++map (XElement (QN "tie" Nothing).emitXml) c)
+        ([XElement (QN "grace" Nothing) (emitXml a)] ++
+        [emitXml b] ++
+        map (XElement (QN "tie" Nothing).emitXml) c)
     emitXml (NoteCue a b c) =
       XContent XEmpty
         []
-        ([XElement (QN "cue" Nothing) (emitXml a)]++[emitXml b]++[emitXml c])
+        ([XElement (QN "cue" Nothing) (emitXml a)] ++
+        [emitXml b] ++
+        [emitXml c])
     emitXml (NoteFullNote a b c) =
       XContent XEmpty
         []
-        ([emitXml a]++[emitXml b]++map (XElement (QN "tie" Nothing).emitXml) c)
+        ([emitXml a] ++
+        [emitXml b] ++
+        map (XElement (QN "tie" Nothing).emitXml) c)
 parseChxNote :: P.XParse ChxNote
 parseChxNote = 
       NoteGrace
@@ -9952,7 +10888,9 @@ instance EmitXml SeqCredit where
     emitXml (SeqCredit a b c) =
       XContent XEmpty
         []
-        (map (XElement (QN "link" Nothing).emitXml) a++map (XElement (QN "bookmark" Nothing).emitXml) b++[XElement (QN "credit-words" Nothing) (emitXml c)])
+        (map (XElement (QN "link" Nothing).emitXml) a ++
+        map (XElement (QN "bookmark" Nothing).emitXml) b ++
+        [XElement (QN "credit-words" Nothing) (emitXml c)])
 parseSeqCredit :: P.XParse SeqCredit
 parseSeqCredit = 
       SeqCredit
@@ -9975,7 +10913,8 @@ instance EmitXml SeqDisplayStepOctave where
     emitXml (SeqDisplayStepOctave a b) =
       XContent XEmpty
         []
-        ([XElement (QN "display-step" Nothing) (emitXml a)]++[XElement (QN "display-octave" Nothing) (emitXml b)])
+        ([XElement (QN "display-step" Nothing) (emitXml a)] ++
+        [XElement (QN "display-octave" Nothing) (emitXml b)])
 parseSeqDisplayStepOctave :: P.XParse SeqDisplayStepOctave
 parseSeqDisplayStepOctave = 
       SeqDisplayStepOctave
@@ -9997,7 +10936,8 @@ instance EmitXml SeqLyric0 where
     emitXml (SeqLyric0 a b) =
       XContent XEmpty
         []
-        ([XElement (QN "elision" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "syllabic" Nothing).emitXml) b])
+        ([XElement (QN "elision" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "syllabic" Nothing).emitXml) b])
 parseSeqLyric0 :: P.XParse SeqLyric0
 parseSeqLyric0 = 
       SeqLyric0
@@ -10021,7 +10961,8 @@ instance EmitXml SeqLyric where
     emitXml (SeqLyric a b) =
       XContent XEmpty
         []
-        ([emitXml a]++[XElement (QN "text" Nothing) (emitXml b)])
+        ([emitXml a] ++
+        [XElement (QN "text" Nothing) (emitXml b)])
 parseSeqLyric :: P.XParse SeqLyric
 parseSeqLyric = 
       SeqLyric
@@ -10043,7 +10984,8 @@ instance EmitXml SeqMetronome where
     emitXml (SeqMetronome a b) =
       XContent XEmpty
         []
-        ([XElement (QN "metronome-relation" Nothing) (emitXml a)]++map (XElement (QN "metronome-note" Nothing).emitXml) b)
+        ([XElement (QN "metronome-relation" Nothing) (emitXml a)] ++
+        map (XElement (QN "metronome-note" Nothing).emitXml) b)
 parseSeqMetronome :: P.XParse SeqMetronome
 parseSeqMetronome = 
       SeqMetronome
@@ -10065,7 +11007,8 @@ instance EmitXml SeqMetronomeTuplet where
     emitXml (SeqMetronomeTuplet a b) =
       XContent XEmpty
         []
-        ([XElement (QN "normal-type" Nothing) (emitXml a)]++map (XElement (QN "normal-dot" Nothing).emitXml) b)
+        ([XElement (QN "normal-type" Nothing) (emitXml a)] ++
+        map (XElement (QN "normal-dot" Nothing).emitXml) b)
 parseSeqMetronomeTuplet :: P.XParse SeqMetronomeTuplet
 parseSeqMetronomeTuplet = 
       SeqMetronomeTuplet
@@ -10087,7 +11030,8 @@ instance EmitXml SeqOrnaments where
     emitXml (SeqOrnaments a b) =
       XContent XEmpty
         []
-        ([emitXml a]++map (XElement (QN "accidental-mark" Nothing).emitXml) b)
+        ([emitXml a] ++
+        map (XElement (QN "accidental-mark" Nothing).emitXml) b)
 parseSeqOrnaments :: P.XParse SeqOrnaments
 parseSeqOrnaments = 
       SeqOrnaments
@@ -10109,7 +11053,8 @@ instance EmitXml SeqPageLayout where
     emitXml (SeqPageLayout a b) =
       XContent XEmpty
         []
-        ([XElement (QN "page-height" Nothing) (emitXml a)]++[XElement (QN "page-width" Nothing) (emitXml b)])
+        ([XElement (QN "page-height" Nothing) (emitXml a)] ++
+        [XElement (QN "page-width" Nothing) (emitXml b)])
 parseSeqPageLayout :: P.XParse SeqPageLayout
 parseSeqPageLayout = 
       SeqPageLayout
@@ -10131,7 +11076,8 @@ instance EmitXml SeqTime where
     emitXml (SeqTime a b) =
       XContent XEmpty
         []
-        ([XElement (QN "beats" Nothing) (emitXml a)]++[XElement (QN "beat-type" Nothing) (emitXml b)])
+        ([XElement (QN "beats" Nothing) (emitXml a)] ++
+        [XElement (QN "beat-type" Nothing) (emitXml b)])
 parseSeqTime :: P.XParse SeqTime
 parseSeqTime = 
       SeqTime
@@ -10153,7 +11099,8 @@ instance EmitXml SeqTimeModification where
     emitXml (SeqTimeModification a b) =
       XContent XEmpty
         []
-        ([XElement (QN "normal-type" Nothing) (emitXml a)]++map (XElement (QN "normal-dot" Nothing).emitXml) b)
+        ([XElement (QN "normal-type" Nothing) (emitXml a)] ++
+        map (XElement (QN "normal-dot" Nothing).emitXml) b)
 parseSeqTimeModification :: P.XParse SeqTimeModification
 parseSeqTimeModification = 
       SeqTimeModification
@@ -10176,7 +11123,9 @@ instance EmitXml AllMargins where
     emitXml (AllMargins a b c) =
       XContent XEmpty
         []
-        ([emitXml a]++[XElement (QN "top-margin" Nothing) (emitXml b)]++[XElement (QN "bottom-margin" Nothing) (emitXml c)])
+        ([emitXml a] ++
+        [XElement (QN "top-margin" Nothing) (emitXml b)] ++
+        [XElement (QN "bottom-margin" Nothing) (emitXml c)])
 parseAllMargins :: P.XParse AllMargins
 parseAllMargins = 
       AllMargins
@@ -10199,7 +11148,8 @@ instance EmitXml BeatUnit where
     emitXml (BeatUnit a b) =
       XContent XEmpty
         []
-        ([XElement (QN "beat-unit" Nothing) (emitXml a)]++map (XElement (QN "beat-unit-dot" Nothing).emitXml) b)
+        ([XElement (QN "beat-unit" Nothing) (emitXml a)] ++
+        map (XElement (QN "beat-unit-dot" Nothing).emitXml) b)
 parseBeatUnit :: P.XParse BeatUnit
 parseBeatUnit = 
       BeatUnit
@@ -10325,7 +11275,8 @@ instance EmitXml GrpFullNote where
     emitXml (GrpFullNote a b) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "chord" Nothing).emitXml) a]++[emitXml b])
+        ([maybe XEmpty (XElement (QN "chord" Nothing).emitXml) a] ++
+        [emitXml b])
 parseGrpFullNote :: P.XParse GrpFullNote
 parseGrpFullNote = 
       GrpFullNote
@@ -10350,7 +11301,11 @@ instance EmitXml HarmonyChord where
     emitXml (HarmonyChord a b c d e) =
       XContent XEmpty
         []
-        ([emitXml a]++[XElement (QN "kind" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "inversion" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "bass" Nothing).emitXml) d]++map (XElement (QN "degree" Nothing).emitXml) e)
+        ([emitXml a] ++
+        [XElement (QN "kind" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "inversion" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "bass" Nothing).emitXml) d] ++
+        map (XElement (QN "degree" Nothing).emitXml) e)
 parseHarmonyChord :: P.XParse HarmonyChord
 parseHarmonyChord = 
       HarmonyChord
@@ -10376,7 +11331,9 @@ instance EmitXml Layout where
     emitXml (Layout a b c) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "page-layout" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "system-layout" Nothing).emitXml) b]++map (XElement (QN "staff-layout" Nothing).emitXml) c)
+        ([maybe XEmpty (XElement (QN "page-layout" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "system-layout" Nothing).emitXml) b] ++
+        map (XElement (QN "staff-layout" Nothing).emitXml) c)
 parseLayout :: P.XParse Layout
 parseLayout = 
       Layout
@@ -10399,7 +11356,8 @@ instance EmitXml LeftRightMargins where
     emitXml (LeftRightMargins a b) =
       XContent XEmpty
         []
-        ([XElement (QN "left-margin" Nothing) (emitXml a)]++[XElement (QN "right-margin" Nothing) (emitXml b)])
+        ([XElement (QN "left-margin" Nothing) (emitXml a)] ++
+        [XElement (QN "right-margin" Nothing) (emitXml b)])
 parseLeftRightMargins :: P.XParse LeftRightMargins
 parseLeftRightMargins = 
       LeftRightMargins
@@ -10459,7 +11417,8 @@ instance EmitXml NonTraditionalKey where
     emitXml (NonTraditionalKey a b) =
       XContent XEmpty
         []
-        ([XElement (QN "key-step" Nothing) (emitXml a)]++[XElement (QN "key-alter" Nothing) (emitXml b)])
+        ([XElement (QN "key-step" Nothing) (emitXml a)] ++
+        [XElement (QN "key-alter" Nothing) (emitXml b)])
 parseNonTraditionalKey :: P.XParse NonTraditionalKey
 parseNonTraditionalKey = 
       NonTraditionalKey
@@ -10506,7 +11465,13 @@ instance EmitXml ScoreHeader where
     emitXml (ScoreHeader a b c d e f g) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "work" Nothing).emitXml) a]++[maybe XEmpty (XElement (QN "movement-number" Nothing).emitXml) b]++[maybe XEmpty (XElement (QN "movement-title" Nothing).emitXml) c]++[maybe XEmpty (XElement (QN "identification" Nothing).emitXml) d]++[maybe XEmpty (XElement (QN "defaults" Nothing).emitXml) e]++map (XElement (QN "credit" Nothing).emitXml) f++[XElement (QN "part-list" Nothing) (emitXml g)])
+        ([maybe XEmpty (XElement (QN "work" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "movement-number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "movement-title" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "identification" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "defaults" Nothing).emitXml) e] ++
+        map (XElement (QN "credit" Nothing).emitXml) f ++
+        [XElement (QN "part-list" Nothing) (emitXml g)])
 parseScoreHeader :: P.XParse ScoreHeader
 parseScoreHeader = 
       ScoreHeader
@@ -10553,7 +11518,8 @@ instance EmitXml Slash where
     emitXml (Slash a b) =
       XContent XEmpty
         []
-        ([XElement (QN "slash-type" Nothing) (emitXml a)]++map (XElement (QN "slash-dot" Nothing).emitXml) b)
+        ([XElement (QN "slash-type" Nothing) (emitXml a)] ++
+        map (XElement (QN "slash-dot" Nothing).emitXml) b)
 parseSlash :: P.XParse Slash
 parseSlash = 
       Slash
@@ -10596,7 +11562,9 @@ instance EmitXml TraditionalKey where
     emitXml (TraditionalKey a b c) =
       XContent XEmpty
         []
-        ([maybe XEmpty (XElement (QN "cancel" Nothing).emitXml) a]++[XElement (QN "fifths" Nothing) (emitXml b)]++[maybe XEmpty (XElement (QN "mode" Nothing).emitXml) c])
+        ([maybe XEmpty (XElement (QN "cancel" Nothing).emitXml) a] ++
+        [XElement (QN "fifths" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "mode" Nothing).emitXml) c])
 parseTraditionalKey :: P.XParse TraditionalKey
 parseTraditionalKey = 
       TraditionalKey
@@ -10620,7 +11588,9 @@ instance EmitXml Tuning where
     emitXml (Tuning a b c) =
       XContent XEmpty
         []
-        ([XElement (QN "tuning-step" Nothing) (emitXml a)]++[maybe XEmpty (XElement (QN "tuning-alter" Nothing).emitXml) b]++[XElement (QN "tuning-octave" Nothing) (emitXml c)])
+        ([XElement (QN "tuning-step" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "tuning-alter" Nothing).emitXml) b] ++
+        [XElement (QN "tuning-octave" Nothing) (emitXml c)])
 parseTuning :: P.XParse Tuning
 parseTuning = 
       Tuning
