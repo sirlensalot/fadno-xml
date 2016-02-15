@@ -10,7 +10,7 @@ module Fadno.Xml.XParser
     -- * Stack manipulation
     ,peek,push,pop,checkStack
     -- * Element operations
-    ,atEl,findChild,findChildren,anyChildren,oneChild,allChildren
+    ,atEl,findChild,findChildren,anyChildren,oneChild,allChildren,manyOrdered
     -- * Attribute/Text operations
     ,attr,textContent
     -- * QNames
@@ -133,6 +133,22 @@ onChildren filt opt just1 act = do
   unless (null fs) $ throwError $ "Failure: " ++ show fs
   _head.lContent .= reverse cs'
   return (reverse rs)
+
+-- | Flailing attempt to restore "order" by faking a single-child element one at a time.
+manyOrdered :: XParser m => m a -> m [a]
+manyOrdered act = do
+  cs <- view lContent <$> peek
+  let fake c = X.Element (name "fake") [] [c] Nothing
+      exec rs c = do
+                push (fake c)
+                r <- catchError (Right <$> act) (return . Left)
+                pop
+                case r of
+                  Left _ -> return (over _2 (c:) rs)
+                  Right a -> return (over _1 (a:) rs)
+  (as,cs') <- foldM exec ([],[]) cs
+  _head.lContent .= reverse cs'
+  return $ reverse as
 
 
 -- | Run optional action on all children.

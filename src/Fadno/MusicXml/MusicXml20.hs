@@ -2314,7 +2314,7 @@ instance EmitXml Articulations where
 parseArticulations :: P.XParser m => m Articulations
 parseArticulations = 
       Articulations
-        <$> P.many (parseChxArticulations)
+        <$> P.manyOrdered (parseChxArticulations)
 
 -- | Smart constructor for 'Articulations'
 mkArticulations :: Articulations
@@ -3260,7 +3260,7 @@ parseDynamics =
         <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
-        <*> P.many (parseChxDynamics)
+        <*> P.manyOrdered (parseChxDynamics)
 
 -- | Smart constructor for 'Dynamics'
 mkDynamics :: Dynamics
@@ -3533,7 +3533,7 @@ instance EmitXml Encoding where
 parseEncoding :: P.XParser m => m Encoding
 parseEncoding = 
       Encoding
-        <$> P.many (parseChxEncoding)
+        <$> P.manyOrdered (parseChxEncoding)
 
 -- | Smart constructor for 'Encoding'
 mkEncoding :: Encoding
@@ -4381,7 +4381,7 @@ parseHarmony =
         <*> P.optional (P.attr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.attr (P.name "color") >>= parseColor)
         <*> P.optional (P.attr (P.name "placement") >>= parseAboveBelow)
-        <*> P.many (parseHarmonyChord)
+        <*> P.manyOrdered (parseHarmonyChord)
         <*> P.optional (P.oneChild (P.atEl (P.name "frame") >> parseFrame))
         <*> P.optional (P.oneChild (P.atEl (P.name "offset") >> parseOffset))
         <*> parseEditorial
@@ -5410,7 +5410,7 @@ parseNameDisplay :: P.XParser m => m NameDisplay
 parseNameDisplay = 
       NameDisplay
         <$> P.optional (P.attr (P.name "print-object") >>= parseYesNo)
-        <*> P.many (parseChxNameDisplay)
+        <*> P.manyOrdered (parseChxNameDisplay)
 
 -- | Smart constructor for 'NameDisplay'
 mkNameDisplay :: NameDisplay
@@ -5468,7 +5468,7 @@ parseNotations :: P.XParser m => m Notations
 parseNotations = 
       Notations
         <$> parseEditorial
-        <*> P.many (parseChxNotations)
+        <*> P.manyOrdered (parseChxNotations)
 
 -- | Smart constructor for 'Notations'
 mkNotations :: Editorial -> Notations
@@ -5762,7 +5762,7 @@ instance EmitXml Ornaments where
 parseOrnaments :: P.XParser m => m Ornaments
 parseOrnaments = 
       Ornaments
-        <$> P.many (parseSeqOrnaments)
+        <$> P.manyOrdered (parseSeqOrnaments)
 
 -- | Smart constructor for 'Ornaments'
 mkOrnaments :: Ornaments
@@ -6036,9 +6036,9 @@ instance EmitXml PartList where
 parsePartList :: P.XParser m => m PartList
 parsePartList = 
       PartList
-        <$> P.many (parseGrpPartGroup)
+        <$> P.manyOrdered (parseGrpPartGroup)
         <*> parseScorePart
-        <*> P.many (parseChxPartList)
+        <*> P.manyOrdered (parseChxPartList)
 
 -- | Smart constructor for 'PartList'
 mkPartList :: ScorePart -> PartList
@@ -7217,7 +7217,7 @@ instance EmitXml Technical where
 parseTechnical :: P.XParser m => m Technical
 parseTechnical = 
       Technical
-        <$> P.many (parseChxTechnical)
+        <$> P.manyOrdered (parseChxTechnical)
 
 -- | Smart constructor for 'Technical'
 mkTechnical :: Technical
@@ -8052,7 +8052,7 @@ parseChxCredit =
         <$> P.oneChild (P.atEl (P.name "credit-image") >> parseImage)
       <|> CreditCreditWords
         <$> P.oneChild (P.atEl (P.name "credit-words") >> parseFormattedText)
-        <*> P.many (parseSeqCredit)
+        <*> P.manyOrdered (parseSeqCredit)
 
 -- | Smart constructor for 'CreditCreditImage'
 mkCreditCreditImage :: Image -> ChxCredit
@@ -8834,7 +8834,7 @@ parseChxKey =
       KeyTraditionalKey
         <$> parseTraditionalKey
       <|> KeyNonTraditionalKey
-        <$> P.many (parseNonTraditionalKey)
+        <$> P.manyOrdered (parseNonTraditionalKey)
 
 -- | Smart constructor for 'KeyTraditionalKey'
 mkKeyTraditionalKey :: TraditionalKey -> ChxKey
@@ -8883,7 +8883,7 @@ parseChxLyric =
       LyricSyllabic
         <$> P.optional (P.oneChild (P.atEl (P.name "syllabic") >> P.textContent >>= parseSyllabic))
         <*> P.oneChild (P.atEl (P.name "text") >> parseTextElementData)
-        <*> P.many (parseSeqLyric)
+        <*> P.manyOrdered (parseSeqLyric)
         <*> P.optional (P.oneChild (P.atEl (P.name "extend") >> parseExtend))
       <|> LyricExtend
         <$> P.oneChild (P.atEl (P.name "extend") >> parseExtend)
@@ -9934,7 +9934,7 @@ instance EmitXml ChxTime where
 parseChxTime :: P.XParser m => m ChxTime
 parseChxTime = 
       TimeTime
-        <$> P.many (parseSeqTime)
+        <$> P.manyOrdered (parseSeqTime)
       <|> TimeSenzaMisura
         <$> P.oneChild (P.atEl (P.name "senza-misura") >> parseEmpty)
 
@@ -10447,7 +10447,7 @@ instance EmitXml MusicData where
 parseMusicData :: P.XParser m => m MusicData
 parseMusicData = 
       MusicData
-        <$> P.many (parseChxMusicData)
+        <$> P.manyOrdered (parseChxMusicData)
 
 -- | Smart constructor for 'MusicData'
 mkMusicData :: MusicData

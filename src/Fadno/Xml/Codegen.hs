@@ -232,7 +232,7 @@ outputType dt@(DataType {..}) = do
                 (FieldElement,One) ->
                     "P.oneChild " ++ elParse
                 (FieldOther,ZeroOrOne) -> "P.optional (" ++ parser ++ ")"
-                (FieldOther,Many) -> "P.many (" ++ parser ++ ")"
+                (FieldOther,Many) -> "P.manyOrdered (" ++ parser ++ ")"
                 (FieldOther,_) -> parser
 
 
