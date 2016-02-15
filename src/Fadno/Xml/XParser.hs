@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | Backtracking combinators for consuming XML productions (elements, attributes).
 module Fadno.Xml.XParser
@@ -17,9 +18,12 @@ module Fadno.Xml.XParser
     ,name,xsName
     -- * Utility
     ,readXml
+    -- * nextgen
+     ,XParse(..),runXParse,xfail,require,xattr,xtext,xchild,xread
     ) where
 
 import qualified Text.XML.Light as X
+import qualified Text.XML.Light.Cursor as C
 
 import Control.Exception
 import Control.Monad.State.Strict hiding (sequence)
@@ -28,12 +32,15 @@ import Data.Either
 import Control.Applicative
 import Prelude hiding (sequence)
 import Control.Lens
+import Text.Read (readMaybe)
 
 -- Element lenses
 lAttrs :: Lens' X.Element [X.Attr]
 lAttrs f s = fmap (\a -> s { X.elAttribs = a }) (f $ X.elAttribs s)
 lContent :: Lens' X.Element [X.Content]
 lContent f s = fmap (\a -> s { X.elContent = a }) (f $ X.elContent s)
+_Elem :: Prism' X.Content X.Element
+_Elem = prism X.Elem $ \c -> case c of X.Elem e -> Right e; _ -> Left c
 
 -- | Stack entry tracking identified elements.
 
@@ -166,3 +173,140 @@ name n = X.QName n Nothing Nothing
 -- | Convenience to read in top element from file.
 readXml :: FilePath -> IO X.Element
 readXml f = maybe (throwIO $ userError "parse failed") return =<< X.parseXMLDoc <$> readFile f
+
+
+-- REDO. Need explicit semantics/zipper.
+
+type XErrors = [([C.Tag],String)]
+
+newtype XParse a = XParse { unXParse :: StateT C.Cursor (Except XErrors) a }
+    deriving (Functor,Applicative,Monad,MonadState C.Cursor,MonadError XErrors,Alternative)
+
+runXParse :: X.Element -> XParse a -> Either XErrors a
+runXParse e act = runExcept (evalStateT (unXParse act) (C.fromElement e))
+
+xfail :: String -> XParse a
+xfail msg = do
+  ts <- map (view _2) . C.parents <$> get
+  throwError [(ts,msg)]
+
+require :: String -> Maybe a -> XParse a
+require msg = maybe (xfail $ "Required: " ++ msg) return
+
+lcurrent :: Lens' C.Cursor X.Content
+lcurrent f s = fmap (\a -> s { C.current = a}) (f (C.current s))
+
+xattr :: X.QName -> XParse String
+xattr n = xel >>= require ("attribute " ++ show n) . X.findAttr n
+
+xel :: XParse X.Element
+xel = firstOf _Elem <$> use lcurrent >>= require "element"
+
+xtext :: XParse String
+xtext = X.strContent <$> xel
+
+xchild :: X.QName -> XParse a -> XParse a
+xchild n act = do
+  fc <- C.firstChild <$> get >>= require "at least one child"
+  let firstEl :: C.Cursor -> XParse C.Cursor
+      firstEl c = case firstOf (lcurrent._Elem) c of
+                    Just e -> do
+                      when (X.elName e /= n) (xfail $ "Element not found: " ++ show n)
+                      return c
+                    Nothing -> do
+                      c' <- C.right c & require "at least one element child"
+                      firstEl c'
+  e <- firstEl fc
+  put e
+  r <- catchError (Right <$> act) (return . Left)
+  case r of
+    Right a -> do
+           p <- C.removeGoUp <$> get >>= require "parent"
+           put p
+           return a
+    Left err -> do
+           p <- C.parent <$> get >>= require "parent"
+           put p
+           throwError err
+
+xread :: Read a => String -> String -> XParse a
+xread msg s = require (msg ++ ": " ++ s) $ readMaybe s
+
+--Tests
+
+data TestAttributes =
+      TestAttributes {
+          attributesEditorial :: TestEditorial
+        , attributesDivisions :: (Maybe Integer) -- ^ /divisions/ child element
+        , attributesTime :: [TestTime] -- ^ /time/ child element
+        , attributesTranspose :: (Maybe String) -- ^ /transpose/ child element
+       }
+    deriving (Eq,Show)
+parseAttributes :: XParse TestAttributes
+parseAttributes =
+      TestAttributes
+        <$> parseEditorial
+        <*> optional (xchild (name "divisions") (xtext >>= xread "Integer"))
+        <*> many (xchild (name "time") parseTime)
+        <*> optional (xchild (name "transpose") (xtext >>= return))
+
+data TestEditorial =
+      TestEditorial {
+          editorialFootnote :: (Maybe String)
+        , editorialLevel :: (Maybe String)
+       }
+    deriving (Eq,Show)
+parseEditorial :: XParse TestEditorial
+parseEditorial =
+      TestEditorial
+        <$> optional (xattr (name "footnote"))
+        <*> optional (xattr (name "level"))
+
+data TestTime =
+      TestTime {
+          timeNumber :: (Maybe Integer) -- ^ /number/ attribute
+        , timeTime :: TestChxTime
+       }
+    deriving (Eq,Show)
+parseTime :: XParse TestTime
+parseTime =
+      TestTime
+        <$> optional (xattr (name "number") >>= xread "Integer")
+        <*> parseChxTime
+
+-- | @time@ /(choice)/
+data TestChxTime =
+      TestTimeTime {
+          chxtimeTime :: [TestSeqTime]
+       }
+    | TestTimeSenzaMisura {
+          timeSenzaMisura :: TestEmpty -- ^ /senza-misura/ child element
+       }
+    deriving (Eq,Show)
+parseChxTime :: XParse TestChxTime
+parseChxTime =
+      TestTimeTime
+        <$> many (parseSeqTime)
+      <|> TestTimeSenzaMisura
+        <$> xchild (name "senza-misura") parseEmpty
+
+
+-- | @time@ /(sequence)/
+data TestSeqTime =
+      TestSeqTime {
+          timeBeats :: String -- ^ /beats/ child element
+        , timeBeatType :: String -- ^ /beat-type/ child element
+       }
+    deriving (Eq,Show)
+parseSeqTime :: XParse TestSeqTime
+parseSeqTime =
+      TestSeqTime
+        <$> xchild (name "beats") (xtext >>= return)
+        <*> xchild (name "beat-type") (xtext >>= return)
+
+data TestEmpty =
+      TestEmpty
+    deriving (Eq,Show)
+parseEmpty :: XParse TestEmpty
+parseEmpty =
+      return TestEmpty

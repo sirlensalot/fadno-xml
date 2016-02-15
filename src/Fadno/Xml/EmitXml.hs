@@ -10,6 +10,7 @@ module Fadno.Xml.EmitXml
      -- * Rendering functions
      renderString
     ,renderElement
+    ,renderFile
      -- * API types
     ,EmitXml (..)
     ,XmlRep (..)
@@ -122,3 +123,7 @@ renderElement (XElement en rep) =
       str (XContent XEmpty [] es) = str (XReps es)
       str r = error $ "renderElement.str: invalid production: " ++ show r
 renderElement r = error $ "renderElement: invalid production: " ++ show r
+
+
+renderFile :: EmitXml a => FilePath -> a -> IO ()
+renderFile fp = writeFile fp . ppTopElement . renderElement . emitXml

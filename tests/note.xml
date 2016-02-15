@@ -1,0 +1,16 @@
+      <note>
+        <pitch>
+          <step>E</step>
+          <alter>-1.0</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>384</duration>
+        <tie type="start" />
+        <type>eighth</type>
+        <notations>
+          <ornaments />
+          <technical />
+          <articulations />
+          <tied type="start" />
+        </notations>
+      </note>

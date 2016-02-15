@@ -115,10 +115,10 @@ outputType nt@(NewType {..}) = do
   outputEmitXml mn
   outStrLn $ "    emitXml = emitXml . " ++ mf
   -- PARSING
-  outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+  outStrLn $ "parse" ++ mn ++ " :: String -> P.XParse " ++ mn
   if _typeDerives == NewTypeString
   then outStrLn $ "parse" ++ mn ++ " = return . fromString"
-  else outStrLn $ "parse" ++ mn ++ " = readParse \"" ++ mn ++ "\""
+  else outStrLn $ "parse" ++ mn ++ " = P.xread \"" ++ mn ++ "\""
 
 
 -- DATA --
@@ -197,10 +197,10 @@ outputType dt@(DataType {..}) = do
 
   if _typeEmit == DataTypeSimple
   then do
-    outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+    outStrLn $ "parse" ++ mn ++ " :: String -> P.XParse " ++ mn
     outStrLn $ "parse" ++ mn ++ " s = "
   else do
-    outStrLn $ "parse" ++ mn ++ " :: P.XParser m => m " ++ mn
+    outStrLn $ "parse" ++ mn ++ " :: P.XParse " ++ mn
     outStrLn $ "parse" ++ mn ++ " = "
   forM_ (zip [(0 :: Int)..] _typeCtors) $ \(j,Ctor {..}) -> do
     mcn <- mangleCtor _typeName _ctorName
@@ -219,20 +219,17 @@ outputType dt@(DataType {..}) = do
             do
               let pname = "(P.name \"" ++ show _fieldName ++ "\")"
                   parser = parseFun ftn
-                  attrParse = "(P.attr " ++ pname ++ " >>= " ++ parser ++ ")"
+                  attrParse = "(P.xattr " ++ pname ++ " >>= " ++ parser ++ ")"
                   elParse = parseEl parser pname _fieldType
               outStrLn $ case (_fieldXmlEmit,_fieldCardinality) of
                 (FieldAttribute,ZeroOrOne) -> "P.optional " ++ attrParse
                 (FieldAttribute,_) -> attrParse
-                (FieldText,_) -> "(P.textContent >>= " ++ parser ++ ")"
-                (FieldElement,Many) ->
-                    "P.findChildren " ++ pname ++ " " ++ elParse
-                (FieldElement,ZeroOrOne) ->
-                    "P.optional (P.oneChild " ++ elParse ++ ")"
-                (FieldElement,One) ->
-                    "P.oneChild " ++ elParse
+                (FieldText,_) -> "(P.xtext >>= " ++ parser ++ ")"
+                (FieldElement,Many) -> "P.many " ++ elParse
+                (FieldElement,ZeroOrOne) -> "P.optional " ++ elParse
+                (FieldElement,One) -> elParse
                 (FieldOther,ZeroOrOne) -> "P.optional (" ++ parser ++ ")"
-                (FieldOther,Many) -> "P.manyOrdered (" ++ parser ++ ")"
+                (FieldOther,Many) -> "P.many (" ++ parser ++ ")"
                 (FieldOther,_) -> parser
 
 
@@ -272,13 +269,13 @@ outputType et@(EnumType {..}) = do
     cn <- mangleCtor _typeName s
     outStrLn $ "    emitXml " ++ cn ++ " = XLit \"" ++ s ++ "\""
   -- PARSING
-  outStrLn $ "parse" ++ mn ++ " :: P.XParser m => String -> m " ++ mn
+  outStrLn $ "parse" ++ mn ++ " :: String -> P.XParse " ++ mn
   outStrLn $ "parse" ++ mn ++ " s"
   forM_  _typeEnumValues $ \s ->
       do
         cn <- mangleCtor _typeName s
         outStrLn $ "        | s == \"" ++ s ++ "\" = return $ " ++ cn
-  outStrLn $ "        | otherwise = P.throwError $ \"" ++ mn ++ ": \" ++ s"
+  outStrLn $ "        | otherwise = P.xfail $ \"" ++ mn ++ ": \" ++ s"
 
 
 -- | breaking off because RecordWildCards breaks haskell
@@ -287,15 +284,15 @@ parseEl parser pname fType =
     case firstOf typeEmit fType of
       Just DataTypeSimple -> simpleEl
       Nothing -> simpleEl
-      _ -> "(P.atEl " ++ pname ++ " >> " ++ parser ++ ")"
-    where simpleEl = "(P.atEl " ++ pname ++ " >> P.textContent >>= " ++ parser ++ ")"
+      _ -> "(P.xchild " ++ pname ++ " (" ++ parser ++ "))"
+    where simpleEl = "(P.xchild " ++ pname ++ " (P.xtext >>= " ++ parser ++ "))"
 
 parseFun :: String -> String
 parseFun tn | tn == "Decimal" = rp
             | tn == "DefString" = "return"
             | tn == "Integer" = rp
             | otherwise = "parse" ++ tn
-            where rp = "(readParse \"" ++ tn ++ "\")"
+            where rp = "(P.xread \"" ++ tn ++ "\")"
 
 -- | List of usable field arguments.
 fieldArgs :: [String]
@@ -422,10 +419,5 @@ outputHeader moduleName = mapM_ outStrLn
     , "import qualified Fadno.Xml.XParser as P"
     , "import qualified Control.Applicative as P"
     , "import Control.Applicative ((<|>))"
-    , "import qualified Text.Read as P"
-    , "import qualified Control.Monad.Except as P"
-    , "import qualified Control.Arrow as A"
-    , ""
-    , "readParse :: (P.XParser m, Read a) => String -> String -> m a"
-    , "readParse t s = maybe (P.throwError $ t ++ \": \" ++ s) return $ P.readMaybe s"
+    , "import Control.Arrow as A"
     ]
