@@ -419,7 +419,7 @@ outputHeader moduleName = mapM_ outStrLn
     , "import Data.Decimal"
     , "import Data.String"
     , "import Fadno.Xml.EmitXml"
-    , "import qualified Fadno.Xml.XParser as P"
+    , "import qualified Fadno.Xml.XParse as P"
     , "import qualified Control.Applicative as P"
     , "import Control.Applicative ((<|>))"
     , "import Control.Arrow as A"
