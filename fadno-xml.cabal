@@ -1,5 +1,5 @@
 name:                fadno-xml
-version:             1.0.0
+version:             1.0.1
 synopsis:            XML/XSD combinators/schemas/codegen
 description:
             Library for generating code from XML schema files, with
@@ -24,6 +24,7 @@ library
                    Fadno.Xml.EmitTypes
                    Fadno.Xml.ParseXsd
                    Fadno.Xml.XParser
+                   Fadno.Xml.XParse
                    Fadno.Xml.EmitXml
                    Fadno.MusicXml.MusicXml20
   -- other-modules:
