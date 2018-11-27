@@ -291,10 +291,12 @@ instance Show Schema where
                      ", attributes = " ++ show (length as) ++
                      "}"
 
+instance Semigroup Schema where
+    (Schema a b c d e f) <> (Schema g h i j k l) =
+        Schema (a<>g) (b<>h) (c<>i) (d<>j) (e<>k) (f<>l)
+
 instance Monoid Schema where
     mempty = Schema mempty mempty mempty mempty mempty mempty
-    (Schema a b c d e f) `mappend` (Schema g h i j k l) =
-        Schema (a<>g) (b<>h) (c<>i) (d<>j) (e<>k) (f<>l)
 
 
 
