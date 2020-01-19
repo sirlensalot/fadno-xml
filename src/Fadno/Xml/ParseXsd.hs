@@ -6,6 +6,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 
 -- | Parse an XSD into types with the ability to resolve references.
 module Fadno.Xml.ParseXsd
@@ -45,6 +46,7 @@ module Fadno.Xml.ParseXsd
 import Control.Monad.State.Strict hiding (sequence)
 import Control.Monad.Except hiding (sequence)
 import Data.Either
+import Data.Semigroup
 import Control.Applicative
 import Prelude hiding (sequence)
 import Fadno.Xml.XParser
@@ -52,7 +54,6 @@ import Control.Lens hiding (Choice,element,elements)
 import Data.Data.Lens
 import Data.Data
 import qualified Text.Parsec as P
-import Data.Monoid
 import Control.Exception
 import qualified Data.Map.Strict as M
 import Data.Map.Strict (Map)
@@ -297,7 +298,7 @@ instance Semigroup Schema where
 
 instance Monoid Schema where
     mempty = Schema mempty mempty mempty mempty mempty mempty
-
+    mappend = (<>)
 
 
 

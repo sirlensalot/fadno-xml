@@ -24,7 +24,7 @@ module Fadno.Xml.EmitTypes
     ) where
 
 import Fadno.Xml.ParseXsd
-import Data.Monoid
+import Data.Semigroup
 import Control.Lens hiding (Choice,element,elements,anon)
 
 import Control.Monad.State.Strict
@@ -181,6 +181,7 @@ instance Semigroup EmitState where
   (EmitState a b) <> (EmitState c d) = EmitState (a<>c) (b<>d)
 instance Monoid EmitState where
     mempty = EmitState mempty mempty
+    mappend = (<>)
 
 
 -- | Emit monad.
