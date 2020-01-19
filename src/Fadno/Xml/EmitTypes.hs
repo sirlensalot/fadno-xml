@@ -177,9 +177,11 @@ $(makeLenses ''Env)
 -- | State data.
 data EmitState = EmitState { _types :: M.Map Name Type, _stack :: [Name] }
 $(makeLenses ''EmitState)
+instance Semigroup EmitState where
+  (EmitState a b) <> (EmitState c d) = EmitState (a<>c) (b<>d)
 instance Monoid EmitState where
     mempty = EmitState mempty mempty
-    (EmitState a b) `mappend` (EmitState c d) = EmitState (a<>c) (b<>d)
+
 
 -- | Emit monad.
 type Emit a = ReaderT Env (StateT EmitState IO) a
