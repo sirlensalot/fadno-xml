@@ -8,32 +8,59 @@ on:
       - opened
       - synchronize
 jobs:
+
   build:
-    runs-on: ubuntu-latest
+    name: Build
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        cabal: ["3.2"]
-        ghc: ["8.6.5", "8.8.3", "8.10.1"]
-    env:
-      CONFIG: "--enable-tests"
+        ghc: ['8.6.5', '8.8.4', '8.10.2']
+        cabal: ['3.2.0.0']
+        os: ['ubuntu-20.04']
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-haskell@v1.1.2
-        id: setup-haskell-cabal
-        with:
-          ghc-version: ${{ matrix.ghc }}
-          cabal-version: ${{ matrix.cabal }}
-      - run: cabal v2-update
-      - run: cabal v2-freeze $CONFIG
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-            dist-newstyle
-          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.ghc }}-
-      - run: cabal v2-build $CONFIG
-      - run: cabal v2-test $CONFIG
-      - run: cabal v2-haddock $CONFIG
-      - run: cabal v2-sdist
+
+    # Setup
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Install GHC and Cabal
+      uses: actions/setup-haskell@v1
+      with:
+         ghc-version: ${{ matrix.ghc }}
+         cabal-version: ${{ matrix.cabal }}
+    - name: Configure project
+      run: |
+        cat > cabal.project.local <<EOF
+        package fadno-xml
+          documentation: True
+          benchmarks: True
+          tests: True
+        EOF
+
+    # Restore Packages from Caches
+    - uses: actions/cache@v2
+      name: cache cabal store
+      with:
+        path: |
+          ~/.cabal/packages
+          ~/.cabal/store
+          ./dist-newstyle
+        key: ${{ matrix.os }}-${{ matrix.ghc }}
+        restore-keys: |
+
+    # Build
+    - name: Update package database
+      run: cabal v2-update
+    - name: Configure build
+      run: |
+        cabal v2-build all --dry-run
+        cabal v2-freeze
+    - name: Install build dependencies
+      run: cabal v2-build --only-dependencies
+    - name: Build library
+      run: cabal v2-build
+
+    # Tests
+    - name: Run Tests
+      run: cabal v2-test
