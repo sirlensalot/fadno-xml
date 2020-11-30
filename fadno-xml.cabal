@@ -30,7 +30,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       Decimal >= 0.4
-                     , base >= 4.9 && < 4.13
+                     , base >= 4.9 && < 4.15
                      , containers >= 0.5
                      , lens >= 4.15
                      , mtl >= 2.2
