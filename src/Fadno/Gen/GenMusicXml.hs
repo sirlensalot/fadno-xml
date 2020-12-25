@@ -27,6 +27,16 @@ runMusicXml20 = do
                   outputHeader "Fadno.MusicXml.MusicXml20"
                   outputTypes e
 
+-- | Emit 3.0 code.
+runMusicXml30 :: IO ()
+runMusicXml30 = do
+  s <- loadMusicXml30
+  e <- snd <$> runEmit (Env s) mempty (emitSchema s)
+  withFile "src/Fadno/MusicXml/MusicXml30.hs" WriteMode $ \h ->
+      void $ runOut' h $ do
+                  outputHeader "Fadno.MusicXml.MusicXml30"
+                  outputTypes e
+
 
 -- | Load XSD,XML and Xlink schemas.
 loadXlinkXmlSchemas :: IO Schema
@@ -40,5 +50,12 @@ loadXlinkXmlSchemas = do
 loadMusicXml20 :: IO Schema
 loadMusicXml20 = do
   x <- parseFile "xsd/musicxml.20.xsd"
+  deps <- loadXlinkXmlSchemas
+  return (x <> deps)
+
+-- | Load Music XML 2.0 schema
+loadMusicXml30 :: IO Schema
+loadMusicXml30 = do
+  x <- parseFile "xsd/musicxml.30.xsd"
   deps <- loadXlinkXmlSchemas
   return (x <> deps)
