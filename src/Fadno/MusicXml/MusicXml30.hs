@@ -18,7 +18,7 @@ import Fadno.Xml.EmitXml
 import qualified Fadno.Xml.XParse as P
 import qualified Control.Applicative as P
 import Control.Applicative ((<|>))
-import Control.Arrow as A
+import qualified Control.Arrow as A
 
 -- | @xs:ID@ /(simple)/
 newtype ID = ID { iD :: NCName }
