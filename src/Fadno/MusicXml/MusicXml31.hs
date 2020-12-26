@@ -8,7 +8,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Fadno.MusicXml.MusicXml20 where
+module Fadno.MusicXml.MusicXml31 where
 
 import GHC.Generics
 import Data.Data
@@ -88,7 +88,7 @@ parseAboveBelow s
 
 -- | @accidental-value@ /(simple)/
 --
--- The accidental-value type represents notated accidentals supported by MusicXML. In the MusicXML 2.0 DTD this was a string with values that could be included. The XSD strengthens the data typing to an enumerated list.
+-- The accidental-value type represents notated accidentals supported by MusicXML. In the MusicXML 2.0 DTD this was a string with values that could be included. The XSD strengthens the data typing to an enumerated list. The quarter- and three-quarters- accidentals are Tartini-style quarter-tone accidentals. The -down and -up accidentals are quarter-tone accidentals that include arrows pointing down or up. The slash- accidentals are used in Turkish classical music. The numbered sharp and flat accidentals are superscripted versions of the accidental signs, used in Turkish folk music. The sori and koron accidentals are microtonal sharp and flat accidentals used in Iranian and Persian music. The other accidental covers accidentals other than those listed here. It is usually used in combination with the smufl attribute to specify a particular SMuFL accidental. The smufl attribute may be used with any accidental value to help specify the appearance of symbols that share the same MusicXML semantics.
 data AccidentalValue = 
       AccidentalValueSharp -- ^ /sharp/
     | AccidentalValueNatural -- ^ /natural/
@@ -102,6 +102,35 @@ data AccidentalValue =
     | AccidentalValueQuarterSharp -- ^ /quarter-sharp/
     | AccidentalValueThreeQuartersFlat -- ^ /three-quarters-flat/
     | AccidentalValueThreeQuartersSharp -- ^ /three-quarters-sharp/
+    | AccidentalValueSharpDown -- ^ /sharp-down/
+    | AccidentalValueSharpUp -- ^ /sharp-up/
+    | AccidentalValueNaturalDown -- ^ /natural-down/
+    | AccidentalValueNaturalUp -- ^ /natural-up/
+    | AccidentalValueFlatDown -- ^ /flat-down/
+    | AccidentalValueFlatUp -- ^ /flat-up/
+    | AccidentalValueDoubleSharpDown -- ^ /double-sharp-down/
+    | AccidentalValueDoubleSharpUp -- ^ /double-sharp-up/
+    | AccidentalValueFlatFlatDown -- ^ /flat-flat-down/
+    | AccidentalValueFlatFlatUp -- ^ /flat-flat-up/
+    | AccidentalValueArrowDown -- ^ /arrow-down/
+    | AccidentalValueArrowUp -- ^ /arrow-up/
+    | AccidentalValueTripleSharp -- ^ /triple-sharp/
+    | AccidentalValueTripleFlat -- ^ /triple-flat/
+    | AccidentalValueSlashQuarterSharp -- ^ /slash-quarter-sharp/
+    | AccidentalValueSlashSharp -- ^ /slash-sharp/
+    | AccidentalValueSlashFlat -- ^ /slash-flat/
+    | AccidentalValueDoubleSlashFlat -- ^ /double-slash-flat/
+    | AccidentalValueSharp1 -- ^ /sharp-1/
+    | AccidentalValueSharp2 -- ^ /sharp-2/
+    | AccidentalValueSharp3 -- ^ /sharp-3/
+    | AccidentalValueSharp5 -- ^ /sharp-5/
+    | AccidentalValueFlat1 -- ^ /flat-1/
+    | AccidentalValueFlat2 -- ^ /flat-2/
+    | AccidentalValueFlat3 -- ^ /flat-3/
+    | AccidentalValueFlat4 -- ^ /flat-4/
+    | AccidentalValueSori -- ^ /sori/
+    | AccidentalValueKoron -- ^ /koron/
+    | AccidentalValueOther -- ^ /other/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml AccidentalValue where
     emitXml AccidentalValueSharp = XLit "sharp"
@@ -116,6 +145,35 @@ instance EmitXml AccidentalValue where
     emitXml AccidentalValueQuarterSharp = XLit "quarter-sharp"
     emitXml AccidentalValueThreeQuartersFlat = XLit "three-quarters-flat"
     emitXml AccidentalValueThreeQuartersSharp = XLit "three-quarters-sharp"
+    emitXml AccidentalValueSharpDown = XLit "sharp-down"
+    emitXml AccidentalValueSharpUp = XLit "sharp-up"
+    emitXml AccidentalValueNaturalDown = XLit "natural-down"
+    emitXml AccidentalValueNaturalUp = XLit "natural-up"
+    emitXml AccidentalValueFlatDown = XLit "flat-down"
+    emitXml AccidentalValueFlatUp = XLit "flat-up"
+    emitXml AccidentalValueDoubleSharpDown = XLit "double-sharp-down"
+    emitXml AccidentalValueDoubleSharpUp = XLit "double-sharp-up"
+    emitXml AccidentalValueFlatFlatDown = XLit "flat-flat-down"
+    emitXml AccidentalValueFlatFlatUp = XLit "flat-flat-up"
+    emitXml AccidentalValueArrowDown = XLit "arrow-down"
+    emitXml AccidentalValueArrowUp = XLit "arrow-up"
+    emitXml AccidentalValueTripleSharp = XLit "triple-sharp"
+    emitXml AccidentalValueTripleFlat = XLit "triple-flat"
+    emitXml AccidentalValueSlashQuarterSharp = XLit "slash-quarter-sharp"
+    emitXml AccidentalValueSlashSharp = XLit "slash-sharp"
+    emitXml AccidentalValueSlashFlat = XLit "slash-flat"
+    emitXml AccidentalValueDoubleSlashFlat = XLit "double-slash-flat"
+    emitXml AccidentalValueSharp1 = XLit "sharp-1"
+    emitXml AccidentalValueSharp2 = XLit "sharp-2"
+    emitXml AccidentalValueSharp3 = XLit "sharp-3"
+    emitXml AccidentalValueSharp5 = XLit "sharp-5"
+    emitXml AccidentalValueFlat1 = XLit "flat-1"
+    emitXml AccidentalValueFlat2 = XLit "flat-2"
+    emitXml AccidentalValueFlat3 = XLit "flat-3"
+    emitXml AccidentalValueFlat4 = XLit "flat-4"
+    emitXml AccidentalValueSori = XLit "sori"
+    emitXml AccidentalValueKoron = XLit "koron"
+    emitXml AccidentalValueOther = XLit "other"
 parseAccidentalValue :: String -> P.XParse AccidentalValue
 parseAccidentalValue s
         | s == "sharp" = return $ AccidentalValueSharp
@@ -130,11 +188,40 @@ parseAccidentalValue s
         | s == "quarter-sharp" = return $ AccidentalValueQuarterSharp
         | s == "three-quarters-flat" = return $ AccidentalValueThreeQuartersFlat
         | s == "three-quarters-sharp" = return $ AccidentalValueThreeQuartersSharp
+        | s == "sharp-down" = return $ AccidentalValueSharpDown
+        | s == "sharp-up" = return $ AccidentalValueSharpUp
+        | s == "natural-down" = return $ AccidentalValueNaturalDown
+        | s == "natural-up" = return $ AccidentalValueNaturalUp
+        | s == "flat-down" = return $ AccidentalValueFlatDown
+        | s == "flat-up" = return $ AccidentalValueFlatUp
+        | s == "double-sharp-down" = return $ AccidentalValueDoubleSharpDown
+        | s == "double-sharp-up" = return $ AccidentalValueDoubleSharpUp
+        | s == "flat-flat-down" = return $ AccidentalValueFlatFlatDown
+        | s == "flat-flat-up" = return $ AccidentalValueFlatFlatUp
+        | s == "arrow-down" = return $ AccidentalValueArrowDown
+        | s == "arrow-up" = return $ AccidentalValueArrowUp
+        | s == "triple-sharp" = return $ AccidentalValueTripleSharp
+        | s == "triple-flat" = return $ AccidentalValueTripleFlat
+        | s == "slash-quarter-sharp" = return $ AccidentalValueSlashQuarterSharp
+        | s == "slash-sharp" = return $ AccidentalValueSlashSharp
+        | s == "slash-flat" = return $ AccidentalValueSlashFlat
+        | s == "double-slash-flat" = return $ AccidentalValueDoubleSlashFlat
+        | s == "sharp-1" = return $ AccidentalValueSharp1
+        | s == "sharp-2" = return $ AccidentalValueSharp2
+        | s == "sharp-3" = return $ AccidentalValueSharp3
+        | s == "sharp-5" = return $ AccidentalValueSharp5
+        | s == "flat-1" = return $ AccidentalValueFlat1
+        | s == "flat-2" = return $ AccidentalValueFlat2
+        | s == "flat-3" = return $ AccidentalValueFlat3
+        | s == "flat-4" = return $ AccidentalValueFlat4
+        | s == "sori" = return $ AccidentalValueSori
+        | s == "koron" = return $ AccidentalValueKoron
+        | s == "other" = return $ AccidentalValueOther
         | otherwise = P.xfail $ "AccidentalValue: " ++ s
 
 -- | @accordion-middle@ /(simple)/
 --
--- The accordion-middle type may have values of 1, 2, or 3, corresponding to having 1 to 3 dots in the middle section of the accordion registration symbol.
+-- The accordion-middle type may have values of 1, 2, or 3, corresponding to having 1 to 3 dots in the middle section of the accordion registration symbol. This type is not used if no dots are present.
 newtype AccordionMiddle = AccordionMiddle { accordionMiddle :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show AccordionMiddle where show (AccordionMiddle a) = show a
@@ -163,6 +250,86 @@ parseActuate s
         | s == "other" = return $ ActuateOther
         | s == "none" = return $ ActuateNone
         | otherwise = P.xfail $ "Actuate: " ++ s
+
+-- | @arrow-direction@ /(simple)/
+--
+-- The arrow-direction type represents the direction in which an arrow points, using Unicode arrow terminology.
+data ArrowDirection = 
+      ArrowDirectionLeft -- ^ /left/
+    | ArrowDirectionUp -- ^ /up/
+    | ArrowDirectionRight -- ^ /right/
+    | ArrowDirectionDown -- ^ /down/
+    | ArrowDirectionNorthwest -- ^ /northwest/
+    | ArrowDirectionNortheast -- ^ /northeast/
+    | ArrowDirectionSoutheast -- ^ /southeast/
+    | ArrowDirectionSouthwest -- ^ /southwest/
+    | ArrowDirectionLeftRight -- ^ /left right/
+    | ArrowDirectionUpDown -- ^ /up down/
+    | ArrowDirectionNorthwestSoutheast -- ^ /northwest southeast/
+    | ArrowDirectionNortheastSouthwest -- ^ /northeast southwest/
+    | ArrowDirectionOther -- ^ /other/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml ArrowDirection where
+    emitXml ArrowDirectionLeft = XLit "left"
+    emitXml ArrowDirectionUp = XLit "up"
+    emitXml ArrowDirectionRight = XLit "right"
+    emitXml ArrowDirectionDown = XLit "down"
+    emitXml ArrowDirectionNorthwest = XLit "northwest"
+    emitXml ArrowDirectionNortheast = XLit "northeast"
+    emitXml ArrowDirectionSoutheast = XLit "southeast"
+    emitXml ArrowDirectionSouthwest = XLit "southwest"
+    emitXml ArrowDirectionLeftRight = XLit "left right"
+    emitXml ArrowDirectionUpDown = XLit "up down"
+    emitXml ArrowDirectionNorthwestSoutheast = XLit "northwest southeast"
+    emitXml ArrowDirectionNortheastSouthwest = XLit "northeast southwest"
+    emitXml ArrowDirectionOther = XLit "other"
+parseArrowDirection :: String -> P.XParse ArrowDirection
+parseArrowDirection s
+        | s == "left" = return $ ArrowDirectionLeft
+        | s == "up" = return $ ArrowDirectionUp
+        | s == "right" = return $ ArrowDirectionRight
+        | s == "down" = return $ ArrowDirectionDown
+        | s == "northwest" = return $ ArrowDirectionNorthwest
+        | s == "northeast" = return $ ArrowDirectionNortheast
+        | s == "southeast" = return $ ArrowDirectionSoutheast
+        | s == "southwest" = return $ ArrowDirectionSouthwest
+        | s == "left right" = return $ ArrowDirectionLeftRight
+        | s == "up down" = return $ ArrowDirectionUpDown
+        | s == "northwest southeast" = return $ ArrowDirectionNorthwestSoutheast
+        | s == "northeast southwest" = return $ ArrowDirectionNortheastSouthwest
+        | s == "other" = return $ ArrowDirectionOther
+        | otherwise = P.xfail $ "ArrowDirection: " ++ s
+
+-- | @arrow-style@ /(simple)/
+--
+-- The arrow-style type represents the style of an arrow, using Unicode arrow terminology. Filled and hollow arrows indicate polygonal single arrows. Paired arrows are duplicate single arrows in the same direction. Combined arrows apply to double direction arrows like left right, indicating that an arrow in one direction should be combined with an arrow in the other direction.
+data ArrowStyle = 
+      ArrowStyleSingle -- ^ /single/
+    | ArrowStyleDouble -- ^ /double/
+    | ArrowStyleFilled -- ^ /filled/
+    | ArrowStyleHollow -- ^ /hollow/
+    | ArrowStylePaired -- ^ /paired/
+    | ArrowStyleCombined -- ^ /combined/
+    | ArrowStyleOther -- ^ /other/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml ArrowStyle where
+    emitXml ArrowStyleSingle = XLit "single"
+    emitXml ArrowStyleDouble = XLit "double"
+    emitXml ArrowStyleFilled = XLit "filled"
+    emitXml ArrowStyleHollow = XLit "hollow"
+    emitXml ArrowStylePaired = XLit "paired"
+    emitXml ArrowStyleCombined = XLit "combined"
+    emitXml ArrowStyleOther = XLit "other"
+parseArrowStyle :: String -> P.XParse ArrowStyle
+parseArrowStyle s
+        | s == "single" = return $ ArrowStyleSingle
+        | s == "double" = return $ ArrowStyleDouble
+        | s == "filled" = return $ ArrowStyleFilled
+        | s == "hollow" = return $ ArrowStyleHollow
+        | s == "paired" = return $ ArrowStylePaired
+        | s == "combined" = return $ ArrowStyleCombined
+        | s == "other" = return $ ArrowStyleOther
+        | otherwise = P.xfail $ "ArrowStyle: " ++ s
 
 -- | @backward-forward@ /(simple)/
 --
@@ -225,7 +392,7 @@ parseBarStyle s
 
 -- | @beam-level@ /(simple)/
 --
--- The MusicXML format supports six levels of beaming, up to 256th notes. Unlike the number-level type, the beam-level type identifies concurrent beams in a beam group. It does not distinguish overlapping beams such as grace notes within regular notes, or beams used in different voices.
+-- The MusicXML format supports six levels of beaming, up to 1024th notes. Unlike the number-level type, the beam-level type identifies concurrent beams in a beam group. It does not distinguish overlapping beams such as grace notes within regular notes, or beams used in different voices.
 newtype BeamLevel = BeamLevel { beamLevel :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show BeamLevel where show (BeamLevel a) = show a
@@ -237,7 +404,7 @@ parseBeamLevel = P.xread "BeamLevel"
 
 -- | @beam-value@ /(simple)/
 --
--- The beam-value type represents the type of beam associated with each of 6 beam levels (up to 256th notes) available for each note.
+-- The beam-value type represents the type of beam associated with each of 8 beam levels (up to 1024th notes) available for each note.
 data BeamValue = 
       BeamValueBegin -- ^ /begin/
     | BeamValueContinue -- ^ /continue/
@@ -260,15 +427,174 @@ parseBeamValue s
         | s == "backward hook" = return $ BeamValueBackwardHook
         | otherwise = P.xfail $ "BeamValue: " ++ s
 
+-- | @beater-value@ /(simple)/
+--
+-- The beater-value type represents pictograms for beaters, mallets, and sticks that do not have different materials represented in the pictogram. The finger and hammer values are in addition to Stone's list.
+data BeaterValue = 
+      BeaterValueBow -- ^ /bow/
+    | BeaterValueChimeHammer -- ^ /chime hammer/
+    | BeaterValueCoin -- ^ /coin/
+    | BeaterValueDrumStick -- ^ /drum stick/
+    | BeaterValueFinger -- ^ /finger/
+    | BeaterValueFingernail -- ^ /fingernail/
+    | BeaterValueFist -- ^ /fist/
+    | BeaterValueGuiroScraper -- ^ /guiro scraper/
+    | BeaterValueHammer -- ^ /hammer/
+    | BeaterValueHand -- ^ /hand/
+    | BeaterValueJazzStick -- ^ /jazz stick/
+    | BeaterValueKnittingNeedle -- ^ /knitting needle/
+    | BeaterValueMetalHammer -- ^ /metal hammer/
+    | BeaterValueSlideBrushOnGong -- ^ /slide brush on gong/
+    | BeaterValueSnareStick -- ^ /snare stick/
+    | BeaterValueSpoonMallet -- ^ /spoon mallet/
+    | BeaterValueSuperball -- ^ /superball/
+    | BeaterValueTriangleBeater -- ^ /triangle beater/
+    | BeaterValueTriangleBeaterPlain -- ^ /triangle beater plain/
+    | BeaterValueWireBrush -- ^ /wire brush/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml BeaterValue where
+    emitXml BeaterValueBow = XLit "bow"
+    emitXml BeaterValueChimeHammer = XLit "chime hammer"
+    emitXml BeaterValueCoin = XLit "coin"
+    emitXml BeaterValueDrumStick = XLit "drum stick"
+    emitXml BeaterValueFinger = XLit "finger"
+    emitXml BeaterValueFingernail = XLit "fingernail"
+    emitXml BeaterValueFist = XLit "fist"
+    emitXml BeaterValueGuiroScraper = XLit "guiro scraper"
+    emitXml BeaterValueHammer = XLit "hammer"
+    emitXml BeaterValueHand = XLit "hand"
+    emitXml BeaterValueJazzStick = XLit "jazz stick"
+    emitXml BeaterValueKnittingNeedle = XLit "knitting needle"
+    emitXml BeaterValueMetalHammer = XLit "metal hammer"
+    emitXml BeaterValueSlideBrushOnGong = XLit "slide brush on gong"
+    emitXml BeaterValueSnareStick = XLit "snare stick"
+    emitXml BeaterValueSpoonMallet = XLit "spoon mallet"
+    emitXml BeaterValueSuperball = XLit "superball"
+    emitXml BeaterValueTriangleBeater = XLit "triangle beater"
+    emitXml BeaterValueTriangleBeaterPlain = XLit "triangle beater plain"
+    emitXml BeaterValueWireBrush = XLit "wire brush"
+parseBeaterValue :: String -> P.XParse BeaterValue
+parseBeaterValue s
+        | s == "bow" = return $ BeaterValueBow
+        | s == "chime hammer" = return $ BeaterValueChimeHammer
+        | s == "coin" = return $ BeaterValueCoin
+        | s == "drum stick" = return $ BeaterValueDrumStick
+        | s == "finger" = return $ BeaterValueFinger
+        | s == "fingernail" = return $ BeaterValueFingernail
+        | s == "fist" = return $ BeaterValueFist
+        | s == "guiro scraper" = return $ BeaterValueGuiroScraper
+        | s == "hammer" = return $ BeaterValueHammer
+        | s == "hand" = return $ BeaterValueHand
+        | s == "jazz stick" = return $ BeaterValueJazzStick
+        | s == "knitting needle" = return $ BeaterValueKnittingNeedle
+        | s == "metal hammer" = return $ BeaterValueMetalHammer
+        | s == "slide brush on gong" = return $ BeaterValueSlideBrushOnGong
+        | s == "snare stick" = return $ BeaterValueSnareStick
+        | s == "spoon mallet" = return $ BeaterValueSpoonMallet
+        | s == "superball" = return $ BeaterValueSuperball
+        | s == "triangle beater" = return $ BeaterValueTriangleBeater
+        | s == "triangle beater plain" = return $ BeaterValueTriangleBeaterPlain
+        | s == "wire brush" = return $ BeaterValueWireBrush
+        | otherwise = P.xfail $ "BeaterValue: " ++ s
+
+-- | @breath-mark-value@ /(simple)/
+--
+-- The breath-mark-value type represents the symbol used for a breath mark.
+data BreathMarkValue = 
+      BreathMarkValue -- ^ //
+    | BreathMarkValueComma -- ^ /comma/
+    | BreathMarkValueTick -- ^ /tick/
+    | BreathMarkValueUpbow -- ^ /upbow/
+    | BreathMarkValueSalzedo -- ^ /salzedo/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml BreathMarkValue where
+    emitXml BreathMarkValue = XLit ""
+    emitXml BreathMarkValueComma = XLit "comma"
+    emitXml BreathMarkValueTick = XLit "tick"
+    emitXml BreathMarkValueUpbow = XLit "upbow"
+    emitXml BreathMarkValueSalzedo = XLit "salzedo"
+parseBreathMarkValue :: String -> P.XParse BreathMarkValue
+parseBreathMarkValue s
+        | s == "" = return $ BreathMarkValue
+        | s == "comma" = return $ BreathMarkValueComma
+        | s == "tick" = return $ BreathMarkValueTick
+        | s == "upbow" = return $ BreathMarkValueUpbow
+        | s == "salzedo" = return $ BreathMarkValueSalzedo
+        | otherwise = P.xfail $ "BreathMarkValue: " ++ s
+
+-- | @caesura-value@ /(simple)/
+--
+-- The caesura-value type represents the shape of the caesura sign.
+data CaesuraValue = 
+      CaesuraValueNormal -- ^ /normal/
+    | CaesuraValueThick -- ^ /thick/
+    | CaesuraValueShort -- ^ /short/
+    | CaesuraValueCurved -- ^ /curved/
+    | CaesuraValueSingle -- ^ /single/
+    | CaesuraValue -- ^ //
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml CaesuraValue where
+    emitXml CaesuraValueNormal = XLit "normal"
+    emitXml CaesuraValueThick = XLit "thick"
+    emitXml CaesuraValueShort = XLit "short"
+    emitXml CaesuraValueCurved = XLit "curved"
+    emitXml CaesuraValueSingle = XLit "single"
+    emitXml CaesuraValue = XLit ""
+parseCaesuraValue :: String -> P.XParse CaesuraValue
+parseCaesuraValue s
+        | s == "normal" = return $ CaesuraValueNormal
+        | s == "thick" = return $ CaesuraValueThick
+        | s == "short" = return $ CaesuraValueShort
+        | s == "curved" = return $ CaesuraValueCurved
+        | s == "single" = return $ CaesuraValueSingle
+        | s == "" = return $ CaesuraValue
+        | otherwise = P.xfail $ "CaesuraValue: " ++ s
+
+-- | @cancel-location@ /(simple)/
+--
+-- The cancel-location type is used to indicate where a key signature cancellation appears relative to a new key signature: to the left, to the right, or before the barline and to the left. It is left by default. For mid-measure key elements, a cancel-location of before-barline should be treated like a cancel-location of left.
+data CancelLocation = 
+      CancelLocationLeft -- ^ /left/
+    | CancelLocationRight -- ^ /right/
+    | CancelLocationBeforeBarline -- ^ /before-barline/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml CancelLocation where
+    emitXml CancelLocationLeft = XLit "left"
+    emitXml CancelLocationRight = XLit "right"
+    emitXml CancelLocationBeforeBarline = XLit "before-barline"
+parseCancelLocation :: String -> P.XParse CancelLocation
+parseCancelLocation s
+        | s == "left" = return $ CancelLocationLeft
+        | s == "right" = return $ CancelLocationRight
+        | s == "before-barline" = return $ CancelLocationBeforeBarline
+        | otherwise = P.xfail $ "CancelLocation: " ++ s
+
+-- | @circular-arrow@ /(simple)/
+--
+-- The circular-arrow type represents the direction in which a circular arrow points, using Unicode arrow terminology.
+data CircularArrow = 
+      CircularArrowClockwise -- ^ /clockwise/
+    | CircularArrowAnticlockwise -- ^ /anticlockwise/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml CircularArrow where
+    emitXml CircularArrowClockwise = XLit "clockwise"
+    emitXml CircularArrowAnticlockwise = XLit "anticlockwise"
+parseCircularArrow :: String -> P.XParse CircularArrow
+parseCircularArrow s
+        | s == "clockwise" = return $ CircularArrowClockwise
+        | s == "anticlockwise" = return $ CircularArrowAnticlockwise
+        | otherwise = P.xfail $ "CircularArrow: " ++ s
+
 -- | @clef-sign@ /(simple)/
 --
--- The clef-sign element represents the different clef symbols.
+-- The clef-sign element represents the different clef symbols. The jianpu sign indicates that the music that follows should be in jianpu numbered notation, just as the TAB sign indicates that the music that follows should be in tablature notation. Unlike TAB, a jianpu sign does not correspond to a visual clef notation.
 data ClefSign = 
       ClefSignG -- ^ /G/
     | ClefSignF -- ^ /F/
     | ClefSignC -- ^ /C/
     | ClefSignPercussion -- ^ /percussion/
     | ClefSignTAB -- ^ /TAB/
+    | ClefSignJianpu -- ^ /jianpu/
     | ClefSignNone -- ^ /none/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml ClefSign where
@@ -277,6 +603,7 @@ instance EmitXml ClefSign where
     emitXml ClefSignC = XLit "C"
     emitXml ClefSignPercussion = XLit "percussion"
     emitXml ClefSignTAB = XLit "TAB"
+    emitXml ClefSignJianpu = XLit "jianpu"
     emitXml ClefSignNone = XLit "none"
 parseClefSign :: String -> P.XParse ClefSign
 parseClefSign s
@@ -285,12 +612,13 @@ parseClefSign s
         | s == "C" = return $ ClefSignC
         | s == "percussion" = return $ ClefSignPercussion
         | s == "TAB" = return $ ClefSignTAB
+        | s == "jianpu" = return $ ClefSignJianpu
         | s == "none" = return $ ClefSignNone
         | otherwise = P.xfail $ "ClefSign: " ++ s
 
 -- | @color@ /(simple)/
 --
--- The color type indicates the color of an element. Color may be represented as hexadecimal RGB triples, as in HTML, or as hexadecimal ARGB tuples, with the A indicating alpha of transparency. An alpha value of 00 is totally transparent; FF is totally opaque. If RGB is used, the A value is assumed to be FF. 
+-- The color type indicates the color of an element. Color may be represented as hexadecimal RGB triples, as in HTML, or as hexadecimal ARGB tuples, with the A indicating alpha of transparency. An alpha value of 00 is totally transparent; FF is totally opaque. If RGB is used, the A value is assumed to be FF.
 -- 
 -- For instance, the RGB value "#800080" represents purple. An ARGB value of "#40800080" would be a transparent purple.
 -- 
@@ -347,6 +675,31 @@ parseCssFontSize s
         | s == "xx-large" = return $ CssFontSizeXxLarge
         | otherwise = P.xfail $ "CssFontSize: " ++ s
 
+-- | @degree-symbol-value@ /(simple)/
+--
+-- The degree-symbol-value type indicates indicates that a symbol should be used in specifying the degree.
+data DegreeSymbolValue = 
+      DegreeSymbolValueMajor -- ^ /major/
+    | DegreeSymbolValueMinor -- ^ /minor/
+    | DegreeSymbolValueAugmented -- ^ /augmented/
+    | DegreeSymbolValueDiminished -- ^ /diminished/
+    | DegreeSymbolValueHalfDiminished -- ^ /half-diminished/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml DegreeSymbolValue where
+    emitXml DegreeSymbolValueMajor = XLit "major"
+    emitXml DegreeSymbolValueMinor = XLit "minor"
+    emitXml DegreeSymbolValueAugmented = XLit "augmented"
+    emitXml DegreeSymbolValueDiminished = XLit "diminished"
+    emitXml DegreeSymbolValueHalfDiminished = XLit "half-diminished"
+parseDegreeSymbolValue :: String -> P.XParse DegreeSymbolValue
+parseDegreeSymbolValue s
+        | s == "major" = return $ DegreeSymbolValueMajor
+        | s == "minor" = return $ DegreeSymbolValueMinor
+        | s == "augmented" = return $ DegreeSymbolValueAugmented
+        | s == "diminished" = return $ DegreeSymbolValueDiminished
+        | s == "half-diminished" = return $ DegreeSymbolValueHalfDiminished
+        | otherwise = P.xfail $ "DegreeSymbolValue: " ++ s
+
 -- | @degree-type-value@ /(simple)/
 --
 -- The degree-type-value type indicates whether the current degree element is an addition, alteration, or subtraction to the kind of the current chord in the harmony element.
@@ -366,6 +719,18 @@ parseDegreeTypeValue s
         | s == "subtract" = return $ DegreeTypeValueSubtract
         | otherwise = P.xfail $ "DegreeTypeValue: " ++ s
 
+-- | @distance-type@ /(simple)/
+--
+-- The distance-type defines what type of distance is being defined in a distance element. Values include beam and hyphen. This is left as a string so that other application-specific types can be defined, but it is made a separate type so that it can be redefined more strictly.
+newtype DistanceType = DistanceType { distanceType :: Token }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show DistanceType where show (DistanceType a) = show a
+instance Read DistanceType where readsPrec i = map (A.first DistanceType) . readsPrec i
+instance EmitXml DistanceType where
+    emitXml = emitXml . distanceType
+parseDistanceType :: String -> P.XParse DistanceType
+parseDistanceType = return . fromString
+
 -- | @divisions@ /(simple)/
 --
 -- The divisions type is used to express values in terms of the musical divisions defined by the divisions element. It is preferred that these be integer values both for MIDI interoperability and to avoid roundoff errors.
@@ -378,24 +743,115 @@ instance EmitXml Divisions where
 parseDivisions :: String -> P.XParse Divisions
 parseDivisions = P.xread "Divisions"
 
--- | @enclosure@ /(simple)/
+-- | @effect@ /(simple)/
 --
--- The enclosure type describes the shape and presence / absence of an enclosure around text.
-data Enclosure = 
-      EnclosureRectangle -- ^ /rectangle/
-    | EnclosureOval -- ^ /oval/
-    | EnclosureNone -- ^ /none/
+-- The effect type represents pictograms for sound effect percussion instruments. The cannon, lotus flute, and megaphone values are in addition to Stone's list.
+data Effect = 
+      EffectAnvil -- ^ /anvil/
+    | EffectAutoHorn -- ^ /auto horn/
+    | EffectBirdWhistle -- ^ /bird whistle/
+    | EffectCannon -- ^ /cannon/
+    | EffectDuckCall -- ^ /duck call/
+    | EffectGunShot -- ^ /gun shot/
+    | EffectKlaxonHorn -- ^ /klaxon horn/
+    | EffectLionsRoar -- ^ /lions roar/
+    | EffectLotusFlute -- ^ /lotus flute/
+    | EffectMegaphone -- ^ /megaphone/
+    | EffectPoliceWhistle -- ^ /police whistle/
+    | EffectSiren -- ^ /siren/
+    | EffectSlideWhistle -- ^ /slide whistle/
+    | EffectThunderSheet -- ^ /thunder sheet/
+    | EffectWindMachine -- ^ /wind machine/
+    | EffectWindWhistle -- ^ /wind whistle/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
-instance EmitXml Enclosure where
-    emitXml EnclosureRectangle = XLit "rectangle"
-    emitXml EnclosureOval = XLit "oval"
-    emitXml EnclosureNone = XLit "none"
-parseEnclosure :: String -> P.XParse Enclosure
-parseEnclosure s
-        | s == "rectangle" = return $ EnclosureRectangle
-        | s == "oval" = return $ EnclosureOval
-        | s == "none" = return $ EnclosureNone
-        | otherwise = P.xfail $ "Enclosure: " ++ s
+instance EmitXml Effect where
+    emitXml EffectAnvil = XLit "anvil"
+    emitXml EffectAutoHorn = XLit "auto horn"
+    emitXml EffectBirdWhistle = XLit "bird whistle"
+    emitXml EffectCannon = XLit "cannon"
+    emitXml EffectDuckCall = XLit "duck call"
+    emitXml EffectGunShot = XLit "gun shot"
+    emitXml EffectKlaxonHorn = XLit "klaxon horn"
+    emitXml EffectLionsRoar = XLit "lions roar"
+    emitXml EffectLotusFlute = XLit "lotus flute"
+    emitXml EffectMegaphone = XLit "megaphone"
+    emitXml EffectPoliceWhistle = XLit "police whistle"
+    emitXml EffectSiren = XLit "siren"
+    emitXml EffectSlideWhistle = XLit "slide whistle"
+    emitXml EffectThunderSheet = XLit "thunder sheet"
+    emitXml EffectWindMachine = XLit "wind machine"
+    emitXml EffectWindWhistle = XLit "wind whistle"
+parseEffect :: String -> P.XParse Effect
+parseEffect s
+        | s == "anvil" = return $ EffectAnvil
+        | s == "auto horn" = return $ EffectAutoHorn
+        | s == "bird whistle" = return $ EffectBirdWhistle
+        | s == "cannon" = return $ EffectCannon
+        | s == "duck call" = return $ EffectDuckCall
+        | s == "gun shot" = return $ EffectGunShot
+        | s == "klaxon horn" = return $ EffectKlaxonHorn
+        | s == "lions roar" = return $ EffectLionsRoar
+        | s == "lotus flute" = return $ EffectLotusFlute
+        | s == "megaphone" = return $ EffectMegaphone
+        | s == "police whistle" = return $ EffectPoliceWhistle
+        | s == "siren" = return $ EffectSiren
+        | s == "slide whistle" = return $ EffectSlideWhistle
+        | s == "thunder sheet" = return $ EffectThunderSheet
+        | s == "wind machine" = return $ EffectWindMachine
+        | s == "wind whistle" = return $ EffectWindWhistle
+        | otherwise = P.xfail $ "Effect: " ++ s
+
+-- | @enclosure-shape@ /(simple)/
+--
+-- The enclosure-shape type describes the shape and presence / absence of an enclosure around text or symbols. A bracket enclosure is similar to a rectangle with the bottom line missing, as is common in jazz notation.
+data EnclosureShape = 
+      EnclosureShapeRectangle -- ^ /rectangle/
+    | EnclosureShapeSquare -- ^ /square/
+    | EnclosureShapeOval -- ^ /oval/
+    | EnclosureShapeCircle -- ^ /circle/
+    | EnclosureShapeBracket -- ^ /bracket/
+    | EnclosureShapeTriangle -- ^ /triangle/
+    | EnclosureShapeDiamond -- ^ /diamond/
+    | EnclosureShapePentagon -- ^ /pentagon/
+    | EnclosureShapeHexagon -- ^ /hexagon/
+    | EnclosureShapeHeptagon -- ^ /heptagon/
+    | EnclosureShapeOctagon -- ^ /octagon/
+    | EnclosureShapeNonagon -- ^ /nonagon/
+    | EnclosureShapeDecagon -- ^ /decagon/
+    | EnclosureShapeNone -- ^ /none/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml EnclosureShape where
+    emitXml EnclosureShapeRectangle = XLit "rectangle"
+    emitXml EnclosureShapeSquare = XLit "square"
+    emitXml EnclosureShapeOval = XLit "oval"
+    emitXml EnclosureShapeCircle = XLit "circle"
+    emitXml EnclosureShapeBracket = XLit "bracket"
+    emitXml EnclosureShapeTriangle = XLit "triangle"
+    emitXml EnclosureShapeDiamond = XLit "diamond"
+    emitXml EnclosureShapePentagon = XLit "pentagon"
+    emitXml EnclosureShapeHexagon = XLit "hexagon"
+    emitXml EnclosureShapeHeptagon = XLit "heptagon"
+    emitXml EnclosureShapeOctagon = XLit "octagon"
+    emitXml EnclosureShapeNonagon = XLit "nonagon"
+    emitXml EnclosureShapeDecagon = XLit "decagon"
+    emitXml EnclosureShapeNone = XLit "none"
+parseEnclosureShape :: String -> P.XParse EnclosureShape
+parseEnclosureShape s
+        | s == "rectangle" = return $ EnclosureShapeRectangle
+        | s == "square" = return $ EnclosureShapeSquare
+        | s == "oval" = return $ EnclosureShapeOval
+        | s == "circle" = return $ EnclosureShapeCircle
+        | s == "bracket" = return $ EnclosureShapeBracket
+        | s == "triangle" = return $ EnclosureShapeTriangle
+        | s == "diamond" = return $ EnclosureShapeDiamond
+        | s == "pentagon" = return $ EnclosureShapePentagon
+        | s == "hexagon" = return $ EnclosureShapeHexagon
+        | s == "heptagon" = return $ EnclosureShapeHeptagon
+        | s == "octagon" = return $ EnclosureShapeOctagon
+        | s == "nonagon" = return $ EnclosureShapeNonagon
+        | s == "decagon" = return $ EnclosureShapeDecagon
+        | s == "none" = return $ EnclosureShapeNone
+        | otherwise = P.xfail $ "EnclosureShape: " ++ s
 
 -- | @ending-number@ /(simple)/
 --
@@ -435,18 +891,33 @@ data FermataShape =
       FermataShapeNormal -- ^ /normal/
     | FermataShapeAngled -- ^ /angled/
     | FermataShapeSquare -- ^ /square/
+    | FermataShapeDoubleAngled -- ^ /double-angled/
+    | FermataShapeDoubleSquare -- ^ /double-square/
+    | FermataShapeDoubleDot -- ^ /double-dot/
+    | FermataShapeHalfCurve -- ^ /half-curve/
+    | FermataShapeCurlew -- ^ /curlew/
     | FermataShape -- ^ //
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml FermataShape where
     emitXml FermataShapeNormal = XLit "normal"
     emitXml FermataShapeAngled = XLit "angled"
     emitXml FermataShapeSquare = XLit "square"
+    emitXml FermataShapeDoubleAngled = XLit "double-angled"
+    emitXml FermataShapeDoubleSquare = XLit "double-square"
+    emitXml FermataShapeDoubleDot = XLit "double-dot"
+    emitXml FermataShapeHalfCurve = XLit "half-curve"
+    emitXml FermataShapeCurlew = XLit "curlew"
     emitXml FermataShape = XLit ""
 parseFermataShape :: String -> P.XParse FermataShape
 parseFermataShape s
         | s == "normal" = return $ FermataShapeNormal
         | s == "angled" = return $ FermataShapeAngled
         | s == "square" = return $ FermataShapeSquare
+        | s == "double-angled" = return $ FermataShapeDoubleAngled
+        | s == "double-square" = return $ FermataShapeDoubleSquare
+        | s == "double-dot" = return $ FermataShapeDoubleDot
+        | s == "half-curve" = return $ FermataShapeHalfCurve
+        | s == "curlew" = return $ FermataShapeCurlew
         | s == "" = return $ FermataShape
         | otherwise = P.xfail $ "FermataShape: " ++ s
 
@@ -516,6 +987,39 @@ parseFontWeight s
         | s == "bold" = return $ FontWeightBold
         | otherwise = P.xfail $ "FontWeight: " ++ s
 
+-- | @glass-value@ /(simple)/
+--
+-- The glass-value type represents pictograms for glass percussion instruments.
+data GlassValue = 
+      GlassValueGlassHarmonica -- ^ /glass harmonica/
+    | GlassValueGlassHarp -- ^ /glass harp/
+    | GlassValueWindChimes -- ^ /wind chimes/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml GlassValue where
+    emitXml GlassValueGlassHarmonica = XLit "glass harmonica"
+    emitXml GlassValueGlassHarp = XLit "glass harp"
+    emitXml GlassValueWindChimes = XLit "wind chimes"
+parseGlassValue :: String -> P.XParse GlassValue
+parseGlassValue s
+        | s == "glass harmonica" = return $ GlassValueGlassHarmonica
+        | s == "glass harp" = return $ GlassValueGlassHarp
+        | s == "wind chimes" = return $ GlassValueWindChimes
+        | otherwise = P.xfail $ "GlassValue: " ++ s
+
+-- | @glyph-type@ /(simple)/
+--
+-- The glyph-type defines what type of glyph is being defined in a glyph element. Values include quarter-rest, g-clef-ottava-bassa, c-clef, f-clef, percussion-clef, octave-shift-up-8, octave-shift-down-8, octave-shift-continue-8, octave-shift-down-15, octave-shift-up-15, octave-shift-continue-15, octave-shift-down-22, octave-shift-up-22, and octave-shift-continue-22. This is left as a string so that other application-specific types can be defined, but it is made a separate type so that it can be redefined more strictly.
+-- 
+-- A quarter-rest type specifies the glyph to use when a note has a rest element and a type value of quarter. The c-clef, f-clef, and percussion-clef types specify the glyph to use when a clef sign element value is C, F, or percussion respectively. The g-clef-ottava-bassa type specifies the glyph to use when a clef sign element value is G and the clef-octave-change element value is -1. The octave-shift types specify the glyph to use when an octave-shift type attribute value is up, down, or continue and the octave-shift size attribute value is 8, 15, or 22.
+newtype GlyphType = GlyphType { glyphType :: Token }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show GlyphType where show (GlyphType a) = show a
+instance Read GlyphType where readsPrec i = map (A.first GlyphType) . readsPrec i
+instance EmitXml GlyphType where
+    emitXml = emitXml . glyphType
+parseGlyphType :: String -> P.XParse GlyphType
+parseGlyphType = return . fromString
+
 -- | @group-barline-value@ /(simple)/
 --
 -- The group-barline-value type indicates if the group should have common barlines.
@@ -543,19 +1047,109 @@ data GroupSymbolValue =
     | GroupSymbolValueBrace -- ^ /brace/
     | GroupSymbolValueLine -- ^ /line/
     | GroupSymbolValueBracket -- ^ /bracket/
+    | GroupSymbolValueSquare -- ^ /square/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml GroupSymbolValue where
     emitXml GroupSymbolValueNone = XLit "none"
     emitXml GroupSymbolValueBrace = XLit "brace"
     emitXml GroupSymbolValueLine = XLit "line"
     emitXml GroupSymbolValueBracket = XLit "bracket"
+    emitXml GroupSymbolValueSquare = XLit "square"
 parseGroupSymbolValue :: String -> P.XParse GroupSymbolValue
 parseGroupSymbolValue s
         | s == "none" = return $ GroupSymbolValueNone
         | s == "brace" = return $ GroupSymbolValueBrace
         | s == "line" = return $ GroupSymbolValueLine
         | s == "bracket" = return $ GroupSymbolValueBracket
+        | s == "square" = return $ GroupSymbolValueSquare
         | otherwise = P.xfail $ "GroupSymbolValue: " ++ s
+
+-- | @handbell-value@ /(simple)/
+--
+-- The handbell-value type represents the type of handbell technique being notated.
+data HandbellValue = 
+      HandbellValueBelltree -- ^ /belltree/
+    | HandbellValueDamp -- ^ /damp/
+    | HandbellValueEcho -- ^ /echo/
+    | HandbellValueGyro -- ^ /gyro/
+    | HandbellValueHandMartellato -- ^ /hand martellato/
+    | HandbellValueMalletLift -- ^ /mallet lift/
+    | HandbellValueMalletTable -- ^ /mallet table/
+    | HandbellValueMartellato -- ^ /martellato/
+    | HandbellValueMartellatoLift -- ^ /martellato lift/
+    | HandbellValueMutedMartellato -- ^ /muted martellato/
+    | HandbellValuePluckLift -- ^ /pluck lift/
+    | HandbellValueSwing -- ^ /swing/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml HandbellValue where
+    emitXml HandbellValueBelltree = XLit "belltree"
+    emitXml HandbellValueDamp = XLit "damp"
+    emitXml HandbellValueEcho = XLit "echo"
+    emitXml HandbellValueGyro = XLit "gyro"
+    emitXml HandbellValueHandMartellato = XLit "hand martellato"
+    emitXml HandbellValueMalletLift = XLit "mallet lift"
+    emitXml HandbellValueMalletTable = XLit "mallet table"
+    emitXml HandbellValueMartellato = XLit "martellato"
+    emitXml HandbellValueMartellatoLift = XLit "martellato lift"
+    emitXml HandbellValueMutedMartellato = XLit "muted martellato"
+    emitXml HandbellValuePluckLift = XLit "pluck lift"
+    emitXml HandbellValueSwing = XLit "swing"
+parseHandbellValue :: String -> P.XParse HandbellValue
+parseHandbellValue s
+        | s == "belltree" = return $ HandbellValueBelltree
+        | s == "damp" = return $ HandbellValueDamp
+        | s == "echo" = return $ HandbellValueEcho
+        | s == "gyro" = return $ HandbellValueGyro
+        | s == "hand martellato" = return $ HandbellValueHandMartellato
+        | s == "mallet lift" = return $ HandbellValueMalletLift
+        | s == "mallet table" = return $ HandbellValueMalletTable
+        | s == "martellato" = return $ HandbellValueMartellato
+        | s == "martellato lift" = return $ HandbellValueMartellatoLift
+        | s == "muted martellato" = return $ HandbellValueMutedMartellato
+        | s == "pluck lift" = return $ HandbellValuePluckLift
+        | s == "swing" = return $ HandbellValueSwing
+        | otherwise = P.xfail $ "HandbellValue: " ++ s
+
+-- | @harmon-closed-location@ /(simple)/
+--
+-- The harmon-closed-location type indicates which portion of the symbol is filled in when the corresponding harmon-closed-value is half.
+data HarmonClosedLocation = 
+      HarmonClosedLocationRight -- ^ /right/
+    | HarmonClosedLocationBottom -- ^ /bottom/
+    | HarmonClosedLocationLeft -- ^ /left/
+    | HarmonClosedLocationTop -- ^ /top/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml HarmonClosedLocation where
+    emitXml HarmonClosedLocationRight = XLit "right"
+    emitXml HarmonClosedLocationBottom = XLit "bottom"
+    emitXml HarmonClosedLocationLeft = XLit "left"
+    emitXml HarmonClosedLocationTop = XLit "top"
+parseHarmonClosedLocation :: String -> P.XParse HarmonClosedLocation
+parseHarmonClosedLocation s
+        | s == "right" = return $ HarmonClosedLocationRight
+        | s == "bottom" = return $ HarmonClosedLocationBottom
+        | s == "left" = return $ HarmonClosedLocationLeft
+        | s == "top" = return $ HarmonClosedLocationTop
+        | otherwise = P.xfail $ "HarmonClosedLocation: " ++ s
+
+-- | @harmon-closed-value@ /(simple)/
+--
+-- The harmon-closed-value type represents whether the harmon mute is closed, open, or half-open.
+data HarmonClosedValue = 
+      HarmonClosedValueYes -- ^ /yes/
+    | HarmonClosedValueNo -- ^ /no/
+    | HarmonClosedValueHalf -- ^ /half/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml HarmonClosedValue where
+    emitXml HarmonClosedValueYes = XLit "yes"
+    emitXml HarmonClosedValueNo = XLit "no"
+    emitXml HarmonClosedValueHalf = XLit "half"
+parseHarmonClosedValue :: String -> P.XParse HarmonClosedValue
+parseHarmonClosedValue s
+        | s == "yes" = return $ HarmonClosedValueYes
+        | s == "no" = return $ HarmonClosedValueNo
+        | s == "half" = return $ HarmonClosedValueHalf
+        | otherwise = P.xfail $ "HarmonClosedValue: " ++ s
 
 -- | @harmony-type@ /(simple)/
 --
@@ -576,12 +1170,53 @@ parseHarmonyType s
         | s == "alternate" = return $ HarmonyTypeAlternate
         | otherwise = P.xfail $ "HarmonyType: " ++ s
 
+-- | @hole-closed-location@ /(simple)/
+--
+-- The hole-closed-location type indicates which portion of the hole is filled in when the corresponding hole-closed-value is half.
+data HoleClosedLocation = 
+      HoleClosedLocationRight -- ^ /right/
+    | HoleClosedLocationBottom -- ^ /bottom/
+    | HoleClosedLocationLeft -- ^ /left/
+    | HoleClosedLocationTop -- ^ /top/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml HoleClosedLocation where
+    emitXml HoleClosedLocationRight = XLit "right"
+    emitXml HoleClosedLocationBottom = XLit "bottom"
+    emitXml HoleClosedLocationLeft = XLit "left"
+    emitXml HoleClosedLocationTop = XLit "top"
+parseHoleClosedLocation :: String -> P.XParse HoleClosedLocation
+parseHoleClosedLocation s
+        | s == "right" = return $ HoleClosedLocationRight
+        | s == "bottom" = return $ HoleClosedLocationBottom
+        | s == "left" = return $ HoleClosedLocationLeft
+        | s == "top" = return $ HoleClosedLocationTop
+        | otherwise = P.xfail $ "HoleClosedLocation: " ++ s
+
+-- | @hole-closed-value@ /(simple)/
+--
+-- The hole-closed-value type represents whether the hole is closed, open, or half-open.
+data HoleClosedValue = 
+      HoleClosedValueYes -- ^ /yes/
+    | HoleClosedValueNo -- ^ /no/
+    | HoleClosedValueHalf -- ^ /half/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml HoleClosedValue where
+    emitXml HoleClosedValueYes = XLit "yes"
+    emitXml HoleClosedValueNo = XLit "no"
+    emitXml HoleClosedValueHalf = XLit "half"
+parseHoleClosedValue :: String -> P.XParse HoleClosedValue
+parseHoleClosedValue s
+        | s == "yes" = return $ HoleClosedValueYes
+        | s == "no" = return $ HoleClosedValueNo
+        | s == "half" = return $ HoleClosedValueHalf
+        | otherwise = P.xfail $ "HoleClosedValue: " ++ s
+
 -- | @kind-value@ /(simple)/
 --
 -- A kind-value indicates the type of chord. Degree elements can then add, subtract, or alter from these starting points. Values include:
 --
 -- @
--- 	
+-- 
 -- Triads:
 -- 	major (major third, perfect fifth)
 -- 	minor (minor third, perfect fifth)
@@ -622,7 +1257,7 @@ parseHarmonyType s
 -- 	pedal (pedal-point bass)
 -- 	power (perfect fifth)
 -- 	Tristan
--- 	
+-- 
 -- The "other" kind is used when the harmony is entirely composed of add elements. The "none" kind is used to explicitly encode absence of chords or functional harmony.
 -- @
 data KindValue = 
@@ -821,6 +1456,25 @@ parseLineEnd s
         | s == "none" = return $ LineEndNone
         | otherwise = P.xfail $ "LineEnd: " ++ s
 
+-- | @line-length@ /(simple)/
+--
+-- The line-length type distinguishes between different line lengths for doit, falloff, plop, and scoop articulations.
+data LineLength = 
+      LineLengthShort -- ^ /short/
+    | LineLengthMedium -- ^ /medium/
+    | LineLengthLong -- ^ /long/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml LineLength where
+    emitXml LineLengthShort = XLit "short"
+    emitXml LineLengthMedium = XLit "medium"
+    emitXml LineLengthLong = XLit "long"
+parseLineLength :: String -> P.XParse LineLength
+parseLineLength s
+        | s == "short" = return $ LineLengthShort
+        | s == "medium" = return $ LineLengthMedium
+        | s == "long" = return $ LineLengthLong
+        | otherwise = P.xfail $ "LineLength: " ++ s
+
 -- | @line-shape@ /(simple)/
 --
 -- The line-shape type distinguishes between straight and curved lines.
@@ -909,6 +1563,185 @@ parseMeasureNumberingValue s
         | s == "system" = return $ MeasureNumberingValueSystem
         | otherwise = P.xfail $ "MeasureNumberingValue: " ++ s
 
+-- | @measure-text@ /(simple)/
+--
+-- The measure-text type is used for the text attribute of measure elements. It has at least one character. The implicit attribute of the measure element should be set to "yes" rather than setting the text attribute to an empty string.
+newtype MeasureText = MeasureText { measureText :: Token }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show MeasureText where show (MeasureText a) = show a
+instance Read MeasureText where readsPrec i = map (A.first MeasureText) . readsPrec i
+instance EmitXml MeasureText where
+    emitXml = emitXml . measureText
+parseMeasureText :: String -> P.XParse MeasureText
+parseMeasureText = return . fromString
+
+-- | @membrane@ /(simple)/
+--
+-- The membrane type represents pictograms for membrane percussion instruments.
+data Membrane = 
+      MembraneBassDrum -- ^ /bass drum/
+    | MembraneBassDrumOnSide -- ^ /bass drum on side/
+    | MembraneBongos -- ^ /bongos/
+    | MembraneChineseTomtom -- ^ /Chinese tomtom/
+    | MembraneCongaDrum -- ^ /conga drum/
+    | MembraneCuica -- ^ /cuica/
+    | MembraneGobletDrum -- ^ /goblet drum/
+    | MembraneIndoAmericanTomtom -- ^ /Indo-American tomtom/
+    | MembraneJapaneseTomtom -- ^ /Japanese tomtom/
+    | MembraneMilitaryDrum -- ^ /military drum/
+    | MembraneSnareDrum -- ^ /snare drum/
+    | MembraneSnareDrumSnaresOff -- ^ /snare drum snares off/
+    | MembraneTabla -- ^ /tabla/
+    | MembraneTambourine -- ^ /tambourine/
+    | MembraneTenorDrum -- ^ /tenor drum/
+    | MembraneTimbales -- ^ /timbales/
+    | MembraneTomtom -- ^ /tomtom/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Membrane where
+    emitXml MembraneBassDrum = XLit "bass drum"
+    emitXml MembraneBassDrumOnSide = XLit "bass drum on side"
+    emitXml MembraneBongos = XLit "bongos"
+    emitXml MembraneChineseTomtom = XLit "Chinese tomtom"
+    emitXml MembraneCongaDrum = XLit "conga drum"
+    emitXml MembraneCuica = XLit "cuica"
+    emitXml MembraneGobletDrum = XLit "goblet drum"
+    emitXml MembraneIndoAmericanTomtom = XLit "Indo-American tomtom"
+    emitXml MembraneJapaneseTomtom = XLit "Japanese tomtom"
+    emitXml MembraneMilitaryDrum = XLit "military drum"
+    emitXml MembraneSnareDrum = XLit "snare drum"
+    emitXml MembraneSnareDrumSnaresOff = XLit "snare drum snares off"
+    emitXml MembraneTabla = XLit "tabla"
+    emitXml MembraneTambourine = XLit "tambourine"
+    emitXml MembraneTenorDrum = XLit "tenor drum"
+    emitXml MembraneTimbales = XLit "timbales"
+    emitXml MembraneTomtom = XLit "tomtom"
+parseMembrane :: String -> P.XParse Membrane
+parseMembrane s
+        | s == "bass drum" = return $ MembraneBassDrum
+        | s == "bass drum on side" = return $ MembraneBassDrumOnSide
+        | s == "bongos" = return $ MembraneBongos
+        | s == "Chinese tomtom" = return $ MembraneChineseTomtom
+        | s == "conga drum" = return $ MembraneCongaDrum
+        | s == "cuica" = return $ MembraneCuica
+        | s == "goblet drum" = return $ MembraneGobletDrum
+        | s == "Indo-American tomtom" = return $ MembraneIndoAmericanTomtom
+        | s == "Japanese tomtom" = return $ MembraneJapaneseTomtom
+        | s == "military drum" = return $ MembraneMilitaryDrum
+        | s == "snare drum" = return $ MembraneSnareDrum
+        | s == "snare drum snares off" = return $ MembraneSnareDrumSnaresOff
+        | s == "tabla" = return $ MembraneTabla
+        | s == "tambourine" = return $ MembraneTambourine
+        | s == "tenor drum" = return $ MembraneTenorDrum
+        | s == "timbales" = return $ MembraneTimbales
+        | s == "tomtom" = return $ MembraneTomtom
+        | otherwise = P.xfail $ "Membrane: " ++ s
+
+-- | @metal@ /(simple)/
+--
+-- The metal type represents pictograms for metal percussion instruments. The hi-hat value refers to a pictogram like Stone's high-hat cymbals but without the long vertical line at the bottom.
+data Metal = 
+      MetalAgogo -- ^ /agogo/
+    | MetalAlmglocken -- ^ /almglocken/
+    | MetalBell -- ^ /bell/
+    | MetalBellPlate -- ^ /bell plate/
+    | MetalBellTree -- ^ /bell tree/
+    | MetalBrakeDrum -- ^ /brake drum/
+    | MetalCencerro -- ^ /cencerro/
+    | MetalChainRattle -- ^ /chain rattle/
+    | MetalChineseCymbal -- ^ /Chinese cymbal/
+    | MetalCowbell -- ^ /cowbell/
+    | MetalCrashCymbals -- ^ /crash cymbals/
+    | MetalCrotale -- ^ /crotale/
+    | MetalCymbalTongs -- ^ /cymbal tongs/
+    | MetalDomedGong -- ^ /domed gong/
+    | MetalFingerCymbals -- ^ /finger cymbals/
+    | MetalFlexatone -- ^ /flexatone/
+    | MetalGong -- ^ /gong/
+    | MetalHiHat -- ^ /hi-hat/
+    | MetalHighHatCymbals -- ^ /high-hat cymbals/
+    | MetalHandbell -- ^ /handbell/
+    | MetalJawHarp -- ^ /jaw harp/
+    | MetalJingleBells -- ^ /jingle bells/
+    | MetalMusicalSaw -- ^ /musical saw/
+    | MetalShellBells -- ^ /shell bells/
+    | MetalSistrum -- ^ /sistrum/
+    | MetalSizzleCymbal -- ^ /sizzle cymbal/
+    | MetalSleighBells -- ^ /sleigh bells/
+    | MetalSuspendedCymbal -- ^ /suspended cymbal/
+    | MetalTamTam -- ^ /tam tam/
+    | MetalTamTamWithBeater -- ^ /tam tam with beater/
+    | MetalTriangle -- ^ /triangle/
+    | MetalVietnameseHat -- ^ /Vietnamese hat/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Metal where
+    emitXml MetalAgogo = XLit "agogo"
+    emitXml MetalAlmglocken = XLit "almglocken"
+    emitXml MetalBell = XLit "bell"
+    emitXml MetalBellPlate = XLit "bell plate"
+    emitXml MetalBellTree = XLit "bell tree"
+    emitXml MetalBrakeDrum = XLit "brake drum"
+    emitXml MetalCencerro = XLit "cencerro"
+    emitXml MetalChainRattle = XLit "chain rattle"
+    emitXml MetalChineseCymbal = XLit "Chinese cymbal"
+    emitXml MetalCowbell = XLit "cowbell"
+    emitXml MetalCrashCymbals = XLit "crash cymbals"
+    emitXml MetalCrotale = XLit "crotale"
+    emitXml MetalCymbalTongs = XLit "cymbal tongs"
+    emitXml MetalDomedGong = XLit "domed gong"
+    emitXml MetalFingerCymbals = XLit "finger cymbals"
+    emitXml MetalFlexatone = XLit "flexatone"
+    emitXml MetalGong = XLit "gong"
+    emitXml MetalHiHat = XLit "hi-hat"
+    emitXml MetalHighHatCymbals = XLit "high-hat cymbals"
+    emitXml MetalHandbell = XLit "handbell"
+    emitXml MetalJawHarp = XLit "jaw harp"
+    emitXml MetalJingleBells = XLit "jingle bells"
+    emitXml MetalMusicalSaw = XLit "musical saw"
+    emitXml MetalShellBells = XLit "shell bells"
+    emitXml MetalSistrum = XLit "sistrum"
+    emitXml MetalSizzleCymbal = XLit "sizzle cymbal"
+    emitXml MetalSleighBells = XLit "sleigh bells"
+    emitXml MetalSuspendedCymbal = XLit "suspended cymbal"
+    emitXml MetalTamTam = XLit "tam tam"
+    emitXml MetalTamTamWithBeater = XLit "tam tam with beater"
+    emitXml MetalTriangle = XLit "triangle"
+    emitXml MetalVietnameseHat = XLit "Vietnamese hat"
+parseMetal :: String -> P.XParse Metal
+parseMetal s
+        | s == "agogo" = return $ MetalAgogo
+        | s == "almglocken" = return $ MetalAlmglocken
+        | s == "bell" = return $ MetalBell
+        | s == "bell plate" = return $ MetalBellPlate
+        | s == "bell tree" = return $ MetalBellTree
+        | s == "brake drum" = return $ MetalBrakeDrum
+        | s == "cencerro" = return $ MetalCencerro
+        | s == "chain rattle" = return $ MetalChainRattle
+        | s == "Chinese cymbal" = return $ MetalChineseCymbal
+        | s == "cowbell" = return $ MetalCowbell
+        | s == "crash cymbals" = return $ MetalCrashCymbals
+        | s == "crotale" = return $ MetalCrotale
+        | s == "cymbal tongs" = return $ MetalCymbalTongs
+        | s == "domed gong" = return $ MetalDomedGong
+        | s == "finger cymbals" = return $ MetalFingerCymbals
+        | s == "flexatone" = return $ MetalFlexatone
+        | s == "gong" = return $ MetalGong
+        | s == "hi-hat" = return $ MetalHiHat
+        | s == "high-hat cymbals" = return $ MetalHighHatCymbals
+        | s == "handbell" = return $ MetalHandbell
+        | s == "jaw harp" = return $ MetalJawHarp
+        | s == "jingle bells" = return $ MetalJingleBells
+        | s == "musical saw" = return $ MetalMusicalSaw
+        | s == "shell bells" = return $ MetalShellBells
+        | s == "sistrum" = return $ MetalSistrum
+        | s == "sizzle cymbal" = return $ MetalSizzleCymbal
+        | s == "sleigh bells" = return $ MetalSleighBells
+        | s == "suspended cymbal" = return $ MetalSuspendedCymbal
+        | s == "tam tam" = return $ MetalTamTam
+        | s == "tam tam with beater" = return $ MetalTamTamWithBeater
+        | s == "triangle" = return $ MetalTriangle
+        | s == "Vietnamese hat" = return $ MetalVietnameseHat
+        | otherwise = P.xfail $ "Metal: " ++ s
+
 -- | @midi-128@ /(simple)/
 --
 -- The midi-16 type is used to express MIDI 1.0 values that range from 1 to 128.
@@ -959,7 +1792,7 @@ parseMillimeters = P.xread "Millimeters"
 
 -- | @mode@ /(simple)/
 --
--- The mode type is used to specify major/minor and other mode distinctions. Valid mode values include major, minor, dorian, phrygian, lydian, mixolydian, aeolian, ionian, and locrian.
+-- The mode type is used to specify major/minor and other mode distinctions. Valid mode values include major, minor, dorian, phrygian, lydian, mixolydian, aeolian, ionian, locrian, and none.
 newtype Mode = Mode { mode :: String }
     deriving (Eq,Typeable,Generic,Ord,IsString)
 instance Show Mode where show (Mode a) = show a
@@ -968,6 +1801,61 @@ instance EmitXml Mode where
     emitXml = emitXml . mode
 parseMode :: String -> P.XParse Mode
 parseMode = return . fromString
+
+-- | @mute@ /(simple)/
+--
+-- The mute type represents muting for different instruments, including brass, winds, and strings. The on and off values are used for undifferentiated mutes. The remaining values represent specific mutes.
+data Mute = 
+      MuteOn -- ^ /on/
+    | MuteOff -- ^ /off/
+    | MuteStraight -- ^ /straight/
+    | MuteCup -- ^ /cup/
+    | MuteHarmonNoStem -- ^ /harmon-no-stem/
+    | MuteHarmonStem -- ^ /harmon-stem/
+    | MuteBucket -- ^ /bucket/
+    | MutePlunger -- ^ /plunger/
+    | MuteHat -- ^ /hat/
+    | MuteSolotone -- ^ /solotone/
+    | MutePractice -- ^ /practice/
+    | MuteStopMute -- ^ /stop-mute/
+    | MuteStopHand -- ^ /stop-hand/
+    | MuteEcho -- ^ /echo/
+    | MutePalm -- ^ /palm/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Mute where
+    emitXml MuteOn = XLit "on"
+    emitXml MuteOff = XLit "off"
+    emitXml MuteStraight = XLit "straight"
+    emitXml MuteCup = XLit "cup"
+    emitXml MuteHarmonNoStem = XLit "harmon-no-stem"
+    emitXml MuteHarmonStem = XLit "harmon-stem"
+    emitXml MuteBucket = XLit "bucket"
+    emitXml MutePlunger = XLit "plunger"
+    emitXml MuteHat = XLit "hat"
+    emitXml MuteSolotone = XLit "solotone"
+    emitXml MutePractice = XLit "practice"
+    emitXml MuteStopMute = XLit "stop-mute"
+    emitXml MuteStopHand = XLit "stop-hand"
+    emitXml MuteEcho = XLit "echo"
+    emitXml MutePalm = XLit "palm"
+parseMute :: String -> P.XParse Mute
+parseMute s
+        | s == "on" = return $ MuteOn
+        | s == "off" = return $ MuteOff
+        | s == "straight" = return $ MuteStraight
+        | s == "cup" = return $ MuteCup
+        | s == "harmon-no-stem" = return $ MuteHarmonNoStem
+        | s == "harmon-stem" = return $ MuteHarmonStem
+        | s == "bucket" = return $ MuteBucket
+        | s == "plunger" = return $ MutePlunger
+        | s == "hat" = return $ MuteHat
+        | s == "solotone" = return $ MuteSolotone
+        | s == "practice" = return $ MutePractice
+        | s == "stop-mute" = return $ MuteStopMute
+        | s == "stop-hand" = return $ MuteStopHand
+        | s == "echo" = return $ MuteEcho
+        | s == "palm" = return $ MutePalm
+        | otherwise = P.xfail $ "Mute: " ++ s
 
 -- | @non-negative-decimal@ /(simple)/
 --
@@ -1003,28 +1891,33 @@ parseNormalizedString = return . fromString
 
 -- | @note-size-type@ /(simple)/
 --
--- The note-size-type type indicates the type of note being defined by a note-size element. The grace type is used for notes of cue size that that include a grace element. The cue type is used for all other notes with cue size, whether defined explicitly or implicitly via a cue element. The large type is used for notes of large size.
+-- The note-size-type type indicates the type of note being defined by a note-size element. The grace-cue type is used for notes of grace-cue size. The grace type is used for notes of cue size that include a grace element. The cue type is used for all other notes with cue size, whether defined explicitly or implicitly via a cue element. The large type is used for notes of large size.
 data NoteSizeType = 
       NoteSizeTypeCue -- ^ /cue/
     | NoteSizeTypeGrace -- ^ /grace/
+    | NoteSizeTypeGraceCue -- ^ /grace-cue/
     | NoteSizeTypeLarge -- ^ /large/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml NoteSizeType where
     emitXml NoteSizeTypeCue = XLit "cue"
     emitXml NoteSizeTypeGrace = XLit "grace"
+    emitXml NoteSizeTypeGraceCue = XLit "grace-cue"
     emitXml NoteSizeTypeLarge = XLit "large"
 parseNoteSizeType :: String -> P.XParse NoteSizeType
 parseNoteSizeType s
         | s == "cue" = return $ NoteSizeTypeCue
         | s == "grace" = return $ NoteSizeTypeGrace
+        | s == "grace-cue" = return $ NoteSizeTypeGraceCue
         | s == "large" = return $ NoteSizeTypeLarge
         | otherwise = P.xfail $ "NoteSizeType: " ++ s
 
 -- | @note-type-value@ /(simple)/
 --
--- The note-type type is used for the MusicXML type element and represents the graphic note type, from 256th (shortest) to long (longest).
+-- The note-type type is used for the MusicXML type element and represents the graphic note type, from 1024th (shortest) to maxima (longest).
 data NoteTypeValue = 
-      NoteTypeValue256th -- ^ /256th/
+      NoteTypeValue1024th -- ^ /1024th/
+    | NoteTypeValue512th -- ^ /512th/
+    | NoteTypeValue256th -- ^ /256th/
     | NoteTypeValue128th -- ^ /128th/
     | NoteTypeValue64th -- ^ /64th/
     | NoteTypeValue32nd -- ^ /32nd/
@@ -1035,8 +1928,11 @@ data NoteTypeValue =
     | NoteTypeValueWhole -- ^ /whole/
     | NoteTypeValueBreve -- ^ /breve/
     | NoteTypeValueLong -- ^ /long/
+    | NoteTypeValueMaxima -- ^ /maxima/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml NoteTypeValue where
+    emitXml NoteTypeValue1024th = XLit "1024th"
+    emitXml NoteTypeValue512th = XLit "512th"
     emitXml NoteTypeValue256th = XLit "256th"
     emitXml NoteTypeValue128th = XLit "128th"
     emitXml NoteTypeValue64th = XLit "64th"
@@ -1048,8 +1944,11 @@ instance EmitXml NoteTypeValue where
     emitXml NoteTypeValueWhole = XLit "whole"
     emitXml NoteTypeValueBreve = XLit "breve"
     emitXml NoteTypeValueLong = XLit "long"
+    emitXml NoteTypeValueMaxima = XLit "maxima"
 parseNoteTypeValue :: String -> P.XParse NoteTypeValue
 parseNoteTypeValue s
+        | s == "1024th" = return $ NoteTypeValue1024th
+        | s == "512th" = return $ NoteTypeValue512th
         | s == "256th" = return $ NoteTypeValue256th
         | s == "128th" = return $ NoteTypeValue128th
         | s == "64th" = return $ NoteTypeValue64th
@@ -1061,14 +1960,19 @@ parseNoteTypeValue s
         | s == "whole" = return $ NoteTypeValueWhole
         | s == "breve" = return $ NoteTypeValueBreve
         | s == "long" = return $ NoteTypeValueLong
+        | s == "maxima" = return $ NoteTypeValueMaxima
         | otherwise = P.xfail $ "NoteTypeValue: " ++ s
 
 -- | @notehead-value@ /(simple)/
 --
 -- 
--- The notehead type indicates shapes other than the open and closed ovals associated with note durations. The values do, re, mi, fa, so, la, and ti correspond to Aikin's 7-shape system.
+-- The notehead-value type indicates shapes other than the open and closed ovals associated with note durations.
 -- 
--- The arrow shapes differ from triangle and inverted triangle by being centered on the stem. Slashed and back slashed notes include both the normal notehead and a slash. The triangle shape has the tip of the triangle pointing up; the inverted triangle shape has the tip of the triangle pointing down.
+-- The values do, re, mi, fa, fa up, so, la, and ti correspond to Aikin's 7-shape system.  The fa up shape is typically used with upstems; the fa shape is typically used with downstems or no stems.
+-- 
+-- The arrow shapes differ from triangle and inverted triangle by being centered on the stem. Slashed and back slashed notes include both the normal notehead and a slash. The triangle shape has the tip of the triangle pointing up; the inverted triangle shape has the tip of the triangle pointing down. The left triangle shape is a right triangle with the hypotenuse facing up and to the left.
+-- 
+-- The other notehead covers noteheads other than those listed here. It is usually used in combination with the smufl attribute to specify a particular SMuFL notehead. The smufl attribute may be used with any notehead value to help specify the appearance of symbols that share the same MusicXML semantics. Noteheads in the SMuFL "Note name noteheads" range (U+E150–U+E1AF) should not use the smufl attribute or the "other" value, but instead use the notehead-text element.
 data NoteheadValue = 
       NoteheadValueSlash -- ^ /slash/
     | NoteheadValueTriangle -- ^ /triangle/
@@ -1080,18 +1984,24 @@ data NoteheadValue =
     | NoteheadValueInvertedTriangle -- ^ /inverted triangle/
     | NoteheadValueArrowDown -- ^ /arrow down/
     | NoteheadValueArrowUp -- ^ /arrow up/
+    | NoteheadValueCircled -- ^ /circled/
     | NoteheadValueSlashed -- ^ /slashed/
     | NoteheadValueBackSlashed -- ^ /back slashed/
     | NoteheadValueNormal -- ^ /normal/
     | NoteheadValueCluster -- ^ /cluster/
+    | NoteheadValueCircleDot -- ^ /circle dot/
+    | NoteheadValueLeftTriangle -- ^ /left triangle/
+    | NoteheadValueRectangle -- ^ /rectangle/
     | NoteheadValueNone -- ^ /none/
     | NoteheadValueDo -- ^ /do/
     | NoteheadValueRe -- ^ /re/
     | NoteheadValueMi -- ^ /mi/
     | NoteheadValueFa -- ^ /fa/
+    | NoteheadValueFaUp -- ^ /fa up/
     | NoteheadValueSo -- ^ /so/
     | NoteheadValueLa -- ^ /la/
     | NoteheadValueTi -- ^ /ti/
+    | NoteheadValueOther -- ^ /other/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml NoteheadValue where
     emitXml NoteheadValueSlash = XLit "slash"
@@ -1104,18 +2014,24 @@ instance EmitXml NoteheadValue where
     emitXml NoteheadValueInvertedTriangle = XLit "inverted triangle"
     emitXml NoteheadValueArrowDown = XLit "arrow down"
     emitXml NoteheadValueArrowUp = XLit "arrow up"
+    emitXml NoteheadValueCircled = XLit "circled"
     emitXml NoteheadValueSlashed = XLit "slashed"
     emitXml NoteheadValueBackSlashed = XLit "back slashed"
     emitXml NoteheadValueNormal = XLit "normal"
     emitXml NoteheadValueCluster = XLit "cluster"
+    emitXml NoteheadValueCircleDot = XLit "circle dot"
+    emitXml NoteheadValueLeftTriangle = XLit "left triangle"
+    emitXml NoteheadValueRectangle = XLit "rectangle"
     emitXml NoteheadValueNone = XLit "none"
     emitXml NoteheadValueDo = XLit "do"
     emitXml NoteheadValueRe = XLit "re"
     emitXml NoteheadValueMi = XLit "mi"
     emitXml NoteheadValueFa = XLit "fa"
+    emitXml NoteheadValueFaUp = XLit "fa up"
     emitXml NoteheadValueSo = XLit "so"
     emitXml NoteheadValueLa = XLit "la"
     emitXml NoteheadValueTi = XLit "ti"
+    emitXml NoteheadValueOther = XLit "other"
 parseNoteheadValue :: String -> P.XParse NoteheadValue
 parseNoteheadValue s
         | s == "slash" = return $ NoteheadValueSlash
@@ -1128,23 +2044,29 @@ parseNoteheadValue s
         | s == "inverted triangle" = return $ NoteheadValueInvertedTriangle
         | s == "arrow down" = return $ NoteheadValueArrowDown
         | s == "arrow up" = return $ NoteheadValueArrowUp
+        | s == "circled" = return $ NoteheadValueCircled
         | s == "slashed" = return $ NoteheadValueSlashed
         | s == "back slashed" = return $ NoteheadValueBackSlashed
         | s == "normal" = return $ NoteheadValueNormal
         | s == "cluster" = return $ NoteheadValueCluster
+        | s == "circle dot" = return $ NoteheadValueCircleDot
+        | s == "left triangle" = return $ NoteheadValueLeftTriangle
+        | s == "rectangle" = return $ NoteheadValueRectangle
         | s == "none" = return $ NoteheadValueNone
         | s == "do" = return $ NoteheadValueDo
         | s == "re" = return $ NoteheadValueRe
         | s == "mi" = return $ NoteheadValueMi
         | s == "fa" = return $ NoteheadValueFa
+        | s == "fa up" = return $ NoteheadValueFaUp
         | s == "so" = return $ NoteheadValueSo
         | s == "la" = return $ NoteheadValueLa
         | s == "ti" = return $ NoteheadValueTi
+        | s == "other" = return $ NoteheadValueOther
         | otherwise = P.xfail $ "NoteheadValue: " ++ s
 
 -- | @number-level@ /(simple)/
 --
--- Slurs, tuplets, and many other features can be concurrent and overlapping within a single musical part. The number-level type distinguishes up to six concurrent objects of the same type. A reading program should be prepared to handle cases where the number-levels stop in an arbitrary order. Different numbers are needed when the features overlap in MusicXML file order. When a number-level value is implied, the value is 1 by default.
+-- Slurs, tuplets, and many other features can be concurrent and overlapping within a single musical part. The number-level type distinguishes up to six concurrent objects of the same type. A reading program should be prepared to handle cases where the number-levels stop in an arbitrary order. Different numbers are needed when the features overlap in MusicXML document order. When a number-level value is optional, the value is 1 by default.
 newtype NumberLevel = NumberLevel { numberLevel :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show NumberLevel where show (NumberLevel a) = show a
@@ -1200,6 +2122,22 @@ instance EmitXml Octave where
 parseOctave :: String -> P.XParse Octave
 parseOctave = P.xread "Octave"
 
+-- | @on-off@ /(simple)/
+--
+-- The on-off type is used for notation elements such as string mutes.
+data OnOff = 
+      OnOffOn -- ^ /on/
+    | OnOffOff -- ^ /off/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml OnOff where
+    emitXml OnOffOn = XLit "on"
+    emitXml OnOffOff = XLit "off"
+parseOnOff :: String -> P.XParse OnOff
+parseOnOff s
+        | s == "on" = return $ OnOffOn
+        | s == "off" = return $ OnOffOff
+        | otherwise = P.xfail $ "OnOff: " ++ s
+
 -- | @over-under@ /(simple)/
 --
 -- The over-under type is used to indicate whether the tips of curved lines such as slurs and ties are overhand (tips down) or underhand (tips up).
@@ -1216,6 +2154,31 @@ parseOverUnder s
         | s == "under" = return $ OverUnderUnder
         | otherwise = P.xfail $ "OverUnder: " ++ s
 
+-- | @pedal-type@ /(simple)/
+--
+-- The pedal-type simple type is used to distinguish types of pedal directions. The start value indicates the start of a damper pedal, while the sostenuto value indicates the start of a sostenuto pedal. The change, continue, and stop values can be used with either the damper or sostenuto pedal. The soft pedal is not included here because there is no special symbol or graphic used for it beyond what can be specified with words and bracket elements.
+data PedalType = 
+      PedalTypeStart -- ^ /start/
+    | PedalTypeStop -- ^ /stop/
+    | PedalTypeSostenuto -- ^ /sostenuto/
+    | PedalTypeChange -- ^ /change/
+    | PedalTypeContinue -- ^ /continue/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml PedalType where
+    emitXml PedalTypeStart = XLit "start"
+    emitXml PedalTypeStop = XLit "stop"
+    emitXml PedalTypeSostenuto = XLit "sostenuto"
+    emitXml PedalTypeChange = XLit "change"
+    emitXml PedalTypeContinue = XLit "continue"
+parsePedalType :: String -> P.XParse PedalType
+parsePedalType s
+        | s == "start" = return $ PedalTypeStart
+        | s == "stop" = return $ PedalTypeStop
+        | s == "sostenuto" = return $ PedalTypeSostenuto
+        | s == "change" = return $ PedalTypeChange
+        | s == "continue" = return $ PedalTypeContinue
+        | otherwise = P.xfail $ "PedalType: " ++ s
+
 -- | @percent@ /(simple)/
 --
 -- The percent type specifies a percentage from 0 to 100.
@@ -1227,6 +2190,49 @@ instance EmitXml Percent where
     emitXml = emitXml . percent
 parsePercent :: String -> P.XParse Percent
 parsePercent = P.xread "Percent"
+
+-- | @pitched-value@ /(simple)/
+--
+-- The pitched-value type represents pictograms for pitched percussion instruments. The chimes and tubular chimes values distinguish the single-line and double-line versions of the pictogram.
+data PitchedValue = 
+      PitchedValueCelesta -- ^ /celesta/
+    | PitchedValueChimes -- ^ /chimes/
+    | PitchedValueGlockenspiel -- ^ /glockenspiel/
+    | PitchedValueLithophone -- ^ /lithophone/
+    | PitchedValueMallet -- ^ /mallet/
+    | PitchedValueMarimba -- ^ /marimba/
+    | PitchedValueSteelDrums -- ^ /steel drums/
+    | PitchedValueTubaphone -- ^ /tubaphone/
+    | PitchedValueTubularChimes -- ^ /tubular chimes/
+    | PitchedValueVibraphone -- ^ /vibraphone/
+    | PitchedValueXylophone -- ^ /xylophone/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml PitchedValue where
+    emitXml PitchedValueCelesta = XLit "celesta"
+    emitXml PitchedValueChimes = XLit "chimes"
+    emitXml PitchedValueGlockenspiel = XLit "glockenspiel"
+    emitXml PitchedValueLithophone = XLit "lithophone"
+    emitXml PitchedValueMallet = XLit "mallet"
+    emitXml PitchedValueMarimba = XLit "marimba"
+    emitXml PitchedValueSteelDrums = XLit "steel drums"
+    emitXml PitchedValueTubaphone = XLit "tubaphone"
+    emitXml PitchedValueTubularChimes = XLit "tubular chimes"
+    emitXml PitchedValueVibraphone = XLit "vibraphone"
+    emitXml PitchedValueXylophone = XLit "xylophone"
+parsePitchedValue :: String -> P.XParse PitchedValue
+parsePitchedValue s
+        | s == "celesta" = return $ PitchedValueCelesta
+        | s == "chimes" = return $ PitchedValueChimes
+        | s == "glockenspiel" = return $ PitchedValueGlockenspiel
+        | s == "lithophone" = return $ PitchedValueLithophone
+        | s == "mallet" = return $ PitchedValueMallet
+        | s == "marimba" = return $ PitchedValueMarimba
+        | s == "steel drums" = return $ PitchedValueSteelDrums
+        | s == "tubaphone" = return $ PitchedValueTubaphone
+        | s == "tubular chimes" = return $ PitchedValueTubularChimes
+        | s == "vibraphone" = return $ PitchedValueVibraphone
+        | s == "xylophone" = return $ PitchedValueXylophone
+        | otherwise = P.xfail $ "PitchedValue: " ++ s
 
 -- | @positive-divisions@ /(simple)/
 --
@@ -1272,24 +2278,27 @@ instance EmitXml PositiveInteger where
 parsePositiveInteger :: String -> P.XParse PositiveInteger
 parsePositiveInteger = P.xread "PositiveInteger"
 
--- | @rehearsal-enclosure@ /(simple)/
+-- | @principal-voice-symbol@ /(simple)/
 --
--- The rehearsal-enclosure type describes the shape and presence / absence of an enclosure around rehearsal text.
-data RehearsalEnclosure = 
-      RehearsalEnclosureSquare -- ^ /square/
-    | RehearsalEnclosureCircle -- ^ /circle/
-    | RehearsalEnclosureNone -- ^ /none/
+-- The principal-voice-symbol type represents the type of symbol used to indicate the start of a principal or secondary voice. The "plain" value represents a plain square bracket. The value of "none" is used for analysis markup when the principal-voice element does not have a corresponding appearance in the score.
+data PrincipalVoiceSymbol = 
+      PrincipalVoiceSymbolHauptstimme -- ^ /Hauptstimme/
+    | PrincipalVoiceSymbolNebenstimme -- ^ /Nebenstimme/
+    | PrincipalVoiceSymbolPlain -- ^ /plain/
+    | PrincipalVoiceSymbolNone -- ^ /none/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
-instance EmitXml RehearsalEnclosure where
-    emitXml RehearsalEnclosureSquare = XLit "square"
-    emitXml RehearsalEnclosureCircle = XLit "circle"
-    emitXml RehearsalEnclosureNone = XLit "none"
-parseRehearsalEnclosure :: String -> P.XParse RehearsalEnclosure
-parseRehearsalEnclosure s
-        | s == "square" = return $ RehearsalEnclosureSquare
-        | s == "circle" = return $ RehearsalEnclosureCircle
-        | s == "none" = return $ RehearsalEnclosureNone
-        | otherwise = P.xfail $ "RehearsalEnclosure: " ++ s
+instance EmitXml PrincipalVoiceSymbol where
+    emitXml PrincipalVoiceSymbolHauptstimme = XLit "Hauptstimme"
+    emitXml PrincipalVoiceSymbolNebenstimme = XLit "Nebenstimme"
+    emitXml PrincipalVoiceSymbolPlain = XLit "plain"
+    emitXml PrincipalVoiceSymbolNone = XLit "none"
+parsePrincipalVoiceSymbol :: String -> P.XParse PrincipalVoiceSymbol
+parsePrincipalVoiceSymbol s
+        | s == "Hauptstimme" = return $ PrincipalVoiceSymbolHauptstimme
+        | s == "Nebenstimme" = return $ PrincipalVoiceSymbolNebenstimme
+        | s == "plain" = return $ PrincipalVoiceSymbolPlain
+        | s == "none" = return $ PrincipalVoiceSymbolNone
+        | otherwise = P.xfail $ "PrincipalVoiceSymbol: " ++ s
 
 -- | @right-left-middle@ /(simple)/
 --
@@ -1322,9 +2331,37 @@ instance EmitXml RotationDegrees where
 parseRotationDegrees :: String -> P.XParse RotationDegrees
 parseRotationDegrees = P.xread "RotationDegrees"
 
+-- | @semi-pitched@ /(simple)/
+--
+-- The semi-pitched type represents categories of indefinite pitch for percussion instruments.
+data SemiPitched = 
+      SemiPitchedHigh -- ^ /high/
+    | SemiPitchedMediumHigh -- ^ /medium-high/
+    | SemiPitchedMedium -- ^ /medium/
+    | SemiPitchedMediumLow -- ^ /medium-low/
+    | SemiPitchedLow -- ^ /low/
+    | SemiPitchedVeryLow -- ^ /very-low/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml SemiPitched where
+    emitXml SemiPitchedHigh = XLit "high"
+    emitXml SemiPitchedMediumHigh = XLit "medium-high"
+    emitXml SemiPitchedMedium = XLit "medium"
+    emitXml SemiPitchedMediumLow = XLit "medium-low"
+    emitXml SemiPitchedLow = XLit "low"
+    emitXml SemiPitchedVeryLow = XLit "very-low"
+parseSemiPitched :: String -> P.XParse SemiPitched
+parseSemiPitched s
+        | s == "high" = return $ SemiPitchedHigh
+        | s == "medium-high" = return $ SemiPitchedMediumHigh
+        | s == "medium" = return $ SemiPitchedMedium
+        | s == "medium-low" = return $ SemiPitchedMediumLow
+        | s == "low" = return $ SemiPitchedLow
+        | s == "very-low" = return $ SemiPitchedVeryLow
+        | otherwise = P.xfail $ "SemiPitched: " ++ s
+
 -- | @semitones@ /(simple)/
 --
--- The semintones type is a number representing semitones, used for chromatic alteration. A value of -1 corresponds to a flat and a value of 1 to a sharp. Decimal values like 0.5 (quarter tone sharp) may be used for microtones.
+-- The semitones type is a number representing semitones, used for chromatic alteration. A value of -1 corresponds to a flat and a value of 1 to a sharp. Decimal values like 0.5 (quarter tone sharp) are used for microtones.
 newtype Semitones = Semitones { semitones :: Decimal }
     deriving (Eq,Typeable,Generic,Ord,Num,Real,Fractional,RealFrac)
 instance Show Semitones where show (Semitones a) = show a
@@ -1391,6 +2428,111 @@ parseShowTuplet s
         | s == "both" = return $ ShowTupletBoth
         | s == "none" = return $ ShowTupletNone
         | otherwise = P.xfail $ "ShowTuplet: " ++ s
+
+-- | @smufl-accidental-glyph-name@ /(simple)/
+--
+-- The smufl-accidental-glyph-name type is used to reference a specific Standard Music Font Layout (SMuFL) accidental character. The value is a SMuFL canonical glyph name that starts with acc.
+newtype SmuflAccidentalGlyphName = SmuflAccidentalGlyphName { smuflAccidentalGlyphName :: SmuflGlyphName }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflAccidentalGlyphName where show (SmuflAccidentalGlyphName a) = show a
+instance Read SmuflAccidentalGlyphName where readsPrec i = map (A.first SmuflAccidentalGlyphName) . readsPrec i
+instance EmitXml SmuflAccidentalGlyphName where
+    emitXml = emitXml . smuflAccidentalGlyphName
+parseSmuflAccidentalGlyphName :: String -> P.XParse SmuflAccidentalGlyphName
+parseSmuflAccidentalGlyphName = return . fromString
+
+-- | @smufl-coda-glyph-name@ /(simple)/
+--
+-- The smufl-coda-glyph-name type is used to reference a specific Standard Music Font Layout (SMuFL) coda character. The value is a SMuFL canonical glyph name that starts with coda.
+newtype SmuflCodaGlyphName = SmuflCodaGlyphName { smuflCodaGlyphName :: SmuflGlyphName }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflCodaGlyphName where show (SmuflCodaGlyphName a) = show a
+instance Read SmuflCodaGlyphName where readsPrec i = map (A.first SmuflCodaGlyphName) . readsPrec i
+instance EmitXml SmuflCodaGlyphName where
+    emitXml = emitXml . smuflCodaGlyphName
+parseSmuflCodaGlyphName :: String -> P.XParse SmuflCodaGlyphName
+parseSmuflCodaGlyphName = return . fromString
+
+-- | @smufl-glyph-name@ /(simple)/
+--
+-- The smufl-glyph-name type is used for attributes that reference a specific Standard Music Font Layout (SMuFL) character. The value is a SMuFL canonical glyph name, not a code point. For instance, the value for a standard piano pedal mark would be keyboardPedalPed, not U+E650.
+newtype SmuflGlyphName = SmuflGlyphName { smuflGlyphName :: NMTOKEN }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflGlyphName where show (SmuflGlyphName a) = show a
+instance Read SmuflGlyphName where readsPrec i = map (A.first SmuflGlyphName) . readsPrec i
+instance EmitXml SmuflGlyphName where
+    emitXml = emitXml . smuflGlyphName
+parseSmuflGlyphName :: String -> P.XParse SmuflGlyphName
+parseSmuflGlyphName = return . fromString
+
+-- | @smufl-lyrics-glyph-name@ /(simple)/
+--
+-- The smufl-lyrics-glyph-name type is used to reference a specific Standard Music Font Layout (SMuFL) lyrics elision character. The value is a SMuFL canonical glyph name that starts with lyrics.
+newtype SmuflLyricsGlyphName = SmuflLyricsGlyphName { smuflLyricsGlyphName :: SmuflGlyphName }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflLyricsGlyphName where show (SmuflLyricsGlyphName a) = show a
+instance Read SmuflLyricsGlyphName where readsPrec i = map (A.first SmuflLyricsGlyphName) . readsPrec i
+instance EmitXml SmuflLyricsGlyphName where
+    emitXml = emitXml . smuflLyricsGlyphName
+parseSmuflLyricsGlyphName :: String -> P.XParse SmuflLyricsGlyphName
+parseSmuflLyricsGlyphName = return . fromString
+
+-- | @smufl-pictogram-glyph-name@ /(simple)/
+--
+-- The smufl-pictogram-glyph-name type is used to reference a specific Standard Music Font Layout (SMuFL) percussion pictogram character. The value is a SMuFL canonical glyph name that starts with pict.
+newtype SmuflPictogramGlyphName = SmuflPictogramGlyphName { smuflPictogramGlyphName :: SmuflGlyphName }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflPictogramGlyphName where show (SmuflPictogramGlyphName a) = show a
+instance Read SmuflPictogramGlyphName where readsPrec i = map (A.first SmuflPictogramGlyphName) . readsPrec i
+instance EmitXml SmuflPictogramGlyphName where
+    emitXml = emitXml . smuflPictogramGlyphName
+parseSmuflPictogramGlyphName :: String -> P.XParse SmuflPictogramGlyphName
+parseSmuflPictogramGlyphName = return . fromString
+
+-- | @smufl-segno-glyph-name@ /(simple)/
+--
+-- The smufl-segno-glyph-name type is used to reference a specific Standard Music Font Layout (SMuFL) segno character. The value is a SMuFL canonical glyph name that starts with segno.
+newtype SmuflSegnoGlyphName = SmuflSegnoGlyphName { smuflSegnoGlyphName :: SmuflGlyphName }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show SmuflSegnoGlyphName where show (SmuflSegnoGlyphName a) = show a
+instance Read SmuflSegnoGlyphName where readsPrec i = map (A.first SmuflSegnoGlyphName) . readsPrec i
+instance EmitXml SmuflSegnoGlyphName where
+    emitXml = emitXml . smuflSegnoGlyphName
+parseSmuflSegnoGlyphName :: String -> P.XParse SmuflSegnoGlyphName
+parseSmuflSegnoGlyphName = return . fromString
+
+-- | @xml:space@ /(simple)/
+data Space = 
+      SpaceDefault -- ^ /default/
+    | SpacePreserve -- ^ /preserve/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Space where
+    emitXml SpaceDefault = XLit "default"
+    emitXml SpacePreserve = XLit "preserve"
+parseSpace :: String -> P.XParse Space
+parseSpace s
+        | s == "default" = return $ SpaceDefault
+        | s == "preserve" = return $ SpacePreserve
+        | otherwise = P.xfail $ "Space: " ++ s
+
+-- | @staff-divide-symbol@ /(simple)/
+--
+-- The staff-divide-symbol type is used for staff division symbols. The down, up, and up-down values correspond to SMuFL code points U+E00B, U+E00C, and U+E00D respectively.
+data StaffDivideSymbol = 
+      StaffDivideSymbolDown -- ^ /down/
+    | StaffDivideSymbolUp -- ^ /up/
+    | StaffDivideSymbolUpDown -- ^ /up-down/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml StaffDivideSymbol where
+    emitXml StaffDivideSymbolDown = XLit "down"
+    emitXml StaffDivideSymbolUp = XLit "up"
+    emitXml StaffDivideSymbolUpDown = XLit "up-down"
+parseStaffDivideSymbol :: String -> P.XParse StaffDivideSymbol
+parseStaffDivideSymbol s
+        | s == "down" = return $ StaffDivideSymbolDown
+        | s == "up" = return $ StaffDivideSymbolUp
+        | s == "up-down" = return $ StaffDivideSymbolUpDown
+        | otherwise = P.xfail $ "StaffDivideSymbol: " ++ s
 
 -- | @staff-line@ /(simple)/
 --
@@ -1462,7 +2604,9 @@ parseStartNote s
 
 -- | @start-stop@ /(simple)/
 --
--- The start-stop type is used for an attribute of musical elements that can either start or stop, such as tuplets, wedges, and lines.
+-- The start-stop type is used for an attribute of musical elements that can either start or stop, such as tuplets.
+-- 
+-- The values of start and stop refer to how an element appears in musical score order, not in MusicXML document order. An element with a stop attribute may precede the corresponding element with a start attribute within a MusicXML document. This is particularly common in multi-staff music. For example, the stopping point for a tuplet may appear in staff 1 before the starting point for the tuplet appears in staff 2 later in the document.
 data StartStop = 
       StartStopStart -- ^ /start/
     | StartStopStop -- ^ /stop/
@@ -1476,28 +2620,11 @@ parseStartStop s
         | s == "stop" = return $ StartStopStop
         | otherwise = P.xfail $ "StartStop: " ++ s
 
--- | @start-stop-change@ /(simple)/
---
--- The start-stop-change type is used to distinguish types of pedal directions.
-data StartStopChange = 
-      StartStopChangeStart -- ^ /start/
-    | StartStopChangeStop -- ^ /stop/
-    | StartStopChangeChange -- ^ /change/
-    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
-instance EmitXml StartStopChange where
-    emitXml StartStopChangeStart = XLit "start"
-    emitXml StartStopChangeStop = XLit "stop"
-    emitXml StartStopChangeChange = XLit "change"
-parseStartStopChange :: String -> P.XParse StartStopChange
-parseStartStopChange s
-        | s == "start" = return $ StartStopChangeStart
-        | s == "stop" = return $ StartStopChangeStop
-        | s == "change" = return $ StartStopChangeChange
-        | otherwise = P.xfail $ "StartStopChange: " ++ s
-
 -- | @start-stop-continue@ /(simple)/
 --
--- The start-stop-continue type is used for an attribute of musical elements that can either start or stop, but also need to refer to an intermediate point in the symbol, as for complex slurs.
+-- The start-stop-continue type is used for an attribute of musical elements that can either start or stop, but also need to refer to an intermediate point in the symbol, as for complex slurs or for formatting of symbols across system breaks.
+-- 
+-- The values of start, stop, and continue refer to how an element appears in musical score order, not in MusicXML document order. An element with a stop attribute may precede the corresponding element with a start attribute within a MusicXML document. This is particularly common in multi-staff music. For example, the stopping point for a slur may appear in staff 1 before the starting point for the slur appears in staff 2 later in the document.
 data StartStopContinue = 
       StartStopContinueStart -- ^ /start/
     | StartStopContinueStop -- ^ /stop/
@@ -1535,7 +2662,7 @@ parseStartStopDiscontinue s
 
 -- | @start-stop-single@ /(simple)/
 --
--- The start-stop-single type is used for an attribute of musical elements that can be used for either multi-note or single-note musical elements, as for tremolos.
+-- The start-stop-single type is used for an attribute of musical elements that can be used for either multi-note or single-note musical elements, as for groupings.
 data StartStopSingle = 
       StartStopSingleStart -- ^ /start/
     | StartStopSingleStop -- ^ /stop/
@@ -1605,9 +2732,97 @@ parseStep s
         | s == "G" = return $ StepG
         | otherwise = P.xfail $ "Step: " ++ s
 
+-- | @stick-location@ /(simple)/
+--
+-- The stick-location type represents pictograms for the location of sticks, beaters, or mallets on cymbals, gongs, drums, and other instruments.
+data StickLocation = 
+      StickLocationCenter -- ^ /center/
+    | StickLocationRim -- ^ /rim/
+    | StickLocationCymbalBell -- ^ /cymbal bell/
+    | StickLocationCymbalEdge -- ^ /cymbal edge/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml StickLocation where
+    emitXml StickLocationCenter = XLit "center"
+    emitXml StickLocationRim = XLit "rim"
+    emitXml StickLocationCymbalBell = XLit "cymbal bell"
+    emitXml StickLocationCymbalEdge = XLit "cymbal edge"
+parseStickLocation :: String -> P.XParse StickLocation
+parseStickLocation s
+        | s == "center" = return $ StickLocationCenter
+        | s == "rim" = return $ StickLocationRim
+        | s == "cymbal bell" = return $ StickLocationCymbalBell
+        | s == "cymbal edge" = return $ StickLocationCymbalEdge
+        | otherwise = P.xfail $ "StickLocation: " ++ s
+
+-- | @stick-material@ /(simple)/
+--
+-- The stick-material type represents the material being displayed in a stick pictogram.
+data StickMaterial = 
+      StickMaterialSoft -- ^ /soft/
+    | StickMaterialMedium -- ^ /medium/
+    | StickMaterialHard -- ^ /hard/
+    | StickMaterialShaded -- ^ /shaded/
+    | StickMaterialX -- ^ /x/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml StickMaterial where
+    emitXml StickMaterialSoft = XLit "soft"
+    emitXml StickMaterialMedium = XLit "medium"
+    emitXml StickMaterialHard = XLit "hard"
+    emitXml StickMaterialShaded = XLit "shaded"
+    emitXml StickMaterialX = XLit "x"
+parseStickMaterial :: String -> P.XParse StickMaterial
+parseStickMaterial s
+        | s == "soft" = return $ StickMaterialSoft
+        | s == "medium" = return $ StickMaterialMedium
+        | s == "hard" = return $ StickMaterialHard
+        | s == "shaded" = return $ StickMaterialShaded
+        | s == "x" = return $ StickMaterialX
+        | otherwise = P.xfail $ "StickMaterial: " ++ s
+
+-- | @stick-type@ /(simple)/
+--
+-- The stick-type type represents the shape of pictograms where the material
+-- 	in the stick, mallet, or beater is represented in the pictogram.
+data StickType = 
+      StickTypeBassDrum -- ^ /bass drum/
+    | StickTypeDoubleBassDrum -- ^ /double bass drum/
+    | StickTypeGlockenspiel -- ^ /glockenspiel/
+    | StickTypeGum -- ^ /gum/
+    | StickTypeHammer -- ^ /hammer/
+    | StickTypeSuperball -- ^ /superball/
+    | StickTypeTimpani -- ^ /timpani/
+    | StickTypeWound -- ^ /wound/
+    | StickTypeXylophone -- ^ /xylophone/
+    | StickTypeYarn -- ^ /yarn/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml StickType where
+    emitXml StickTypeBassDrum = XLit "bass drum"
+    emitXml StickTypeDoubleBassDrum = XLit "double bass drum"
+    emitXml StickTypeGlockenspiel = XLit "glockenspiel"
+    emitXml StickTypeGum = XLit "gum"
+    emitXml StickTypeHammer = XLit "hammer"
+    emitXml StickTypeSuperball = XLit "superball"
+    emitXml StickTypeTimpani = XLit "timpani"
+    emitXml StickTypeWound = XLit "wound"
+    emitXml StickTypeXylophone = XLit "xylophone"
+    emitXml StickTypeYarn = XLit "yarn"
+parseStickType :: String -> P.XParse StickType
+parseStickType s
+        | s == "bass drum" = return $ StickTypeBassDrum
+        | s == "double bass drum" = return $ StickTypeDoubleBassDrum
+        | s == "glockenspiel" = return $ StickTypeGlockenspiel
+        | s == "gum" = return $ StickTypeGum
+        | s == "hammer" = return $ StickTypeHammer
+        | s == "superball" = return $ StickTypeSuperball
+        | s == "timpani" = return $ StickTypeTimpani
+        | s == "wound" = return $ StickTypeWound
+        | s == "xylophone" = return $ StickTypeXylophone
+        | s == "yarn" = return $ StickTypeYarn
+        | otherwise = P.xfail $ "StickType: " ++ s
+
 -- | @string-number@ /(simple)/
 --
--- The string-number type indicates a string number. Strings are numbered from high to low, with 1 being the highest pitched string.
+-- The string-number type indicates a string number. Strings are numbered from high to low, with 1 being the highest pitched full-length string.
 newtype StringNumber = StringNumber { stringNumber :: PositiveInteger }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show StringNumber where show (StringNumber a) = show a
@@ -1641,22 +2856,41 @@ parseSyllabic s
 
 -- | @symbol-size@ /(simple)/
 --
--- The symbol-size type is used to indicate full vs. cue-sized vs. oversized symbols. The large value for oversized symbols was added in version 1.1.
+-- The symbol-size type is used to distinguish between full, cue sized, grace cue sized, and oversized symbols.
 data SymbolSize = 
       SymbolSizeFull -- ^ /full/
     | SymbolSizeCue -- ^ /cue/
+    | SymbolSizeGraceCue -- ^ /grace-cue/
     | SymbolSizeLarge -- ^ /large/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml SymbolSize where
     emitXml SymbolSizeFull = XLit "full"
     emitXml SymbolSizeCue = XLit "cue"
+    emitXml SymbolSizeGraceCue = XLit "grace-cue"
     emitXml SymbolSizeLarge = XLit "large"
 parseSymbolSize :: String -> P.XParse SymbolSize
 parseSymbolSize s
         | s == "full" = return $ SymbolSizeFull
         | s == "cue" = return $ SymbolSizeCue
+        | s == "grace-cue" = return $ SymbolSizeGraceCue
         | s == "large" = return $ SymbolSizeLarge
         | otherwise = P.xfail $ "SymbolSize: " ++ s
+
+-- | @tap-hand@ /(simple)/
+--
+-- The tap-hand type represents the symbol to use for a tap element. The left and right values refer to the SMuFL guitarLeftHandTapping and guitarRightHandTapping glyphs respectively.
+data TapHand = 
+      TapHandLeft -- ^ /left/
+    | TapHandRight -- ^ /right/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TapHand where
+    emitXml TapHandLeft = XLit "left"
+    emitXml TapHandRight = XLit "right"
+parseTapHand :: String -> P.XParse TapHand
+parseTapHand s
+        | s == "left" = return $ TapHandLeft
+        | s == "right" = return $ TapHandRight
+        | otherwise = P.xfail $ "TapHand: " ++ s
 
 -- | @tenths@ /(simple)/
 --
@@ -1694,27 +2928,156 @@ parseTextDirection s
         | s == "rlo" = return $ TextDirectionRlo
         | otherwise = P.xfail $ "TextDirection: " ++ s
 
+-- | @tied-type@ /(simple)/
+--
+-- The tied-type type is used as an attribute of the tied element to specify where the visual representation of a tie begins and ends. A tied element which joins two notes of the same pitch can be specified with tied-type start on the first note and tied-type stop on the second note. To indicate a note should be undamped, use a single tied element with tied-type let-ring. For other ties that are visually attached to a single note, such as a tie leading into or out of a repeated section or coda, use two tied elements on the same note, one start and one stop.
+-- 
+-- In start-stop cases, ties can add more elements using a continue type. This is typically used to specify the formatting of cross-system ties.
+data TiedType = 
+      TiedTypeStart -- ^ /start/
+    | TiedTypeStop -- ^ /stop/
+    | TiedTypeContinue -- ^ /continue/
+    | TiedTypeLetRing -- ^ /let-ring/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TiedType where
+    emitXml TiedTypeStart = XLit "start"
+    emitXml TiedTypeStop = XLit "stop"
+    emitXml TiedTypeContinue = XLit "continue"
+    emitXml TiedTypeLetRing = XLit "let-ring"
+parseTiedType :: String -> P.XParse TiedType
+parseTiedType s
+        | s == "start" = return $ TiedTypeStart
+        | s == "stop" = return $ TiedTypeStop
+        | s == "continue" = return $ TiedTypeContinue
+        | s == "let-ring" = return $ TiedTypeLetRing
+        | otherwise = P.xfail $ "TiedType: " ++ s
+
+-- | @time-only@ /(simple)/
+--
+-- The time-only type is used to indicate that a particular playback-related element only applies particular times through a repeated section. The value is a comma-separated list of positive integers arranged in ascending order, indicating which times through the repeated section that the element applies.
+newtype TimeOnly = TimeOnly { timeOnly :: Token }
+    deriving (Eq,Typeable,Generic,Ord,IsString)
+instance Show TimeOnly where show (TimeOnly a) = show a
+instance Read TimeOnly where readsPrec i = map (A.first TimeOnly) . readsPrec i
+instance EmitXml TimeOnly where
+    emitXml = emitXml . timeOnly
+parseTimeOnly :: String -> P.XParse TimeOnly
+parseTimeOnly = return . fromString
+
+-- | @time-relation@ /(simple)/
+--
+-- The time-relation type indicates the symbol used to represent the interchangeable aspect of dual time signatures.
+data TimeRelation = 
+      TimeRelationParentheses -- ^ /parentheses/
+    | TimeRelationBracket -- ^ /bracket/
+    | TimeRelationEquals -- ^ /equals/
+    | TimeRelationSlash -- ^ /slash/
+    | TimeRelationSpace -- ^ /space/
+    | TimeRelationHyphen -- ^ /hyphen/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TimeRelation where
+    emitXml TimeRelationParentheses = XLit "parentheses"
+    emitXml TimeRelationBracket = XLit "bracket"
+    emitXml TimeRelationEquals = XLit "equals"
+    emitXml TimeRelationSlash = XLit "slash"
+    emitXml TimeRelationSpace = XLit "space"
+    emitXml TimeRelationHyphen = XLit "hyphen"
+parseTimeRelation :: String -> P.XParse TimeRelation
+parseTimeRelation s
+        | s == "parentheses" = return $ TimeRelationParentheses
+        | s == "bracket" = return $ TimeRelationBracket
+        | s == "equals" = return $ TimeRelationEquals
+        | s == "slash" = return $ TimeRelationSlash
+        | s == "space" = return $ TimeRelationSpace
+        | s == "hyphen" = return $ TimeRelationHyphen
+        | otherwise = P.xfail $ "TimeRelation: " ++ s
+
+-- | @time-separator@ /(simple)/
+--
+-- The time-separator type indicates how to display the arrangement between the beats and beat-type values in a time signature. The default value is none. The horizontal, diagonal, and vertical values represent horizontal, diagonal lower-left to upper-right, and vertical lines respectively. For these values, the beats and beat-type values are arranged on either side of the separator line. The none value represents no separator with the beats and beat-type arranged vertically. The adjacent value represents no separator with the beats and beat-type arranged horizontally.
+data TimeSeparator = 
+      TimeSeparatorNone -- ^ /none/
+    | TimeSeparatorHorizontal -- ^ /horizontal/
+    | TimeSeparatorDiagonal -- ^ /diagonal/
+    | TimeSeparatorVertical -- ^ /vertical/
+    | TimeSeparatorAdjacent -- ^ /adjacent/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TimeSeparator where
+    emitXml TimeSeparatorNone = XLit "none"
+    emitXml TimeSeparatorHorizontal = XLit "horizontal"
+    emitXml TimeSeparatorDiagonal = XLit "diagonal"
+    emitXml TimeSeparatorVertical = XLit "vertical"
+    emitXml TimeSeparatorAdjacent = XLit "adjacent"
+parseTimeSeparator :: String -> P.XParse TimeSeparator
+parseTimeSeparator s
+        | s == "none" = return $ TimeSeparatorNone
+        | s == "horizontal" = return $ TimeSeparatorHorizontal
+        | s == "diagonal" = return $ TimeSeparatorDiagonal
+        | s == "vertical" = return $ TimeSeparatorVertical
+        | s == "adjacent" = return $ TimeSeparatorAdjacent
+        | otherwise = P.xfail $ "TimeSeparator: " ++ s
+
 -- | @time-symbol@ /(simple)/
 --
--- The time-symbol type indicates how to display a time signature. The normal value is the usual fractional display, and is the implied symbol type if none is specified. Other options are the common and cut time symbols, as well as a single number with an implied denominator.
+-- The time-symbol type indicates how to display a time signature. The normal value is the usual fractional display, and is the implied symbol type if none is specified. Other options are the common and cut time symbols, as well as a single number with an implied denominator. The note symbol indicates that the beat-type should be represented with the corresponding downstem note rather than a number. The dotted-note symbol indicates that the beat-type should be represented with a dotted downstem note that corresponds to three times the beat-type value, and a numerator that is one third the beats value.
 data TimeSymbol = 
       TimeSymbolCommon -- ^ /common/
     | TimeSymbolCut -- ^ /cut/
     | TimeSymbolSingleNumber -- ^ /single-number/
+    | TimeSymbolNote -- ^ /note/
+    | TimeSymbolDottedNote -- ^ /dotted-note/
     | TimeSymbolNormal -- ^ /normal/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml TimeSymbol where
     emitXml TimeSymbolCommon = XLit "common"
     emitXml TimeSymbolCut = XLit "cut"
     emitXml TimeSymbolSingleNumber = XLit "single-number"
+    emitXml TimeSymbolNote = XLit "note"
+    emitXml TimeSymbolDottedNote = XLit "dotted-note"
     emitXml TimeSymbolNormal = XLit "normal"
 parseTimeSymbol :: String -> P.XParse TimeSymbol
 parseTimeSymbol s
         | s == "common" = return $ TimeSymbolCommon
         | s == "cut" = return $ TimeSymbolCut
         | s == "single-number" = return $ TimeSymbolSingleNumber
+        | s == "note" = return $ TimeSymbolNote
+        | s == "dotted-note" = return $ TimeSymbolDottedNote
         | s == "normal" = return $ TimeSymbolNormal
         | otherwise = P.xfail $ "TimeSymbol: " ++ s
+
+-- | @tip-direction@ /(simple)/
+--
+-- The tip-direction type represents the direction in which the tip of a stick or beater points, using Unicode arrow terminology.
+data TipDirection = 
+      TipDirectionUp -- ^ /up/
+    | TipDirectionDown -- ^ /down/
+    | TipDirectionLeft -- ^ /left/
+    | TipDirectionRight -- ^ /right/
+    | TipDirectionNorthwest -- ^ /northwest/
+    | TipDirectionNortheast -- ^ /northeast/
+    | TipDirectionSoutheast -- ^ /southeast/
+    | TipDirectionSouthwest -- ^ /southwest/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TipDirection where
+    emitXml TipDirectionUp = XLit "up"
+    emitXml TipDirectionDown = XLit "down"
+    emitXml TipDirectionLeft = XLit "left"
+    emitXml TipDirectionRight = XLit "right"
+    emitXml TipDirectionNorthwest = XLit "northwest"
+    emitXml TipDirectionNortheast = XLit "northeast"
+    emitXml TipDirectionSoutheast = XLit "southeast"
+    emitXml TipDirectionSouthwest = XLit "southwest"
+parseTipDirection :: String -> P.XParse TipDirection
+parseTipDirection s
+        | s == "up" = return $ TipDirectionUp
+        | s == "down" = return $ TipDirectionDown
+        | s == "left" = return $ TipDirectionLeft
+        | s == "right" = return $ TipDirectionRight
+        | s == "northwest" = return $ TipDirectionNorthwest
+        | s == "northeast" = return $ TipDirectionNortheast
+        | s == "southeast" = return $ TipDirectionSoutheast
+        | s == "southwest" = return $ TipDirectionSouthwest
+        | otherwise = P.xfail $ "TipDirection: " ++ s
 
 -- | @xs:token@ /(simple)/
 newtype Token = Token { token :: NormalizedString }
@@ -1744,7 +3107,7 @@ parseTopBottom s
 
 -- | @tremolo-marks@ /(simple)/
 --
--- The number of tremolo marks is represented by a number from 0 to 6: the same as beam-level with 0 added.
+-- The number of tremolo marks is represented by a number from 0 to 8: the same as beam-level with 0 added.
 newtype TremoloMarks = TremoloMarks { tremoloMarks :: Int }
     deriving (Eq,Typeable,Generic,Ord,Bounded,Enum,Num,Real,Integral)
 instance Show TremoloMarks where show (TremoloMarks a) = show a
@@ -1753,6 +3116,28 @@ instance EmitXml TremoloMarks where
     emitXml = emitXml . tremoloMarks
 parseTremoloMarks :: String -> P.XParse TremoloMarks
 parseTremoloMarks = P.xread "TremoloMarks"
+
+-- | @tremolo-type@ /(simple)/
+--
+-- The tremolo-type is used to distinguish multi-note, single-note, and unmeasured tremolos.
+data TremoloType = 
+      TremoloTypeStart -- ^ /start/
+    | TremoloTypeStop -- ^ /stop/
+    | TremoloTypeSingle -- ^ /single/
+    | TremoloTypeUnmeasured -- ^ /unmeasured/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml TremoloType where
+    emitXml TremoloTypeStart = XLit "start"
+    emitXml TremoloTypeStop = XLit "stop"
+    emitXml TremoloTypeSingle = XLit "single"
+    emitXml TremoloTypeUnmeasured = XLit "unmeasured"
+parseTremoloType :: String -> P.XParse TremoloType
+parseTremoloType s
+        | s == "start" = return $ TremoloTypeStart
+        | s == "stop" = return $ TremoloTypeStop
+        | s == "single" = return $ TremoloTypeSingle
+        | s == "unmeasured" = return $ TremoloTypeUnmeasured
+        | otherwise = P.xfail $ "TremoloType: " ++ s
 
 -- | @trill-beats@ /(simple)/
 --
@@ -1817,7 +3202,7 @@ parseType s
 
 -- | @up-down@ /(simple)/
 --
--- The up-down type is used for arrow direction, indicating which way the tip is pointing.
+-- The up-down type is used for the direction of arrows and other pointed symbols like vertical accents, indicating which way the tip is pointing.
 data UpDown = 
       UpDownUp -- ^ /up/
     | UpDownDown -- ^ /down/
@@ -1831,24 +3216,27 @@ parseUpDown s
         | s == "down" = return $ UpDownDown
         | otherwise = P.xfail $ "UpDown: " ++ s
 
--- | @up-down-stop@ /(simple)/
+-- | @up-down-stop-continue@ /(simple)/
 --
--- The up-down-stop type is used for octave-shift elements, indicating the direction of the shift from their true pitched values because of printing difficulty.
-data UpDownStop = 
-      UpDownStopUp -- ^ /up/
-    | UpDownStopDown -- ^ /down/
-    | UpDownStopStop -- ^ /stop/
+-- The up-down-stop-continue type is used for octave-shift elements, indicating the direction of the shift from their true pitched values because of printing difficulty.
+data UpDownStopContinue = 
+      UpDownStopContinueUp -- ^ /up/
+    | UpDownStopContinueDown -- ^ /down/
+    | UpDownStopContinueStop -- ^ /stop/
+    | UpDownStopContinueContinue -- ^ /continue/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
-instance EmitXml UpDownStop where
-    emitXml UpDownStopUp = XLit "up"
-    emitXml UpDownStopDown = XLit "down"
-    emitXml UpDownStopStop = XLit "stop"
-parseUpDownStop :: String -> P.XParse UpDownStop
-parseUpDownStop s
-        | s == "up" = return $ UpDownStopUp
-        | s == "down" = return $ UpDownStopDown
-        | s == "stop" = return $ UpDownStopStop
-        | otherwise = P.xfail $ "UpDownStop: " ++ s
+instance EmitXml UpDownStopContinue where
+    emitXml UpDownStopContinueUp = XLit "up"
+    emitXml UpDownStopContinueDown = XLit "down"
+    emitXml UpDownStopContinueStop = XLit "stop"
+    emitXml UpDownStopContinueContinue = XLit "continue"
+parseUpDownStopContinue :: String -> P.XParse UpDownStopContinue
+parseUpDownStopContinue s
+        | s == "up" = return $ UpDownStopContinueUp
+        | s == "down" = return $ UpDownStopContinueDown
+        | s == "stop" = return $ UpDownStopContinueStop
+        | s == "continue" = return $ UpDownStopContinueContinue
+        | otherwise = P.xfail $ "UpDownStopContinue: " ++ s
 
 -- | @upright-inverted@ /(simple)/
 --
@@ -1909,22 +3297,123 @@ parseValignImage s
 
 -- | @wedge-type@ /(simple)/
 --
--- The wedge type is crescendo for the start of a wedge that is closed at the left side, diminuendo for the start of a wedge that is closed on the right side, and stop for the end of a wedge.
+-- The wedge type is crescendo for the start of a wedge that is closed at the left side, diminuendo for the start of a wedge that is closed on the right side, and stop for the end of a wedge. The continue type is used for formatting wedges over a system break, or for other situations where a single wedge is divided into multiple segments.
 data WedgeType = 
       WedgeTypeCrescendo -- ^ /crescendo/
     | WedgeTypeDiminuendo -- ^ /diminuendo/
     | WedgeTypeStop -- ^ /stop/
+    | WedgeTypeContinue -- ^ /continue/
     deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
 instance EmitXml WedgeType where
     emitXml WedgeTypeCrescendo = XLit "crescendo"
     emitXml WedgeTypeDiminuendo = XLit "diminuendo"
     emitXml WedgeTypeStop = XLit "stop"
+    emitXml WedgeTypeContinue = XLit "continue"
 parseWedgeType :: String -> P.XParse WedgeType
 parseWedgeType s
         | s == "crescendo" = return $ WedgeTypeCrescendo
         | s == "diminuendo" = return $ WedgeTypeDiminuendo
         | s == "stop" = return $ WedgeTypeStop
+        | s == "continue" = return $ WedgeTypeContinue
         | otherwise = P.xfail $ "WedgeType: " ++ s
+
+-- | @winged@ /(simple)/
+--
+-- The winged attribute indicates whether the repeat has winged extensions that appear above and below the barline. The straight and curved values represent single wings, while the double-straight and double-curved values represent double wings. The none value indicates no wings and is the default.
+data Winged = 
+      WingedNone -- ^ /none/
+    | WingedStraight -- ^ /straight/
+    | WingedCurved -- ^ /curved/
+    | WingedDoubleStraight -- ^ /double-straight/
+    | WingedDoubleCurved -- ^ /double-curved/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Winged where
+    emitXml WingedNone = XLit "none"
+    emitXml WingedStraight = XLit "straight"
+    emitXml WingedCurved = XLit "curved"
+    emitXml WingedDoubleStraight = XLit "double-straight"
+    emitXml WingedDoubleCurved = XLit "double-curved"
+parseWinged :: String -> P.XParse Winged
+parseWinged s
+        | s == "none" = return $ WingedNone
+        | s == "straight" = return $ WingedStraight
+        | s == "curved" = return $ WingedCurved
+        | s == "double-straight" = return $ WingedDoubleStraight
+        | s == "double-curved" = return $ WingedDoubleCurved
+        | otherwise = P.xfail $ "Winged: " ++ s
+
+-- | @wood@ /(simple)/
+--
+-- The wood type represents pictograms for wood percussion instruments. The maraca and maracas values distinguish the one- and two-maraca versions of the pictogram.
+data Wood = 
+      WoodBambooScraper -- ^ /bamboo scraper/
+    | WoodBoardClapper -- ^ /board clapper/
+    | WoodCabasa -- ^ /cabasa/
+    | WoodCastanets -- ^ /castanets/
+    | WoodCastanetsWithHandle -- ^ /castanets with handle/
+    | WoodClaves -- ^ /claves/
+    | WoodFootballRattle -- ^ /football rattle/
+    | WoodGuiro -- ^ /guiro/
+    | WoodLogDrum -- ^ /log drum/
+    | WoodMaraca -- ^ /maraca/
+    | WoodMaracas -- ^ /maracas/
+    | WoodQuijada -- ^ /quijada/
+    | WoodRainstick -- ^ /rainstick/
+    | WoodRatchet -- ^ /ratchet/
+    | WoodRecoReco -- ^ /reco-reco/
+    | WoodSandpaperBlocks -- ^ /sandpaper blocks/
+    | WoodSlitDrum -- ^ /slit drum/
+    | WoodTempleBlock -- ^ /temple block/
+    | WoodVibraslap -- ^ /vibraslap/
+    | WoodWhip -- ^ /whip/
+    | WoodWoodBlock -- ^ /wood block/
+    deriving (Eq,Typeable,Generic,Show,Ord,Enum,Bounded)
+instance EmitXml Wood where
+    emitXml WoodBambooScraper = XLit "bamboo scraper"
+    emitXml WoodBoardClapper = XLit "board clapper"
+    emitXml WoodCabasa = XLit "cabasa"
+    emitXml WoodCastanets = XLit "castanets"
+    emitXml WoodCastanetsWithHandle = XLit "castanets with handle"
+    emitXml WoodClaves = XLit "claves"
+    emitXml WoodFootballRattle = XLit "football rattle"
+    emitXml WoodGuiro = XLit "guiro"
+    emitXml WoodLogDrum = XLit "log drum"
+    emitXml WoodMaraca = XLit "maraca"
+    emitXml WoodMaracas = XLit "maracas"
+    emitXml WoodQuijada = XLit "quijada"
+    emitXml WoodRainstick = XLit "rainstick"
+    emitXml WoodRatchet = XLit "ratchet"
+    emitXml WoodRecoReco = XLit "reco-reco"
+    emitXml WoodSandpaperBlocks = XLit "sandpaper blocks"
+    emitXml WoodSlitDrum = XLit "slit drum"
+    emitXml WoodTempleBlock = XLit "temple block"
+    emitXml WoodVibraslap = XLit "vibraslap"
+    emitXml WoodWhip = XLit "whip"
+    emitXml WoodWoodBlock = XLit "wood block"
+parseWood :: String -> P.XParse Wood
+parseWood s
+        | s == "bamboo scraper" = return $ WoodBambooScraper
+        | s == "board clapper" = return $ WoodBoardClapper
+        | s == "cabasa" = return $ WoodCabasa
+        | s == "castanets" = return $ WoodCastanets
+        | s == "castanets with handle" = return $ WoodCastanetsWithHandle
+        | s == "claves" = return $ WoodClaves
+        | s == "football rattle" = return $ WoodFootballRattle
+        | s == "guiro" = return $ WoodGuiro
+        | s == "log drum" = return $ WoodLogDrum
+        | s == "maraca" = return $ WoodMaraca
+        | s == "maracas" = return $ WoodMaracas
+        | s == "quijada" = return $ WoodQuijada
+        | s == "rainstick" = return $ WoodRainstick
+        | s == "ratchet" = return $ WoodRatchet
+        | s == "reco-reco" = return $ WoodRecoReco
+        | s == "sandpaper blocks" = return $ WoodSandpaperBlocks
+        | s == "slit drum" = return $ WoodSlitDrum
+        | s == "temple block" = return $ WoodTempleBlock
+        | s == "vibraslap" = return $ WoodVibraslap
+        | s == "whip" = return $ WoodWhip
+        | s == "wood block" = return $ WoodWoodBlock
+        | otherwise = P.xfail $ "Wood: " ++ s
 
 -- | @yes-no@ /(simple)/
 --
@@ -2017,6 +3506,7 @@ data Accidental =
           accidentalAccidentalValue :: AccidentalValue -- ^ text content
         , accidentalCautionary :: (Maybe YesNo) -- ^ /cautionary/ attribute
         , accidentalEditorial :: (Maybe YesNo) -- ^ /editorial/ attribute
+        , accidentalSmufl :: (Maybe SmuflAccidentalGlyphName) -- ^ /smufl/ attribute
         , accidentalParentheses :: (Maybe YesNo) -- ^ /parentheses/ attribute
         , accidentalBracket :: (Maybe YesNo) -- ^ /bracket/ attribute
         , accidentalSize :: (Maybe SymbolSize) -- ^ /size/ attribute
@@ -2032,22 +3522,23 @@ data Accidental =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Accidental where
-    emitXml (Accidental a b c d e f g h i j k l m n o) =
+    emitXml (Accidental a b c d e f g h i j k l m n o p) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "cautionary" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "editorial" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o])
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
         []
 parseAccidental :: P.XParse Accidental
 parseAccidental = 
@@ -2055,6 +3546,7 @@ parseAccidental =
         <$> (P.xtext >>= parseAccidentalValue)
         <*> P.optional (P.xattr (P.name "cautionary") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "editorial") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflAccidentalGlyphName)
         <*> P.optional (P.xattr (P.name "parentheses") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "bracket") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "size") >>= parseSymbolSize)
@@ -2070,7 +3562,7 @@ parseAccidental =
 
 -- | Smart constructor for 'Accidental'
 mkAccidental :: AccidentalValue -> Accidental
-mkAccidental a = Accidental a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkAccidental a = Accidental a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @accidental-mark@ /(complex)/
 --
@@ -2078,6 +3570,10 @@ mkAccidental a = Accidental a Nothing Nothing Nothing Nothing Nothing Nothing No
 data AccidentalMark = 
       AccidentalMark {
           accidentalMarkAccidentalValue :: AccidentalValue -- ^ text content
+        , accidentalMarkSmufl :: (Maybe SmuflAccidentalGlyphName) -- ^ /smufl/ attribute
+        , accidentalMarkParentheses :: (Maybe YesNo) -- ^ /parentheses/ attribute
+        , accidentalMarkBracket :: (Maybe YesNo) -- ^ /bracket/ attribute
+        , accidentalMarkSize :: (Maybe SymbolSize) -- ^ /size/ attribute
         , accidentalMarkDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , accidentalMarkDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , accidentalMarkRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -2088,26 +3584,36 @@ data AccidentalMark =
         , accidentalMarkFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , accidentalMarkColor :: (Maybe Color) -- ^ /color/ attribute
         , accidentalMarkPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , accidentalMarkId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml AccidentalMark where
-    emitXml (AccidentalMark a b c d e f g h i j k) =
+    emitXml (AccidentalMark a b c d e f g h i j k l m n o p) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "bracket" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) p])
         []
 parseAccidentalMark :: P.XParse AccidentalMark
 parseAccidentalMark = 
       AccidentalMark
         <$> (P.xtext >>= parseAccidentalValue)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflAccidentalGlyphName)
+        <*> P.optional (P.xattr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "bracket") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "size") >>= parseSymbolSize)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -2118,10 +3624,11 @@ parseAccidentalMark =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'AccidentalMark'
 mkAccidentalMark :: AccidentalValue -> AccidentalMark
-mkAccidentalMark a = AccidentalMark a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkAccidentalMark a = AccidentalMark a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @accidental-text@ /(complex)/
 --
@@ -2129,11 +3636,10 @@ mkAccidentalMark a = AccidentalMark a Nothing Nothing Nothing Nothing Nothing No
 data AccidentalText = 
       AccidentalText {
           accidentalTextAccidentalValue :: AccidentalValue -- ^ text content
+        , accidentalTextSmufl :: (Maybe SmuflAccidentalGlyphName) -- ^ /smufl/ attribute
         , accidentalTextLang :: (Maybe Lang) -- ^ /xml:lang/ attribute
-        , accidentalTextEnclosure :: (Maybe Enclosure) -- ^ /enclosure/ attribute
+        , accidentalTextSpace :: (Maybe Space) -- ^ /xml:space/ attribute
         , accidentalTextJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
-        , accidentalTextHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
-        , accidentalTextValign :: (Maybe Valign) -- ^ /valign/ attribute
         , accidentalTextDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , accidentalTextDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , accidentalTextRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -2143,6 +3649,8 @@ data AccidentalText =
         , accidentalTextFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , accidentalTextFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , accidentalTextColor :: (Maybe Color) -- ^ /color/ attribute
+        , accidentalTextHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , accidentalTextValign :: (Maybe Valign) -- ^ /valign/ attribute
         , accidentalTextUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
         , accidentalTextOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
         , accidentalTextLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
@@ -2150,42 +3658,44 @@ data AccidentalText =
         , accidentalTextLetterSpacing :: (Maybe NumberOrNormal) -- ^ /letter-spacing/ attribute
         , accidentalTextLineHeight :: (Maybe NumberOrNormal) -- ^ /line-height/ attribute
         , accidentalTextDir :: (Maybe TextDirection) -- ^ /dir/ attribute
+        , accidentalTextEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml AccidentalText where
-    emitXml (AccidentalText a b c d e f g h i j k l m n o p q r s t u v) =
+    emitXml (AccidentalText a b c d e f g h i j k l m n o p q r s t u v w x) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
-        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
-        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
-        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
-        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
-        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "space" (Just "xml")).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) v] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) w] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) x])
         []
 parseAccidentalText :: P.XParse AccidentalText
 parseAccidentalText = 
       AccidentalText
         <$> (P.xtext >>= parseAccidentalValue)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflAccidentalGlyphName)
         <*> P.optional (P.xattr (P.name "xml:lang") >>= parseLang)
-        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosure)
+        <*> P.optional (P.xattr (P.name "xml:space") >>= parseSpace)
         <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
-        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
-        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -2195,6 +3705,8 @@ parseAccidentalText =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
         <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
         <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
@@ -2202,10 +3714,11 @@ parseAccidentalText =
         <*> P.optional (P.xattr (P.name "letter-spacing") >>= parseNumberOrNormal)
         <*> P.optional (P.xattr (P.name "line-height") >>= parseNumberOrNormal)
         <*> P.optional (P.xattr (P.name "dir") >>= parseTextDirection)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
 
 -- | Smart constructor for 'AccidentalText'
 mkAccidentalText :: AccidentalValue -> AccidentalText
-mkAccidentalText a = AccidentalText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkAccidentalText a = AccidentalText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @accord@ /(complex)/
 --
@@ -2245,13 +3758,16 @@ data AccordionRegistration =
         , accordionRegistrationFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , accordionRegistrationFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , accordionRegistrationColor :: (Maybe Color) -- ^ /color/ attribute
+        , accordionRegistrationHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , accordionRegistrationValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , accordionRegistrationId :: (Maybe ID) -- ^ /id/ attribute
         , accordionRegistrationAccordionHigh :: (Maybe Empty) -- ^ /accordion-high/ child element
         , accordionRegistrationAccordionMiddle :: (Maybe AccordionMiddle) -- ^ /accordion-middle/ child element
         , accordionRegistrationAccordionLow :: (Maybe Empty) -- ^ /accordion-low/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml AccordionRegistration where
-    emitXml (AccordionRegistration a b c d e f g h i j k l) =
+    emitXml (AccordionRegistration a b c d e f g h i j k l m n o) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
@@ -2261,10 +3777,13 @@ instance EmitXml AccordionRegistration where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
-        ([maybe XEmpty (XElement (QN "accordion-high" Nothing).emitXml) j] ++
-        [maybe XEmpty (XElement (QN "accordion-middle" Nothing).emitXml) k] ++
-        [maybe XEmpty (XElement (QN "accordion-low" Nothing).emitXml) l])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        ([maybe XEmpty (XElement (QN "accordion-high" Nothing).emitXml) m] ++
+        [maybe XEmpty (XElement (QN "accordion-middle" Nothing).emitXml) n] ++
+        [maybe XEmpty (XElement (QN "accordion-low" Nothing).emitXml) o])
 parseAccordionRegistration :: P.XParse AccordionRegistration
 parseAccordionRegistration = 
       AccordionRegistration
@@ -2277,41 +3796,50 @@ parseAccordionRegistration =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.optional (P.xchild (P.name "accordion-high") (parseEmpty))
         <*> P.optional (P.xchild (P.name "accordion-middle") (P.xtext >>= parseAccordionMiddle))
         <*> P.optional (P.xchild (P.name "accordion-low") (parseEmpty))
 
 -- | Smart constructor for 'AccordionRegistration'
 mkAccordionRegistration :: AccordionRegistration
-mkAccordionRegistration = AccordionRegistration Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkAccordionRegistration = AccordionRegistration Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @appearance@ /(complex)/
 --
--- The appearance type controls general graphical settings for the music's final form appearance on a printed page of display. Currently this includes support for line widths and definitions for note sizes, plus an extension element for other aspects of appearance.
+-- The appearance type controls general graphical settings for the music's final form appearance on a printed page of display. This includes support for line widths, definitions for note sizes, and standard distances between notation elements, plus an extension element for other aspects of appearance.
 data Appearance = 
       Appearance {
           appearanceLineWidth :: [LineWidth] -- ^ /line-width/ child element
         , appearanceNoteSize :: [NoteSize] -- ^ /note-size/ child element
+        , appearanceDistance :: [Distance] -- ^ /distance/ child element
+        , appearanceGlyph :: [Glyph] -- ^ /glyph/ child element
         , appearanceOtherAppearance :: [OtherAppearance] -- ^ /other-appearance/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Appearance where
-    emitXml (Appearance a b c) =
+    emitXml (Appearance a b c d e) =
       XContent XEmpty
         []
         (map (XElement (QN "line-width" Nothing).emitXml) a ++
         map (XElement (QN "note-size" Nothing).emitXml) b ++
-        map (XElement (QN "other-appearance" Nothing).emitXml) c)
+        map (XElement (QN "distance" Nothing).emitXml) c ++
+        map (XElement (QN "glyph" Nothing).emitXml) d ++
+        map (XElement (QN "other-appearance" Nothing).emitXml) e)
 parseAppearance :: P.XParse Appearance
 parseAppearance = 
       Appearance
         <$> P.many (P.xchild (P.name "line-width") (parseLineWidth))
         <*> P.many (P.xchild (P.name "note-size") (parseNoteSize))
+        <*> P.many (P.xchild (P.name "distance") (parseDistance))
+        <*> P.many (P.xchild (P.name "glyph") (parseGlyph))
         <*> P.many (P.xchild (P.name "other-appearance") (parseOtherAppearance))
 
 -- | Smart constructor for 'Appearance'
 mkAppearance :: Appearance
-mkAppearance = Appearance [] [] []
+mkAppearance = Appearance [] [] [] [] []
 
 -- | @arpeggiate@ /(complex)/
 --
@@ -2326,10 +3854,11 @@ data Arpeggiate =
         , arpeggiateRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , arpeggiatePlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , arpeggiateColor :: (Maybe Color) -- ^ /color/ attribute
+        , arpeggiateId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Arpeggiate where
-    emitXml (Arpeggiate a b c d e f g h) =
+    emitXml (Arpeggiate a b c d e f g h i) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "direction" Nothing).emitXml) b] ++
@@ -2338,7 +3867,8 @@ instance EmitXml Arpeggiate where
         [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
         [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) i])
         []
 parseArpeggiate :: P.XParse Arpeggiate
 parseArpeggiate = 
@@ -2351,34 +3881,93 @@ parseArpeggiate =
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Arpeggiate'
 mkArpeggiate :: Arpeggiate
-mkArpeggiate = Arpeggiate Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkArpeggiate = Arpeggiate Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @arrow@ /(complex)/
+--
+-- The arrow element represents an arrow used for a musical technical indication. It can represent both Unicode and SMuFL arrows. The presence of an arrowhead element indicates that only the arrowhead is displayed, not the arrow stem. The smufl attribute distinguishes different SMuFL glyphs that have an arrow appearance such as arrowBlackUp, guitarStrumUp, or handbellsSwingUp. The specified glyph should match the descriptive representation.
+data Arrow = 
+      Arrow {
+          arrowDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , arrowDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , arrowRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , arrowRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , arrowFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , arrowFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , arrowFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , arrowFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , arrowColor :: (Maybe Color) -- ^ /color/ attribute
+        , arrowPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , arrowSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
+        , arrowArrow :: ChxArrow
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Arrow where
+    emitXml (Arrow a b c d e f g h i j k l) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) k])
+        ([emitXml l])
+parseArrow :: P.XParse Arrow
+parseArrow = 
+      Arrow
+        <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
+        <*> parseChxArrow
+
+-- | Smart constructor for 'Arrow'
+mkArrow :: ChxArrow -> Arrow
+mkArrow l = Arrow Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing l
 
 -- | @articulations@ /(complex)/
 --
 -- Articulations and accents are grouped together here.
 data Articulations = 
       Articulations {
-          articulationsArticulations :: [ChxArticulations]
+          articulationsId :: (Maybe ID) -- ^ /id/ attribute
+        , articulationsArticulations :: [ChxArticulations]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Articulations where
-    emitXml (Articulations a) =
-      XReps [emitXml a]
+    emitXml (Articulations a b) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        ([emitXml b])
 parseArticulations :: P.XParse Articulations
 parseArticulations = 
       Articulations
-        <$> P.many (parseChxArticulations)
+        <$> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (parseChxArticulations)
 
 -- | Smart constructor for 'Articulations'
 mkArticulations :: Articulations
-mkArticulations = Articulations []
+mkArticulations = Articulations Nothing []
 
 -- | @attributes@ /(complex)/
 --
--- The attributes element contains musical information that typically changes on measure boundaries. This includes key and time signatures, clefs, transpositions, and staving.
+-- The attributes element contains musical information that typically changes on measure boundaries. This includes key and time signatures, clefs, transpositions, and staving. When attributes are changed mid-measure, it affects the music in score order, not in MusicXML document order.
 data Attributes = 
       Attributes {
           attributesEditorial :: Editorial
@@ -2390,7 +3979,7 @@ data Attributes =
         , attributesInstruments :: (Maybe NonNegativeInteger) -- ^ /instruments/ child element
         , attributesClef :: [Clef] -- ^ /clef/ child element
         , attributesStaffDetails :: [StaffDetails] -- ^ /staff-details/ child element
-        , attributesTranspose :: (Maybe Transpose) -- ^ /transpose/ child element
+        , attributesTranspose :: [Transpose] -- ^ /transpose/ child element
         , attributesDirective :: [Directive] -- ^ /directive/ child element
         , attributesMeasureStyle :: [MeasureStyle] -- ^ /measure-style/ child element
        }
@@ -2408,7 +3997,7 @@ instance EmitXml Attributes where
         [maybe XEmpty (XElement (QN "instruments" Nothing).emitXml) g] ++
         map (XElement (QN "clef" Nothing).emitXml) h ++
         map (XElement (QN "staff-details" Nothing).emitXml) i ++
-        [maybe XEmpty (XElement (QN "transpose" Nothing).emitXml) j] ++
+        map (XElement (QN "transpose" Nothing).emitXml) j ++
         map (XElement (QN "directive" Nothing).emitXml) k ++
         map (XElement (QN "measure-style" Nothing).emitXml) l)
 parseAttributes :: P.XParse Attributes
@@ -2423,17 +4012,17 @@ parseAttributes =
         <*> P.optional (P.xchild (P.name "instruments") (P.xtext >>= parseNonNegativeInteger))
         <*> P.many (P.xchild (P.name "clef") (parseClef))
         <*> P.many (P.xchild (P.name "staff-details") (parseStaffDetails))
-        <*> P.optional (P.xchild (P.name "transpose") (parseTranspose))
+        <*> P.many (P.xchild (P.name "transpose") (parseTranspose))
         <*> P.many (P.xchild (P.name "directive") (parseDirective))
         <*> P.many (P.xchild (P.name "measure-style") (parseMeasureStyle))
 
 -- | Smart constructor for 'Attributes'
 mkAttributes :: Editorial -> Attributes
-mkAttributes a = Attributes a Nothing [] [] Nothing Nothing Nothing [] [] Nothing [] []
+mkAttributes a = Attributes a Nothing [] [] Nothing Nothing Nothing [] [] [] [] []
 
 -- | @backup@ /(complex)/
 --
--- The backup and forward elements are required to coordinate multiple voices in one part, including music on multiple staves. The backup type is generally used to move between voices and staves. Thus the backup element does not include voice or staff elements. Duration values should always be positive, and should not cross measure boundaries.
+-- The backup and forward elements are required to coordinate multiple voices in one part, including music on multiple staves. The backup type is generally used to move between voices and staves. Thus the backup element does not include voice or staff elements. Duration values should always be positive, and should not cross measure boundaries or mid-measure changes in the divisions value.
 data Backup = 
       Backup {
           backupDuration :: Duration
@@ -2480,7 +4069,7 @@ mkBarStyleColor a = BarStyleColor a Nothing
 -- | @barline@ /(complex)/
 --
 -- If a barline is other than a normal single barline, it should be represented by a barline type that describes it. This includes information about repeats and multiple endings, as well as line style. Barline data is on the same level as the other musical data in a score - a child of a measure in a partwise score, or a part in a timewise score. This allows for barlines within measures, as in dotted barlines that subdivide measures in complex meters. The two fermata elements allow for fermatas on both sides of the barline (the lower one inverted).
--- 	
+-- 
 -- Barlines have a location attribute to make it easier to process barlines independently of the other musical data in a score. It is often easier to set up measures separately from entering notes. The location attribute must match where the barline element occurs within the rest of the musical data in the score. If location is left, it should be the first element in the measure, aside from the print, bookmark, and link elements. If location is right, it should be the last element, again with the possible exception of the print, bookmark, and link elements. If no location is specified, the right barline is the default. The segno, coda, and divisions attributes work the same way as in the sound element. They are used for playback when barline elements contain segno or coda child elements.
 data Barline = 
       Barline {
@@ -2488,31 +4077,33 @@ data Barline =
         , barlineSegno :: (Maybe Token) -- ^ /segno/ attribute
         , barlineCoda :: (Maybe Token) -- ^ /coda/ attribute
         , barlineDivisions :: (Maybe Divisions) -- ^ /divisions/ attribute
+        , barlineId :: (Maybe ID) -- ^ /id/ attribute
         , barlineBarStyle :: (Maybe BarStyleColor) -- ^ /bar-style/ child element
         , barlineEditorial :: Editorial
         , barlineWavyLine :: (Maybe WavyLine) -- ^ /wavy-line/ child element
-        , barlineSegno1 :: (Maybe EmptyPrintStyle) -- ^ /segno/ child element
-        , barlineCoda1 :: (Maybe EmptyPrintStyle) -- ^ /coda/ child element
+        , barlineSegno1 :: (Maybe Segno) -- ^ /segno/ child element
+        , barlineCoda1 :: (Maybe Coda) -- ^ /coda/ child element
         , barlineFermata :: [Fermata] -- ^ /fermata/ child element
         , barlineEnding :: (Maybe Ending) -- ^ /ending/ child element
         , barlineRepeat :: (Maybe Repeat) -- ^ /repeat/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Barline where
-    emitXml (Barline a b c d e f g h i j k l) =
+    emitXml (Barline a b c d e f g h i j k l m) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "segno" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "coda" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) d])
-        ([maybe XEmpty (XElement (QN "bar-style" Nothing).emitXml) e] ++
-        [emitXml f] ++
-        [maybe XEmpty (XElement (QN "wavy-line" Nothing).emitXml) g] ++
-        [maybe XEmpty (XElement (QN "segno" Nothing).emitXml) h] ++
-        [maybe XEmpty (XElement (QN "coda" Nothing).emitXml) i] ++
-        map (XElement (QN "fermata" Nothing).emitXml) j ++
-        [maybe XEmpty (XElement (QN "ending" Nothing).emitXml) k] ++
-        [maybe XEmpty (XElement (QN "repeat" Nothing).emitXml) l])
+        [maybe XEmpty (XAttr (QN "divisions" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) e])
+        ([maybe XEmpty (XElement (QN "bar-style" Nothing).emitXml) f] ++
+        [emitXml g] ++
+        [maybe XEmpty (XElement (QN "wavy-line" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "segno" Nothing).emitXml) i] ++
+        [maybe XEmpty (XElement (QN "coda" Nothing).emitXml) j] ++
+        map (XElement (QN "fermata" Nothing).emitXml) k ++
+        [maybe XEmpty (XElement (QN "ending" Nothing).emitXml) l] ++
+        [maybe XEmpty (XElement (QN "repeat" Nothing).emitXml) m])
 parseBarline :: P.XParse Barline
 parseBarline = 
       Barline
@@ -2520,18 +4111,19 @@ parseBarline =
         <*> P.optional (P.xattr (P.name "segno") >>= parseToken)
         <*> P.optional (P.xattr (P.name "coda") >>= parseToken)
         <*> P.optional (P.xattr (P.name "divisions") >>= parseDivisions)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.optional (P.xchild (P.name "bar-style") (parseBarStyleColor))
         <*> parseEditorial
         <*> P.optional (P.xchild (P.name "wavy-line") (parseWavyLine))
-        <*> P.optional (P.xchild (P.name "segno") (parseEmptyPrintStyle))
-        <*> P.optional (P.xchild (P.name "coda") (parseEmptyPrintStyle))
+        <*> P.optional (P.xchild (P.name "segno") (parseSegno))
+        <*> P.optional (P.xchild (P.name "coda") (parseCoda))
         <*> P.many (P.xchild (P.name "fermata") (parseFermata))
         <*> P.optional (P.xchild (P.name "ending") (parseEnding))
         <*> P.optional (P.xchild (P.name "repeat") (parseRepeat))
 
 -- | Smart constructor for 'Barline'
 mkBarline :: Editorial -> Barline
-mkBarline f = Barline Nothing Nothing Nothing Nothing Nothing f Nothing Nothing Nothing [] Nothing Nothing
+mkBarline g = Barline Nothing Nothing Nothing Nothing Nothing Nothing g Nothing Nothing Nothing [] Nothing Nothing
 
 -- | @barre@ /(complex)/
 --
@@ -2639,7 +4231,7 @@ mkBassAlter a = BassAlter a Nothing Nothing Nothing Nothing Nothing Nothing Noth
 
 -- | @bass-step@ /(complex)/
 --
--- The bass-step type represents the pitch step of the bass of the current chord within the harmony element. The text attribute indicates how the bass should appear on the page if not using the element contents.
+-- The bass-step type represents the pitch step of the bass of the current chord within the harmony element. The text attribute indicates how the bass should appear in a score if not using the element contents.
 data BassStep = 
       BassStep {
           bassStepStep :: Step -- ^ text content
@@ -2690,9 +4282,13 @@ mkBassStep a = BassStep a Nothing Nothing Nothing Nothing Nothing Nothing Nothin
 
 -- | @beam@ /(complex)/
 --
--- Beam values include begin, continue, end, forward hook, and backward hook. Up to six concurrent beam levels are available to cover up to 256th notes. The repeater attribute, used for tremolos, needs to be specified with a "yes" value for each beam using it. Beams that have a begin value can also have a fan attribute to indicate accelerandos and ritardandos using fanned beams. The fan attribute may also be used with a continue value if the fanning direction changes on that note. The value is "none" if not specified.
--- 	
+-- Beam values include begin, continue, end, forward hook, and backward hook. Up to eight concurrent beams are available to cover up to 1024th notes. Each beam in a note is represented with a separate beam element, starting with the eighth note beam using a number attribute of 1.
+-- 
 -- Note that the beam number does not distinguish sets of beams that overlap, as it does for slur and other elements. Beaming groups are distinguished by being in different voices and/or the presence or absence of grace and cue elements.
+-- 
+-- Beams that have a begin value can also have a fan attribute to indicate accelerandos and ritardandos using fanned beams. The fan attribute may also be used with a continue value if the fanning direction changes on that note. The value is "none" if not specified.
+-- 
+-- The repeater attribute has been deprecated in MusicXML 3.0. Formerly used for tremolos, it needs to be specified with a "yes" value for each beam using it.
 data Beam = 
       Beam {
           beamBeamValue :: BeamValue -- ^ text content
@@ -2700,15 +4296,17 @@ data Beam =
         , beamRepeater :: (Maybe YesNo) -- ^ /repeater/ attribute
         , beamFan :: (Maybe Fan) -- ^ /fan/ attribute
         , beamColor :: (Maybe Color) -- ^ /color/ attribute
+        , beamId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Beam where
-    emitXml (Beam a b c d e) =
+    emitXml (Beam a b c d e f) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "repeater" Nothing).emitXml) c] ++
         [maybe XEmpty (XAttr (QN "fan" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) f])
         []
 parseBeam :: P.XParse Beam
 parseBeam = 
@@ -2718,15 +4316,16 @@ parseBeam =
         <*> P.optional (P.xattr (P.name "repeater") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "fan") >>= parseFan)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Beam'
 mkBeam :: BeamValue -> Beam
-mkBeam a = Beam a Nothing Nothing Nothing Nothing
+mkBeam a = Beam a Nothing Nothing Nothing Nothing Nothing
 
 -- | @beat-repeat@ /(complex)/
 --
 -- The beat-repeat type is used to indicate that a single beat (but possibly many notes) is repeated. Both the start and stop of the beat being repeated should be specified. The slashes attribute specifies the number of slashes to use in the symbol. The use-dots attribute indicates whether or not to use dots as well (for instance, with mixed rhythm patterns). By default, the value for slashes is 1 and the value for use-dots is no.
--- 	
+-- 
 -- The beat-repeat element specifies a notation style for repetitions. The actual music being repeated needs to be repeated within the MusicXML file. This element specifies the notation that indicates the repeat.
 data BeatRepeat = 
       BeatRepeat {
@@ -2754,6 +4353,50 @@ parseBeatRepeat =
 -- | Smart constructor for 'BeatRepeat'
 mkBeatRepeat :: StartStop -> BeatRepeat
 mkBeatRepeat a = BeatRepeat a Nothing Nothing Nothing
+
+-- | @beat-unit-tied@ /(complex)/
+--
+-- The beat-unit-tied type indicates a beat-unit within a metronome mark that is tied to the preceding beat-unit. This allows or two or more tied notes to be associated with a per-minute value in a metronome mark, whereas the metronome-tied element is restricted to metric relationship marks.
+data BeatUnitTied = 
+      BeatUnitTied {
+          beatUnitTiedBeatUnit :: BeatUnit
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml BeatUnitTied where
+    emitXml (BeatUnitTied a) =
+      XReps [emitXml a]
+parseBeatUnitTied :: P.XParse BeatUnitTied
+parseBeatUnitTied = 
+      BeatUnitTied
+        <$> parseBeatUnit
+
+-- | Smart constructor for 'BeatUnitTied'
+mkBeatUnitTied :: BeatUnit -> BeatUnitTied
+mkBeatUnitTied a = BeatUnitTied a
+
+-- | @beater@ /(complex)/
+--
+-- The beater type represents pictograms for beaters, mallets, and sticks that do not have different materials represented in the pictogram.
+data Beater = 
+      Beater {
+          beaterBeaterValue :: BeaterValue -- ^ text content
+        , beaterTip :: (Maybe TipDirection) -- ^ /tip/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Beater where
+    emitXml (Beater a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "tip" Nothing).emitXml) b])
+        []
+parseBeater :: P.XParse Beater
+parseBeater = 
+      Beater
+        <$> (P.xtext >>= parseBeaterValue)
+        <*> P.optional (P.xattr (P.name "tip") >>= parseTipDirection)
+
+-- | Smart constructor for 'Beater'
+mkBeater :: BeaterValue -> Beater
+mkBeater a = Beater a Nothing
 
 -- | @bend@ /(complex)/
 --
@@ -2857,57 +4500,168 @@ mkBookmark a = Bookmark a Nothing Nothing Nothing
 -- Brackets are combined with words in a variety of modern directions. The line-end attribute specifies if there is a jog up or down (or both), an arrow, or nothing at the start or end of the bracket. If the line-end is up or down, the length of the jog can be specified using the end-length attribute. The line-type is solid by default.
 data Bracket = 
       Bracket {
-          bracketType :: StartStop -- ^ /type/ attribute
+          bracketType :: StartStopContinue -- ^ /type/ attribute
         , bracketNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , bracketLineEnd :: LineEnd -- ^ /line-end/ attribute
         , bracketEndLength :: (Maybe Tenths) -- ^ /end-length/ attribute
         , bracketLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , bracketDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , bracketSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , bracketDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , bracketDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , bracketRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , bracketRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , bracketColor :: (Maybe Color) -- ^ /color/ attribute
+        , bracketId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Bracket where
-    emitXml (Bracket a b c d e f g h i j) =
+    emitXml (Bracket a b c d e f g h i j k l m) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [XAttr (QN "line-end" Nothing) (emitXml c)] ++
         [maybe XEmpty (XAttr (QN "end-length" Nothing).emitXml) d] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
         []
 parseBracket :: P.XParse Bracket
 parseBracket = 
       Bracket
-        <$> (P.xattr (P.name "type") >>= parseStartStop)
+        <$> (P.xattr (P.name "type") >>= parseStartStopContinue)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> (P.xattr (P.name "line-end") >>= parseLineEnd)
         <*> P.optional (P.xattr (P.name "end-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Bracket'
-mkBracket :: StartStop -> LineEnd -> Bracket
-mkBracket a c = Bracket a Nothing c Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkBracket :: StartStopContinue -> LineEnd -> Bracket
+mkBracket a c = Bracket a Nothing c Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @breath-mark@ /(complex)/
+--
+-- The breath-mark element indicates a place to take a breath.
+data BreathMark = 
+      BreathMark {
+          breathMarkBreathMarkValue :: BreathMarkValue -- ^ text content
+        , breathMarkDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , breathMarkDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , breathMarkRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , breathMarkRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , breathMarkFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , breathMarkFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , breathMarkFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , breathMarkFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , breathMarkColor :: (Maybe Color) -- ^ /color/ attribute
+        , breathMarkPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml BreathMark where
+    emitXml (BreathMark a b c d e f g h i j k) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        []
+parseBreathMark :: P.XParse BreathMark
+parseBreathMark = 
+      BreathMark
+        <$> (P.xtext >>= parseBreathMarkValue)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+
+-- | Smart constructor for 'BreathMark'
+mkBreathMark :: BreathMarkValue -> BreathMark
+mkBreathMark a = BreathMark a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @caesura@ /(complex)/
+--
+-- The caesura element indicates a slight pause. It is notated using a "railroad tracks" symbol or other variations specified in the element content.
+data Caesura = 
+      Caesura {
+          caesuraCaesuraValue :: CaesuraValue -- ^ text content
+        , caesuraDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , caesuraDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , caesuraRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , caesuraRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , caesuraFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , caesuraFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , caesuraFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , caesuraFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , caesuraColor :: (Maybe Color) -- ^ /color/ attribute
+        , caesuraPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Caesura where
+    emitXml (Caesura a b c d e f g h i j k) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        []
+parseCaesura :: P.XParse Caesura
+parseCaesura = 
+      Caesura
+        <$> (P.xtext >>= parseCaesuraValue)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+
+-- | Smart constructor for 'Caesura'
+mkCaesura :: CaesuraValue -> Caesura
+mkCaesura a = Caesura a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @cancel@ /(complex)/
 --
--- A cancel element indicates that the old key signature should be cancelled before the new one appears. This will always happen when changing to C major or A minor and need not be specified then. The cancel value matches the fifths value of the cancelled key signature (e.g., a cancel of -2 will provide an explicit cancellation for changing from B flat major to F major). The optional location attribute indicates whether the cancellation appears to the left or the right of the new key signature. It is left by default.
+-- A cancel element indicates that the old key signature should be cancelled before the new one appears. This will always happen when changing to C major or A minor and need not be specified then. The cancel value matches the fifths value of the cancelled key signature (e.g., a cancel of -2 will provide an explicit cancellation for changing from B flat major to F major). The optional location attribute indicates where the cancellation appears relative to the new key signature.
 data Cancel = 
       Cancel {
           cancelFifths :: Fifths -- ^ text content
-        , cancelLocation :: (Maybe LeftRight) -- ^ /location/ attribute
+        , cancelLocation :: (Maybe CancelLocation) -- ^ /location/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Cancel where
@@ -2919,7 +4673,7 @@ parseCancel :: P.XParse Cancel
 parseCancel = 
       Cancel
         <$> (P.xtext >>= parseFifths)
-        <*> P.optional (P.xattr (P.name "location") >>= parseLeftRight)
+        <*> P.optional (P.xattr (P.name "location") >>= parseCancelLocation)
 
 -- | Smart constructor for 'Cancel'
 mkCancel :: Fifths -> Cancel
@@ -2930,11 +4684,16 @@ mkCancel a = Cancel a Nothing
 -- Clefs are represented by a combination of sign, line, and clef-octave-change elements. The optional number attribute refers to staff numbers within the part. A value of 1 is assumed if not present.
 -- 
 -- Sometimes clefs are added to the staff in non-standard line positions, either to indicate cue passages, or when there are multiple clefs present simultaneously on one staff. In this situation, the additional attribute is set to "yes" and the line value is ignored. The size attribute is used for clefs where the additional attribute is "yes". It is typically used to indicate cue clefs.
+-- 
+-- Sometimes clefs at the start of a measure need to appear after the barline rather than before, as for cues or for use after a repeated section. The after-barline attribute is set to "yes" in this situation. The attribute is ignored for mid-measure clefs.
+-- 
+-- Clefs appear at the start of each system unless the print-object attribute has been set to "no" or the additional attribute has been set to "yes".
 data Clef = 
       Clef {
           clefNumber :: (Maybe StaffNumber) -- ^ /number/ attribute
         , clefAdditional :: (Maybe YesNo) -- ^ /additional/ attribute
         , clefSize :: (Maybe SymbolSize) -- ^ /size/ attribute
+        , clefAfterBarline :: (Maybe YesNo) -- ^ /after-barline/ attribute
         , clefDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , clefDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , clefRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -2945,36 +4704,40 @@ data Clef =
         , clefFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , clefColor :: (Maybe Color) -- ^ /color/ attribute
         , clefPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , clefId :: (Maybe ID) -- ^ /id/ attribute
         , clefSign :: ClefSign -- ^ /sign/ child element
         , clefLine :: (Maybe StaffLine) -- ^ /line/ child element
         , clefClefOctaveChange :: (Maybe Int) -- ^ /clef-octave-change/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Clef where
-    emitXml (Clef a b c d e f g h i j k l m n o p) =
+    emitXml (Clef a b c d e f g h i j k l m n o p q r) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "additional" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m])
-        ([XElement (QN "sign" Nothing) (emitXml n)] ++
-        [maybe XEmpty (XElement (QN "line" Nothing).emitXml) o] ++
-        [maybe XEmpty (XElement (QN "clef-octave-change" Nothing).emitXml) p])
+        [maybe XEmpty (XAttr (QN "after-barline" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) o])
+        ([XElement (QN "sign" Nothing) (emitXml p)] ++
+        [maybe XEmpty (XElement (QN "line" Nothing).emitXml) q] ++
+        [maybe XEmpty (XElement (QN "clef-octave-change" Nothing).emitXml) r])
 parseClef :: P.XParse Clef
 parseClef = 
       Clef
         <$> P.optional (P.xattr (P.name "number") >>= parseStaffNumber)
         <*> P.optional (P.xattr (P.name "additional") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "size") >>= parseSymbolSize)
+        <*> P.optional (P.xattr (P.name "after-barline") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -2985,87 +4748,163 @@ parseClef =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> (P.xchild (P.name "sign") (P.xtext >>= parseClefSign))
         <*> P.optional (P.xchild (P.name "line") (P.xtext >>= parseStaffLine))
         <*> P.optional (P.xchild (P.name "clef-octave-change") (P.xtext >>= (P.xread "Integer")))
 
 -- | Smart constructor for 'Clef'
 mkClef :: ClefSign -> Clef
-mkClef n = Clef Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing n Nothing Nothing
+mkClef p = Clef Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing p Nothing Nothing
+
+-- | @coda@ /(complex)/
+--
+-- The coda type is the visual indicator of a coda sign. The exact glyph can be specified with the smufl attribute. A sound element is also needed to guide playback applications reliably.
+data Coda = 
+      Coda {
+          codaSmufl :: (Maybe SmuflCodaGlyphName) -- ^ /smufl/ attribute
+        , codaDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , codaDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , codaRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , codaRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , codaFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , codaFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , codaFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , codaFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , codaColor :: (Maybe Color) -- ^ /color/ attribute
+        , codaHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , codaValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , codaId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Coda where
+    emitXml (Coda a b c d e f g h i j k l m) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
+        []
+parseCoda :: P.XParse Coda
+parseCoda = 
+      Coda
+        <$> P.optional (P.xattr (P.name "smufl") >>= parseSmuflCodaGlyphName)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'Coda'
+mkCoda :: Coda
+mkCoda = Coda Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @credit@ /(complex)/
 --
--- The credit type represents the appearance of the title, composer, arranger, lyricist, copyright, dedication, and other text and graphics that commonly appears on the first page of a score. The credit-words and credit-image elements are similar to the words and image elements for directions. However, since the credit is not part of a measure, the default-x and default-y attributes adjust the origin relative to the bottom left-hand corner of the first page. The enclosure for credit-words is none by default.
--- 	
--- By default, a series of credit-words elements within a single credit element follow one another in sequence visually. Non-positional formatting attributes are carried over from the previous element by default.
--- 	
--- The page attribute for the credit element, new in Version 2.0, specifies the page number where the credit should appear. This is an integer value that starts with 1 for the first page. Its value is 1 by default. Since credits occur before the music, these page numbers do not refer to the page numbering specified by the print element's page-number attribute.
+-- The credit type represents the appearance of the title, composer, arranger, lyricist, copyright, dedication, and other text, symbols, and graphics that commonly appear on the first page of a score. The credit-words, credit-symbol, and credit-image elements are similar to the words, symbol, and image elements for directions. However, since the credit is not part of a measure, the default-x and default-y attributes adjust the origin relative to the bottom left-hand corner of the page. The enclosure for credit-words and credit-symbol is none by default.
+-- 
+-- By default, a series of credit-words and credit-symbol elements within a single credit element follow one another in sequence visually. Non-positional formatting attributes are carried over from the previous element by default.
+-- 
+-- The page attribute for the credit element specifies the page number where the credit should appear. This is an integer value that starts with 1 for the first page. Its value is 1 by default. Since credits occur before the music, these page numbers do not refer to the page numbering specified by the print element's page-number attribute.
+-- 
+-- The credit-type element indicates the purpose behind a credit. Multiple types of data may be combined in a single credit, so multiple elements may be used. Standard values include page number, title, subtitle, composer, arranger, lyricist, and rights.
 data Credit = 
       Credit {
           creditPage :: (Maybe PositiveInteger) -- ^ /page/ attribute
+        , creditId :: (Maybe ID) -- ^ /id/ attribute
+        , creditCreditType :: [String] -- ^ /credit-type/ child element
         , creditLink :: [Link] -- ^ /link/ child element
         , creditBookmark :: [Bookmark] -- ^ /bookmark/ child element
         , creditCredit :: ChxCredit
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Credit where
-    emitXml (Credit a b c d) =
+    emitXml (Credit a b c d e f) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "page" Nothing).emitXml) a])
-        (map (XElement (QN "link" Nothing).emitXml) b ++
-        map (XElement (QN "bookmark" Nothing).emitXml) c ++
-        [emitXml d])
+        ([maybe XEmpty (XAttr (QN "page" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) b])
+        (map (XElement (QN "credit-type" Nothing).emitXml) c ++
+        map (XElement (QN "link" Nothing).emitXml) d ++
+        map (XElement (QN "bookmark" Nothing).emitXml) e ++
+        [emitXml f])
 parseCredit :: P.XParse Credit
 parseCredit = 
       Credit
         <$> P.optional (P.xattr (P.name "page") >>= parsePositiveInteger)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (P.xchild (P.name "credit-type") (P.xtext >>= return))
         <*> P.many (P.xchild (P.name "link") (parseLink))
         <*> P.many (P.xchild (P.name "bookmark") (parseBookmark))
         <*> parseChxCredit
 
 -- | Smart constructor for 'Credit'
 mkCredit :: ChxCredit -> Credit
-mkCredit d = Credit Nothing [] [] d
+mkCredit f = Credit Nothing Nothing [] [] [] f
 
 -- | @dashes@ /(complex)/
 --
 -- The dashes type represents dashes, used for instance with cresc. and dim. marks.
 data Dashes = 
       Dashes {
-          dashesType :: StartStop -- ^ /type/ attribute
+          dashesType :: StartStopContinue -- ^ /type/ attribute
         , dashesNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
+        , dashesDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , dashesSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , dashesDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , dashesDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , dashesRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , dashesRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , dashesColor :: (Maybe Color) -- ^ /color/ attribute
+        , dashesId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Dashes where
-    emitXml (Dashes a b c d e f g) =
+    emitXml (Dashes a b c d e f g h i j) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g])
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) j])
         []
 parseDashes :: P.XParse Dashes
 parseDashes = 
       Dashes
-        <$> (P.xattr (P.name "type") >>= parseStartStop)
+        <$> (P.xattr (P.name "type") >>= parseStartStopContinue)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Dashes'
-mkDashes :: StartStop -> Dashes
-mkDashes a = Dashes a Nothing Nothing Nothing Nothing Nothing Nothing
+mkDashes :: StartStopContinue -> Dashes
+mkDashes a = Dashes a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @defaults@ /(complex)/
 --
@@ -3110,7 +4949,7 @@ mkDefaults b = Defaults Nothing b Nothing Nothing Nothing [] []
 -- | @degree@ /(complex)/
 --
 -- The degree type is used to add, alter, or subtract individual notes in the chord. The print-object attribute can be used to keep the degree from printing separately when it has already taken into account in the text attribute of the kind element. The degree-value and degree-type text attributes specify how the value and type of the degree should be displayed.
--- 	
+-- 
 -- A harmony of kind "other" can be spelled explicitly by using a series of degree elements together with a root.
 data Degree = 
       Degree {
@@ -3192,7 +5031,7 @@ mkDegreeAlter a = DegreeAlter a Nothing Nothing Nothing Nothing Nothing Nothing 
 
 -- | @degree-type@ /(complex)/
 --
--- The degree-type type indicates if this degree is an addition, alteration, or subtraction relative to the kind of the current chord. The value of the degree-type element affects the interpretation of the value of the degree-alter element. The text attribute specifies how the type of the degree should be displayed.
+-- The degree-type type indicates if this degree is an addition, alteration, or subtraction relative to the kind of the current chord. The value of the degree-type element affects the interpretation of the value of the degree-alter element. The text attribute specifies how the type of the degree should be displayed in a score.
 data DegreeType = 
       DegreeType {
           degreeTypeDegreeTypeValue :: DegreeTypeValue -- ^ text content
@@ -3243,10 +5082,11 @@ mkDegreeType a = DegreeType a Nothing Nothing Nothing Nothing Nothing Nothing No
 
 -- | @degree-value@ /(complex)/
 --
--- The content of the degree-value type is a number indicating the degree of the chord (1 for the root, 3 for third, etc). The text attribute specifies how the type of the degree should be displayed.
+-- The content of the degree-value type is a number indicating the degree of the chord (1 for the root, 3 for third, etc). The text attribute specifies how the type of the degree should be displayed in a score. The degree-value symbol attribute indicates that a symbol should be used in specifying the degree. If the symbol attribute is present, the value of the text attribute follows the symbol.
 data DegreeValue = 
       DegreeValue {
           degreeValuePositiveInteger :: PositiveInteger -- ^ text content
+        , degreeValueSymbol :: (Maybe DegreeSymbolValue) -- ^ /symbol/ attribute
         , degreeValueText :: (Maybe Token) -- ^ /text/ attribute
         , degreeValueDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , degreeValueDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
@@ -3260,23 +5100,25 @@ data DegreeValue =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml DegreeValue where
-    emitXml (DegreeValue a b c d e f g h i j k) =
+    emitXml (DegreeValue a b c d e f g h i j k l) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        ([maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "text" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
         []
 parseDegreeValue :: P.XParse DegreeValue
 parseDegreeValue = 
       DegreeValue
         <$> (P.xtext >>= parsePositiveInteger)
+        <*> P.optional (P.xattr (P.name "symbol") >>= parseDegreeSymbolValue)
         <*> P.optional (P.xattr (P.name "text") >>= parseToken)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
@@ -3290,17 +5132,18 @@ parseDegreeValue =
 
 -- | Smart constructor for 'DegreeValue'
 mkDegreeValue :: PositiveInteger -> DegreeValue
-mkDegreeValue a = DegreeValue a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkDegreeValue a = DegreeValue a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @direction@ /(complex)/
 --
--- A direction is a musical indication that is not attached to a specific note. Two or more may be combined to indicate starts and stops of wedges, dashes, etc.
--- 	
+-- A direction is a musical indication that is not necessarily attached to a specific note. Two or more may be combined to indicate starts and stops of wedges, dashes, etc. For applications where a specific direction is indeed attached to a specific note, the direction element can be associated with the note element that follows it in score order that is not in a different voice.
+-- 
 -- By default, a series of direction-type elements and a series of child elements of a direction-type within a single direction element follow one another in sequence visually. For a series of direction-type children, non-positional formatting attributes are carried over from the previous element by default.
 data Direction = 
       Direction {
           directionPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , directionDirective :: (Maybe YesNo) -- ^ /directive/ attribute
+        , directionId :: (Maybe ID) -- ^ /id/ attribute
         , directionDirectionType :: [DirectionType] -- ^ /direction-type/ child element
         , directionOffset :: (Maybe Offset) -- ^ /offset/ child element
         , directionEditorialVoiceDirection :: EditorialVoiceDirection
@@ -3309,20 +5152,22 @@ data Direction =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Direction where
-    emitXml (Direction a b c d e f g) =
+    emitXml (Direction a b c d e f g h) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) a] ++
-        [maybe XEmpty (XAttr (QN "directive" Nothing).emitXml) b])
-        (map (XElement (QN "direction-type" Nothing).emitXml) c ++
-        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) d] ++
-        [emitXml e] ++
+        [maybe XEmpty (XAttr (QN "directive" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) c])
+        (map (XElement (QN "direction-type" Nothing).emitXml) d ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) e] ++
         [emitXml f] ++
-        [maybe XEmpty (XElement (QN "sound" Nothing).emitXml) g])
+        [emitXml g] ++
+        [maybe XEmpty (XElement (QN "sound" Nothing).emitXml) h])
 parseDirection :: P.XParse Direction
 parseDirection = 
       Direction
         <$> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "directive") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (P.xchild (P.name "direction-type") (parseDirectionType))
         <*> P.optional (P.xchild (P.name "offset") (parseOffset))
         <*> parseEditorialVoiceDirection
@@ -3331,27 +5176,31 @@ parseDirection =
 
 -- | Smart constructor for 'Direction'
 mkDirection :: EditorialVoiceDirection -> Direction
-mkDirection e = Direction Nothing Nothing [] Nothing e Nothing Nothing
+mkDirection f = Direction Nothing Nothing Nothing [] Nothing f Nothing Nothing
 
 -- | @direction-type@ /(complex)/
 --
 -- Textual direction types may have more than 1 component due to multiple fonts. The dynamics element may also be used in the notations element. Attribute groups related to print suggestions apply to the individual direction-type, not to the overall direction.
 data DirectionType = 
       DirectionType {
-          directionTypeDirectionType :: ChxDirectionType
+          directionTypeId :: (Maybe ID) -- ^ /id/ attribute
+        , directionTypeDirectionType :: ChxDirectionType
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml DirectionType where
-    emitXml (DirectionType a) =
-      XReps [emitXml a]
+    emitXml (DirectionType a b) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        ([emitXml b])
 parseDirectionType :: P.XParse DirectionType
 parseDirectionType = 
       DirectionType
-        <$> parseChxDirectionType
+        <$> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> parseChxDirectionType
 
 -- | Smart constructor for 'DirectionType'
 mkDirectionType :: ChxDirectionType -> DirectionType
-mkDirectionType a = DirectionType a
+mkDirectionType b = DirectionType Nothing b
 
 -- | @directive@ /(complex)/
 data Directive = 
@@ -3402,30 +5251,34 @@ parseDirective =
 mkDirective :: String -> Directive
 mkDirective a = Directive a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
--- | @display-step-octave@ /(complex)/
+-- | @distance@ /(complex)/
 --
--- The display-step-octave type contains the sequence of elements used by both the rest and unpitched elements. This group is used to place rests and unpitched elements on the staff without implying that these elements have pitch. Positioning follows the current clef. If percussion clef is used, the display-step and display-octave elements are interpreted as if in treble clef, with a G in octave 4 on line 2. If not present, the note is placed on the middle line of the staff, generally used for one-line staffs.
-data DisplayStepOctave = 
-      DisplayStepOctave {
-          displayStepOctaveDisplayStepOctave :: (Maybe SeqDisplayStepOctave)
+-- The distance element represents standard distances between notation elements in tenths. The type attribute defines what type of distance is being defined. Valid values include hyphen (for hyphens in lyrics) and beam.
+data Distance = 
+      Distance {
+          distanceTenths :: Tenths -- ^ text content
+        , cmpdistanceType :: DistanceType -- ^ /type/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml DisplayStepOctave where
-    emitXml (DisplayStepOctave a) =
-      XReps [emitXml a]
-parseDisplayStepOctave :: P.XParse DisplayStepOctave
-parseDisplayStepOctave = 
-      DisplayStepOctave
-        <$> P.optional (parseSeqDisplayStepOctave)
+instance EmitXml Distance where
+    emitXml (Distance a b) =
+      XContent (emitXml a)
+        ([XAttr (QN "type" Nothing) (emitXml b)])
+        []
+parseDistance :: P.XParse Distance
+parseDistance = 
+      Distance
+        <$> (P.xtext >>= parseTenths)
+        <*> (P.xattr (P.name "type") >>= parseDistanceType)
 
--- | Smart constructor for 'DisplayStepOctave'
-mkDisplayStepOctave :: DisplayStepOctave
-mkDisplayStepOctave = DisplayStepOctave Nothing
+-- | Smart constructor for 'Distance'
+mkDistance :: Tenths -> DistanceType -> Distance
+mkDistance a b = Distance a b
 
 -- | @dynamics@ /(complex)/
 --
 -- Dynamics can be associated either with a note or a general musical direction. To avoid inconsistencies between and amongst the letter abbreviations for dynamics (what is sf vs. sfz, standing alone or with a trailing dynamic that is not always piano), we use the actual letters as the names of these dynamic elements. The other-dynamics element allows other dynamic marks that are not covered here, but many of those should perhaps be included in a more general musical direction element. Dynamics elements may also be combined to create marks not covered by a single element, such as sfmp.
--- 	
+-- 
 -- These letter dynamic symbols are separated from crescendo, decrescendo, and wedge indications. Dynamic representation is inconsistent in scores. Many things are assumed by the composer and left out, such as returns to original dynamics. Systematic representations are quite complex: for example, Humdrum has at least 3 representation formats related to dynamics. The MusicXML format captures what is in the score, but does not try to be optimal for analysis or synthesis of dynamics.
 data Dynamics = 
       Dynamics {
@@ -3438,12 +5291,19 @@ data Dynamics =
         , dynamicsFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , dynamicsFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , dynamicsColor :: (Maybe Color) -- ^ /color/ attribute
+        , dynamicsHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , dynamicsValign :: (Maybe Valign) -- ^ /valign/ attribute
         , dynamicsPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , dynamicsUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
+        , dynamicsOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
+        , dynamicsLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
+        , dynamicsEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
+        , dynamicsId :: (Maybe ID) -- ^ /id/ attribute
         , dynamicsDynamics :: [ChxDynamics]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Dynamics where
-    emitXml (Dynamics a b c d e f g h i j k) =
+    emitXml (Dynamics a b c d e f g h i j k l m n o p q r) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
@@ -3454,8 +5314,15 @@ instance EmitXml Dynamics where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
-        ([emitXml k])
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) q])
+        ([emitXml r])
 parseDynamics :: P.XParse Dynamics
 parseDynamics = 
       Dynamics
@@ -3468,19 +5335,27 @@ parseDynamics =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (parseChxDynamics)
 
 -- | Smart constructor for 'Dynamics'
 mkDynamics :: Dynamics
-mkDynamics = Dynamics Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
+mkDynamics = Dynamics Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
 
 -- | @elision@ /(complex)/
 --
--- In Version 2.0, the content of the elision type is used to specify the symbol used to display the elision. Common values are a no-break space (Unicode 00A0), an underscore (Unicode 005F), or an undertie (Unicode 203F).
+-- The elision type represents an elision between lyric syllables. The text content specifies the symbol used to display the elision. Common values are a no-break space (Unicode 00A0), an underscore (Unicode 005F), or an undertie (Unicode 203F). If the text content is empty, the smufl attribute is used to specify the symbol to use. Its value is a SMuFL canonical glyph name that starts with lyrics. The SMuFL attribute is ignored if the elision glyph is already specified by the text content. If neither text content nor a smufl attribute are present, the elision glyph is application-specific.
 data Elision = 
       Elision {
           elisionString :: String -- ^ text content
+        , elisionSmufl :: (Maybe SmuflLyricsGlyphName) -- ^ /smufl/ attribute
         , elisionFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
         , elisionFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
         , elisionFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
@@ -3489,18 +5364,20 @@ data Elision =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Elision where
-    emitXml (Elision a b c d e f) =
+    emitXml (Elision a b c d e f g) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g])
         []
 parseElision :: P.XParse Elision
 parseElision = 
       Elision
         <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflLyricsGlyphName)
         <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
         <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
@@ -3509,7 +5386,7 @@ parseElision =
 
 -- | Smart constructor for 'Elision'
 mkElision :: String -> Elision
-mkElision a = Elision a Nothing Nothing Nothing Nothing Nothing
+mkElision a = Elision a Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @empty@ /(complex)/
 --
@@ -3561,11 +5438,14 @@ mkEmptyFont = EmptyFont Nothing Nothing Nothing Nothing
 
 -- | @empty-line@ /(complex)/
 --
--- The empty-line type represents an empty element with line-shape, line-type, print-style and placement attributes.
+-- The empty-line type represents an empty element with line-shape, line-type, line-length, dashed-formatting, print-style and placement attributes.
 data EmptyLine = 
       EmptyLine {
           emptyLineLineShape :: (Maybe LineShape) -- ^ /line-shape/ attribute
         , emptyLineLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , emptyLineLineLength :: (Maybe LineLength) -- ^ /line-length/ attribute
+        , emptyLineDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , emptyLineSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , emptyLineDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , emptyLineDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , emptyLineRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -3579,26 +5459,32 @@ data EmptyLine =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml EmptyLine where
-    emitXml (EmptyLine a b c d e f g h i j k l) =
+    emitXml (EmptyLine a b c d e f g h i j k l m n o) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "line-shape" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
+        [maybe XEmpty (XAttr (QN "line-length" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) o])
         []
 parseEmptyLine :: P.XParse EmptyLine
 parseEmptyLine = 
       EmptyLine
         <$> P.optional (P.xattr (P.name "line-shape") >>= parseLineShape)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "line-length") >>= parseLineLength)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -3612,7 +5498,7 @@ parseEmptyLine =
 
 -- | Smart constructor for 'EmptyLine'
 mkEmptyLine :: EmptyLine
-mkEmptyLine = EmptyLine Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkEmptyLine = EmptyLine Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @empty-placement@ /(complex)/
 --
@@ -3663,24 +5549,26 @@ parseEmptyPlacement =
 mkEmptyPlacement :: EmptyPlacement
 mkEmptyPlacement = EmptyPlacement Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
--- | @empty-print-style@ /(complex)/
+-- | @empty-placement-smufl@ /(complex)/
 --
--- The empty-print-style type represents an empty element with print-style attributes.
-data EmptyPrintStyle = 
-      EmptyPrintStyle {
-          emptyPrintStyleDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
-        , emptyPrintStyleDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
-        , emptyPrintStyleRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
-        , emptyPrintStyleRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
-        , emptyPrintStyleFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
-        , emptyPrintStyleFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
-        , emptyPrintStyleFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
-        , emptyPrintStyleFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
-        , emptyPrintStyleColor :: (Maybe Color) -- ^ /color/ attribute
+-- The empty-placement-smufl type represents an empty element with print-style, placement, and smufl attributes.
+data EmptyPlacementSmufl = 
+      EmptyPlacementSmufl {
+          emptyPlacementSmuflDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , emptyPlacementSmuflDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , emptyPlacementSmuflRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , emptyPlacementSmuflRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , emptyPlacementSmuflFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , emptyPlacementSmuflFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , emptyPlacementSmuflFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , emptyPlacementSmuflFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , emptyPlacementSmuflColor :: (Maybe Color) -- ^ /color/ attribute
+        , emptyPlacementSmuflPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , emptyPlacementSmuflSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml EmptyPrintStyle where
-    emitXml (EmptyPrintStyle a b c d e f g h i) =
+instance EmitXml EmptyPlacementSmufl where
+    emitXml (EmptyPlacementSmufl a b c d e f g h i j k) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
@@ -3690,11 +5578,13 @@ instance EmitXml EmptyPrintStyle where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) k])
         []
-parseEmptyPrintStyle :: P.XParse EmptyPrintStyle
-parseEmptyPrintStyle = 
-      EmptyPrintStyle
+parseEmptyPlacementSmufl :: P.XParse EmptyPlacementSmufl
+parseEmptyPlacementSmufl = 
+      EmptyPlacementSmufl
         <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -3704,10 +5594,122 @@ parseEmptyPrintStyle =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
 
--- | Smart constructor for 'EmptyPrintStyle'
-mkEmptyPrintStyle :: EmptyPrintStyle
-mkEmptyPrintStyle = EmptyPrintStyle Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+-- | Smart constructor for 'EmptyPlacementSmufl'
+mkEmptyPlacementSmufl :: EmptyPlacementSmufl
+mkEmptyPlacementSmufl = EmptyPlacementSmufl Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @empty-print-object-style-align@ /(complex)/
+--
+-- The empty-print-style-align-object type represents an empty element with print-object and print-style-align attribute groups.
+data EmptyPrintObjectStyleAlign = 
+      EmptyPrintObjectStyleAlign {
+          emptyPrintObjectStyleAlignPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , emptyPrintObjectStyleAlignDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , emptyPrintObjectStyleAlignDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , emptyPrintObjectStyleAlignRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , emptyPrintObjectStyleAlignRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , emptyPrintObjectStyleAlignFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , emptyPrintObjectStyleAlignFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , emptyPrintObjectStyleAlignFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , emptyPrintObjectStyleAlignFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , emptyPrintObjectStyleAlignColor :: (Maybe Color) -- ^ /color/ attribute
+        , emptyPrintObjectStyleAlignHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , emptyPrintObjectStyleAlignValign :: (Maybe Valign) -- ^ /valign/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml EmptyPrintObjectStyleAlign where
+    emitXml (EmptyPrintObjectStyleAlign a b c d e f g h i j k l) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l])
+        []
+parseEmptyPrintObjectStyleAlign :: P.XParse EmptyPrintObjectStyleAlign
+parseEmptyPrintObjectStyleAlign = 
+      EmptyPrintObjectStyleAlign
+        <$> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+
+-- | Smart constructor for 'EmptyPrintObjectStyleAlign'
+mkEmptyPrintObjectStyleAlign :: EmptyPrintObjectStyleAlign
+mkEmptyPrintObjectStyleAlign = EmptyPrintObjectStyleAlign Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @empty-print-style-align-id@ /(complex)/
+--
+-- The empty-print-style-align-id type represents an empty element with print-style-align and optional-unique-id attribute groups.
+data EmptyPrintStyleAlignId = 
+      EmptyPrintStyleAlignId {
+          emptyPrintStyleAlignIdDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , emptyPrintStyleAlignIdDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , emptyPrintStyleAlignIdRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , emptyPrintStyleAlignIdRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , emptyPrintStyleAlignIdFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , emptyPrintStyleAlignIdFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , emptyPrintStyleAlignIdFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , emptyPrintStyleAlignIdFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , emptyPrintStyleAlignIdColor :: (Maybe Color) -- ^ /color/ attribute
+        , emptyPrintStyleAlignIdHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , emptyPrintStyleAlignIdValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , emptyPrintStyleAlignIdId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml EmptyPrintStyleAlignId where
+    emitXml (EmptyPrintStyleAlignId a b c d e f g h i j k l) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        []
+parseEmptyPrintStyleAlignId :: P.XParse EmptyPrintStyleAlignId
+parseEmptyPrintStyleAlignId = 
+      EmptyPrintStyleAlignId
+        <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'EmptyPrintStyleAlignId'
+mkEmptyPrintStyleAlignId :: EmptyPrintStyleAlignId
+mkEmptyPrintStyleAlignId = EmptyPrintStyleAlignId Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @empty-trill-sound@ /(complex)/
 --
@@ -3802,7 +5804,7 @@ mkEncoding = Encoding []
 -- | @ending@ /(complex)/
 --
 -- The ending type represents multiple (e.g. first and second) endings. Typically, the start type is associated with the left barline of the first measure in an ending. The stop and discontinue types are associated with the right barline of the last measure in an ending. Stop is used when the ending mark concludes with a downward jog, as is typical for first endings. Discontinue is used when there is no downward jog, as is typical for second endings that do not conclude a piece. The length of the jog can be specified using the end-length attribute. The text-x and text-y attributes are offsets that specify where the baseline of the start of the ending text appears, relative to the start of the ending line.
--- 	
+-- 
 -- The number attribute reflects the numeric values of what is under the ending line. Single endings such as "1" or comma-separated multiple endings such as "1,2" may be used. The ending element text is used when the text displayed in the ending is different than what appears in the number attribute. The print-object element is used to indicate when an ending is present but not printed, as is often the case for many parts in a full score.
 data Ending = 
       Ending {
@@ -3869,37 +5871,40 @@ mkEnding a b c = Ending a b c Nothing Nothing Nothing Nothing Nothing Nothing No
 
 -- | @extend@ /(complex)/
 --
--- The extend type represents word extensions for lyrics.
+-- The extend type represents lyric word extension / melisma lines as well as figured bass extensions. The optional type and position attributes are added in Version 3.0 to provide better formatting control.
 data Extend = 
       Extend {
-          extendFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
-        , extendFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
-        , extendFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
-        , extendFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+          extendType :: (Maybe StartStopContinue) -- ^ /type/ attribute
+        , extendDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , extendDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , extendRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , extendRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , extendColor :: (Maybe Color) -- ^ /color/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Extend where
-    emitXml (Extend a b c d e) =
+    emitXml (Extend a b c d e f) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) a] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) e])
+        ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
         []
 parseExtend :: P.XParse Extend
 parseExtend = 
       Extend
-        <$> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
-        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
-        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
-        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <$> P.optional (P.xattr (P.name "type") >>= parseStartStopContinue)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
 
 -- | Smart constructor for 'Extend'
 mkExtend :: Extend
-mkExtend = Extend Nothing Nothing Nothing Nothing Nothing
+mkExtend = Extend Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @feature@ /(complex)/
 --
@@ -3941,10 +5946,11 @@ data Fermata =
         , fermataFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , fermataFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , fermataColor :: (Maybe Color) -- ^ /color/ attribute
+        , fermataId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Fermata where
-    emitXml (Fermata a b c d e f g h i j k) =
+    emitXml (Fermata a b c d e f g h i j k l) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
@@ -3955,7 +5961,8 @@ instance EmitXml Fermata where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
         []
 parseFermata :: P.XParse Fermata
 parseFermata = 
@@ -3971,10 +5978,11 @@ parseFermata =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Fermata'
 mkFermata :: FermataShape -> Fermata
-mkFermata a = Fermata a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkFermata a = Fermata a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @figure@ /(complex)/
 --
@@ -3985,16 +5993,18 @@ data Figure =
         , figureFigureNumber :: (Maybe StyleText) -- ^ /figure-number/ child element
         , figureSuffix :: (Maybe StyleText) -- ^ /suffix/ child element
         , figureExtend :: (Maybe Extend) -- ^ /extend/ child element
+        , figureEditorial :: Editorial
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Figure where
-    emitXml (Figure a b c d) =
+    emitXml (Figure a b c d e) =
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "prefix" Nothing).emitXml) a] ++
         [maybe XEmpty (XElement (QN "figure-number" Nothing).emitXml) b] ++
         [maybe XEmpty (XElement (QN "suffix" Nothing).emitXml) c] ++
-        [maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d])
+        [maybe XEmpty (XElement (QN "extend" Nothing).emitXml) d] ++
+        [emitXml e])
 parseFigure :: P.XParse Figure
 parseFigure = 
       Figure
@@ -4002,14 +6012,17 @@ parseFigure =
         <*> P.optional (P.xchild (P.name "figure-number") (parseStyleText))
         <*> P.optional (P.xchild (P.name "suffix") (parseStyleText))
         <*> P.optional (P.xchild (P.name "extend") (parseExtend))
+        <*> parseEditorial
 
 -- | Smart constructor for 'Figure'
-mkFigure :: Figure
-mkFigure = Figure Nothing Nothing Nothing Nothing
+mkFigure :: Editorial -> Figure
+mkFigure e = Figure Nothing Nothing Nothing Nothing e
 
 -- | @figured-bass@ /(complex)/
 --
--- The figured-bass element represents figured bass notation. Figured bass elements take their position from the first regular note that follows. Figures are ordered from top to bottom. The value of parentheses is "no" if not present.
+-- The figured-bass element represents figured bass notation. Figured bass elements take their position from the first regular note (not a grace note or chord note) that follows in score order. The optional duration element is used to indicate changes of figures under a note.
+-- 
+-- Figures are ordered from top to bottom. The value of parentheses is "no" if not present.
 data FiguredBass = 
       FiguredBass {
           figuredBassParentheses :: (Maybe YesNo) -- ^ /parentheses/ attribute
@@ -4026,13 +6039,14 @@ data FiguredBass =
         , figuredBassPrintLyric :: (Maybe YesNo) -- ^ /print-lyric/ attribute
         , figuredBassPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
         , figuredBassPrintSpacing :: (Maybe YesNo) -- ^ /print-spacing/ attribute
+        , figuredBassId :: (Maybe ID) -- ^ /id/ attribute
         , figuredBassFigure :: [Figure] -- ^ /figure/ child element
         , figuredBassDuration :: (Maybe Duration)
         , figuredBassEditorial :: Editorial
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml FiguredBass where
-    emitXml (FiguredBass a b c d e f g h i j k l m n o p q) =
+    emitXml (FiguredBass a b c d e f g h i j k l m n o p q r) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
@@ -4047,10 +6061,11 @@ instance EmitXml FiguredBass where
         [maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) l] ++
         [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) n])
-        (map (XElement (QN "figure" Nothing).emitXml) o ++
-        [emitXml p] ++
-        [emitXml q])
+        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) o])
+        (map (XElement (QN "figure" Nothing).emitXml) p ++
+        [emitXml q] ++
+        [emitXml r])
 parseFiguredBass :: P.XParse FiguredBass
 parseFiguredBass = 
       FiguredBass
@@ -4068,13 +6083,14 @@ parseFiguredBass =
         <*> P.optional (P.xattr (P.name "print-lyric") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "print-spacing") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (P.xchild (P.name "figure") (parseFigure))
         <*> P.optional (parseDuration)
         <*> parseEditorial
 
 -- | Smart constructor for 'FiguredBass'
 mkFiguredBass :: Editorial -> FiguredBass
-mkFiguredBass q = FiguredBass Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing q
+mkFiguredBass r = FiguredBass Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing r
 
 -- | @fingering@ /(complex)/
 --
@@ -4160,69 +6176,65 @@ parseFirstFret =
 mkFirstFret :: PositiveInteger -> FirstFret
 mkFirstFret a = FirstFret a Nothing Nothing
 
--- | @formatted-text@ /(complex)/
+-- | @formatted-symbol-id@ /(complex)/
 --
--- The formatted-text type represents a text element with text-formatting attributes.
-data FormattedText = 
-      FormattedText {
-          formattedTextString :: String -- ^ text content
-        , formattedTextLang :: (Maybe Lang) -- ^ /xml:lang/ attribute
-        , formattedTextEnclosure :: (Maybe Enclosure) -- ^ /enclosure/ attribute
-        , formattedTextJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
-        , formattedTextHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
-        , formattedTextValign :: (Maybe Valign) -- ^ /valign/ attribute
-        , formattedTextDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
-        , formattedTextDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
-        , formattedTextRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
-        , formattedTextRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
-        , formattedTextFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
-        , formattedTextFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
-        , formattedTextFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
-        , formattedTextFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
-        , formattedTextColor :: (Maybe Color) -- ^ /color/ attribute
-        , formattedTextUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
-        , formattedTextOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
-        , formattedTextLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
-        , formattedTextRotation :: (Maybe RotationDegrees) -- ^ /rotation/ attribute
-        , formattedTextLetterSpacing :: (Maybe NumberOrNormal) -- ^ /letter-spacing/ attribute
-        , formattedTextLineHeight :: (Maybe NumberOrNormal) -- ^ /line-height/ attribute
-        , formattedTextDir :: (Maybe TextDirection) -- ^ /dir/ attribute
+-- The formatted-symbol-id type represents a SMuFL musical symbol element with formatting and id attributes.
+data FormattedSymbolId = 
+      FormattedSymbolId {
+          formattedSymbolIdSmuflGlyphName :: SmuflGlyphName -- ^ text content
+        , formattedSymbolIdJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
+        , formattedSymbolIdDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , formattedSymbolIdDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , formattedSymbolIdRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , formattedSymbolIdRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , formattedSymbolIdFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , formattedSymbolIdFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , formattedSymbolIdFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , formattedSymbolIdFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , formattedSymbolIdColor :: (Maybe Color) -- ^ /color/ attribute
+        , formattedSymbolIdHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , formattedSymbolIdValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , formattedSymbolIdUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
+        , formattedSymbolIdOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
+        , formattedSymbolIdLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
+        , formattedSymbolIdRotation :: (Maybe RotationDegrees) -- ^ /rotation/ attribute
+        , formattedSymbolIdLetterSpacing :: (Maybe NumberOrNormal) -- ^ /letter-spacing/ attribute
+        , formattedSymbolIdLineHeight :: (Maybe NumberOrNormal) -- ^ /line-height/ attribute
+        , formattedSymbolIdDir :: (Maybe TextDirection) -- ^ /dir/ attribute
+        , formattedSymbolIdEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
+        , formattedSymbolIdId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml FormattedText where
-    emitXml (FormattedText a b c d e f g h i j k l m n o p q r s t u v) =
+instance EmitXml FormattedSymbolId where
+    emitXml (FormattedSymbolId a b c d e f g h i j k l m n o p q r s t u v) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
-        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
-        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
-        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
-        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
-        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v])
+        ([maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) v])
         []
-parseFormattedText :: P.XParse FormattedText
-parseFormattedText = 
-      FormattedText
-        <$> (P.xtext >>= return)
-        <*> P.optional (P.xattr (P.name "xml:lang") >>= parseLang)
-        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosure)
+parseFormattedSymbolId :: P.XParse FormattedSymbolId
+parseFormattedSymbolId = 
+      FormattedSymbolId
+        <$> (P.xtext >>= parseSmuflGlyphName)
         <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
-        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
-        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -4232,6 +6244,8 @@ parseFormattedText =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
         <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
         <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
@@ -4239,14 +6253,193 @@ parseFormattedText =
         <*> P.optional (P.xattr (P.name "letter-spacing") >>= parseNumberOrNormal)
         <*> P.optional (P.xattr (P.name "line-height") >>= parseNumberOrNormal)
         <*> P.optional (P.xattr (P.name "dir") >>= parseTextDirection)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'FormattedSymbolId'
+mkFormattedSymbolId :: SmuflGlyphName -> FormattedSymbolId
+mkFormattedSymbolId a = FormattedSymbolId a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @formatted-text@ /(complex)/
+--
+-- The formatted-text type represents a text element with text-formatting attributes.
+data FormattedText = 
+      FormattedText {
+          formattedTextString :: String -- ^ text content
+        , formattedTextLang :: (Maybe Lang) -- ^ /xml:lang/ attribute
+        , formattedTextSpace :: (Maybe Space) -- ^ /xml:space/ attribute
+        , formattedTextJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
+        , formattedTextDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , formattedTextDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , formattedTextRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , formattedTextRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , formattedTextFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , formattedTextFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , formattedTextFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , formattedTextFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , formattedTextColor :: (Maybe Color) -- ^ /color/ attribute
+        , formattedTextHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , formattedTextValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , formattedTextUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
+        , formattedTextOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
+        , formattedTextLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
+        , formattedTextRotation :: (Maybe RotationDegrees) -- ^ /rotation/ attribute
+        , formattedTextLetterSpacing :: (Maybe NumberOrNormal) -- ^ /letter-spacing/ attribute
+        , formattedTextLineHeight :: (Maybe NumberOrNormal) -- ^ /line-height/ attribute
+        , formattedTextDir :: (Maybe TextDirection) -- ^ /dir/ attribute
+        , formattedTextEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml FormattedText where
+    emitXml (FormattedText a b c d e f g h i j k l m n o p q r s t u v w) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "space" (Just "xml")).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) w])
+        []
+parseFormattedText :: P.XParse FormattedText
+parseFormattedText = 
+      FormattedText
+        <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.xattr (P.name "xml:space") >>= parseSpace)
+        <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.xattr (P.name "letter-spacing") >>= parseNumberOrNormal)
+        <*> P.optional (P.xattr (P.name "line-height") >>= parseNumberOrNormal)
+        <*> P.optional (P.xattr (P.name "dir") >>= parseTextDirection)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
 
 -- | Smart constructor for 'FormattedText'
 mkFormattedText :: String -> FormattedText
-mkFormattedText a = FormattedText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkFormattedText a = FormattedText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @formatted-text-id@ /(complex)/
+--
+-- The formatted-text-id type represents a text element with text-formatting and id attributes.
+data FormattedTextId = 
+      FormattedTextId {
+          formattedTextIdString :: String -- ^ text content
+        , formattedTextIdLang :: (Maybe Lang) -- ^ /xml:lang/ attribute
+        , formattedTextIdSpace :: (Maybe Space) -- ^ /xml:space/ attribute
+        , formattedTextIdJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
+        , formattedTextIdDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , formattedTextIdDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , formattedTextIdRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , formattedTextIdRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , formattedTextIdFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , formattedTextIdFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , formattedTextIdFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , formattedTextIdFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , formattedTextIdColor :: (Maybe Color) -- ^ /color/ attribute
+        , formattedTextIdHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , formattedTextIdValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , formattedTextIdUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
+        , formattedTextIdOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
+        , formattedTextIdLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
+        , formattedTextIdRotation :: (Maybe RotationDegrees) -- ^ /rotation/ attribute
+        , formattedTextIdLetterSpacing :: (Maybe NumberOrNormal) -- ^ /letter-spacing/ attribute
+        , formattedTextIdLineHeight :: (Maybe NumberOrNormal) -- ^ /line-height/ attribute
+        , formattedTextIdDir :: (Maybe TextDirection) -- ^ /dir/ attribute
+        , formattedTextIdEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
+        , formattedTextIdId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml FormattedTextId where
+    emitXml (FormattedTextId a b c d e f g h i j k l m n o p q r s t u v w x) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "space" (Just "xml")).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "letter-spacing" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "line-height" Nothing).emitXml) u] ++
+        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) v] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) w] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) x])
+        []
+parseFormattedTextId :: P.XParse FormattedTextId
+parseFormattedTextId = 
+      FormattedTextId
+        <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "xml:lang") >>= parseLang)
+        <*> P.optional (P.xattr (P.name "xml:space") >>= parseSpace)
+        <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
+        <*> P.optional (P.xattr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.xattr (P.name "letter-spacing") >>= parseNumberOrNormal)
+        <*> P.optional (P.xattr (P.name "line-height") >>= parseNumberOrNormal)
+        <*> P.optional (P.xattr (P.name "dir") >>= parseTextDirection)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'FormattedTextId'
+mkFormattedTextId :: String -> FormattedTextId
+mkFormattedTextId a = FormattedTextId a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @forward@ /(complex)/
 --
--- The backup and forward elements are required to coordinate multiple voices in one part, including music on multiple staves. The forward element is generally used within voices and staves. Duration values should always be positive, and should not cross measure boundaries.
+-- The backup and forward elements are required to coordinate multiple voices in one part, including music on multiple staves. The forward element is generally used within voices and staves. Duration values should always be positive, and should not cross measure boundaries or mid-measure changes in the divisions value.
 data Forward = 
       Forward {
           forwardDuration :: Duration
@@ -4270,18 +6463,20 @@ mkForward a b = Forward a b Nothing
 
 -- | @frame@ /(complex)/
 --
--- The frame type represents a frame or fretboard diagram used together with a chord symbol. The representation is based on the NIFF guitar grid with additional information.
+-- The frame type represents a frame or fretboard diagram used together with a chord symbol. The representation is based on the NIFF guitar grid with additional information. The frame type's unplayed attribute indicates what to display above a string that has no associated frame-note element. Typical values are x and the empty string. If the attribute is not present, the display of the unplayed string is application-defined.
 data Frame = 
       Frame {
           frameHeight :: (Maybe Tenths) -- ^ /height/ attribute
         , frameWidth :: (Maybe Tenths) -- ^ /width/ attribute
+        , frameUnplayed :: (Maybe Token) -- ^ /unplayed/ attribute
         , frameDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , frameDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , frameRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , frameRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , frameColor :: (Maybe Color) -- ^ /color/ attribute
         , frameHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
-        , frameValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , frameValign :: (Maybe ValignImage) -- ^ /valign/ attribute
+        , frameId :: (Maybe ID) -- ^ /id/ attribute
         , frameFrameStrings :: PositiveInteger -- ^ /frame-strings/ child element
         , frameFrameFrets :: PositiveInteger -- ^ /frame-frets/ child element
         , frameFirstFret :: (Maybe FirstFret) -- ^ /first-fret/ child element
@@ -4289,33 +6484,37 @@ data Frame =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Frame where
-    emitXml (Frame a b c d e f g h i j k l m) =
+    emitXml (Frame a b c d e f g h i j k l m n o) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "height" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) i])
-        ([XElement (QN "frame-strings" Nothing) (emitXml j)] ++
-        [XElement (QN "frame-frets" Nothing) (emitXml k)] ++
-        [maybe XEmpty (XElement (QN "first-fret" Nothing).emitXml) l] ++
-        map (XElement (QN "frame-note" Nothing).emitXml) m)
+        [maybe XEmpty (XAttr (QN "unplayed" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) k])
+        ([XElement (QN "frame-strings" Nothing) (emitXml l)] ++
+        [XElement (QN "frame-frets" Nothing) (emitXml m)] ++
+        [maybe XEmpty (XElement (QN "first-fret" Nothing).emitXml) n] ++
+        map (XElement (QN "frame-note" Nothing).emitXml) o)
 parseFrame :: P.XParse Frame
 parseFrame = 
       Frame
         <$> P.optional (P.xattr (P.name "height") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "width") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "unplayed") >>= parseToken)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
-        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValignImage)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> (P.xchild (P.name "frame-strings") (P.xtext >>= parsePositiveInteger))
         <*> (P.xchild (P.name "frame-frets") (P.xtext >>= parsePositiveInteger))
         <*> P.optional (P.xchild (P.name "first-fret") (parseFirstFret))
@@ -4323,7 +6522,7 @@ parseFrame =
 
 -- | Smart constructor for 'Frame'
 mkFrame :: PositiveInteger -> PositiveInteger -> Frame
-mkFrame j k = Frame Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing j k Nothing []
+mkFrame l m = Frame Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing l m Nothing []
 
 -- | @frame-note@ /(complex)/
 --
@@ -4392,6 +6591,30 @@ parseFret =
 mkFret :: NonNegativeInteger -> Fret
 mkFret a = Fret a Nothing Nothing Nothing Nothing Nothing
 
+-- | @glass@ /(complex)/
+--
+-- The glass type represents pictograms for glass percussion instruments. The smufl attribute is used to distinguish different SMuFL glyphs for wind chimes in the chimes pictograms range, including those made of materials other than glass.
+data Glass = 
+      Glass {
+          glassGlassValue :: GlassValue -- ^ text content
+        , glassSmufl :: (Maybe SmuflPictogramGlyphName) -- ^ /smufl/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Glass where
+    emitXml (Glass a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b])
+        []
+parseGlass :: P.XParse Glass
+parseGlass = 
+      Glass
+        <$> (P.xtext >>= parseGlassValue)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflPictogramGlyphName)
+
+-- | Smart constructor for 'Glass'
+mkGlass :: GlassValue -> Glass
+mkGlass a = Glass a Nothing
+
 -- | @glissando@ /(complex)/
 --
 -- Glissando and slide types both indicate rapidly moving from one pitch to the other so that individual notes are not discerned. The distinction is similar to that between NIFF's glissando and portamento elements. A glissando sounds the half notes in between the slide and defaults to a wavy line. The optional text is printed alongside the line.
@@ -4401,6 +6624,8 @@ data Glissando =
         , glissandoType :: StartStop -- ^ /type/ attribute
         , glissandoNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , glissandoLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , glissandoDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , glissandoSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , glissandoDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , glissandoDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , glissandoRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -4410,23 +6635,27 @@ data Glissando =
         , glissandoFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , glissandoFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , glissandoColor :: (Maybe Color) -- ^ /color/ attribute
+        , glissandoId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Glissando where
-    emitXml (Glissando a b c d e f g h i j k l m) =
+    emitXml (Glissando a b c d e f g h i j k l m n o p) =
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m])
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) p])
         []
 parseGlissando :: P.XParse Glissando
 parseGlissando = 
@@ -4435,6 +6664,8 @@ parseGlissando =
         <*> (P.xattr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -4444,14 +6675,39 @@ parseGlissando =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Glissando'
 mkGlissando :: String -> StartStop -> Glissando
-mkGlissando a b = Glissando a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkGlissando a b = Glissando a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @glyph@ /(complex)/
+--
+-- The glyph element represents what SMuFL glyph should be used for different variations of symbols that are semantically identical. The type attribute specifies what type of glyph is being defined. The element value specifies what SMuFL glyph to use, including recommended stylistic alternates. The SMuFL glyph name should match the type. For instance, a type of quarter-rest would use values restQuarter, restQuarterOld, or restQuarterZ. A type of g-clef-ottava-bassa would use values gClef8vb, gClef8vbOld, or gClef8vbCClef. A type of octave-shift-up-8 would use values ottava, ottavaBassa, ottavaBassaBa, ottavaBassaVb, or octaveBassa.
+data Glyph = 
+      Glyph {
+          glyphSmuflGlyphName :: SmuflGlyphName -- ^ text content
+        , cmpglyphType :: GlyphType -- ^ /type/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Glyph where
+    emitXml (Glyph a b) =
+      XContent (emitXml a)
+        ([XAttr (QN "type" Nothing) (emitXml b)])
+        []
+parseGlyph :: P.XParse Glyph
+parseGlyph = 
+      Glyph
+        <$> (P.xtext >>= parseSmuflGlyphName)
+        <*> (P.xattr (P.name "type") >>= parseGlyphType)
+
+-- | Smart constructor for 'Glyph'
+mkGlyph :: SmuflGlyphName -> GlyphType -> Glyph
+mkGlyph a b = Glyph a b
 
 -- | @grace@ /(complex)/
 --
--- The grace type indicates the presence of a grace note. The slash attribute for a grace note is yes for slashed eighth notes. The other grace note attributes come from MuseData sound suggestions. Steal-time-previous indicates the percentage of time to steal from the previous note for the grace note. Steal-time-following indicates the percentage of time to steal from the following note for the grace note. Make-time indicates to make time, not steal time; the units are in real-time divisions for the grace note.
+-- The grace type indicates the presence of a grace note. The slash attribute for a grace note is yes for slashed eighth notes. The other grace note attributes come from MuseData sound suggestions. The steal-time-previous attribute indicates the percentage of time to steal from the previous note for the grace note. The steal-time-following attribute indicates the percentage of time to steal from the following note for the grace note, as for appoggiaturas. The make-time attribute indicates to make time, not steal time; the units are in real-time divisions for the grace note.
 data Grace = 
       Grace {
           graceStealTimePrevious :: (Maybe Percent) -- ^ /steal-time-previous/ attribute
@@ -4594,34 +6850,37 @@ mkGroupSymbol a = GroupSymbol a Nothing Nothing Nothing Nothing Nothing
 -- | @grouping@ /(complex)/
 --
 -- The grouping type is used for musical analysis. When the type attribute is "start" or "single", it usually contains one or more feature elements. The number attribute is used for distinguishing between overlapping and hierarchical groupings. The member-of attribute allows for easy distinguishing of what grouping elements are in what hierarchy. Feature elements contained within a "stop" type of grouping may be ignored.
--- 	
+-- 
 -- This element is flexible to allow for different types of analyses. Future versions of the MusicXML format may add elements that can represent more standardized categories of analysis data, allowing for easier data sharing.
 data Grouping = 
       Grouping {
           groupingType :: StartStopSingle -- ^ /type/ attribute
         , groupingNumber :: (Maybe Token) -- ^ /number/ attribute
         , groupingMemberOf :: (Maybe Token) -- ^ /member-of/ attribute
+        , groupingId :: (Maybe ID) -- ^ /id/ attribute
         , groupingFeature :: [Feature] -- ^ /feature/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Grouping where
-    emitXml (Grouping a b c d) =
+    emitXml (Grouping a b c d e) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "member-of" Nothing).emitXml) c])
-        (map (XElement (QN "feature" Nothing).emitXml) d)
+        [maybe XEmpty (XAttr (QN "member-of" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) d])
+        (map (XElement (QN "feature" Nothing).emitXml) e)
 parseGrouping :: P.XParse Grouping
 parseGrouping = 
       Grouping
         <$> (P.xattr (P.name "type") >>= parseStartStopSingle)
         <*> P.optional (P.xattr (P.name "number") >>= parseToken)
         <*> P.optional (P.xattr (P.name "member-of") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (P.xchild (P.name "feature") (parseFeature))
 
 -- | Smart constructor for 'Grouping'
 mkGrouping :: StartStopSingle -> Grouping
-mkGrouping a = Grouping a Nothing Nothing []
+mkGrouping a = Grouping a Nothing Nothing Nothing []
 
 -- | @hammer-on-pull-off@ /(complex)/
 --
@@ -4679,6 +6938,132 @@ parseHammerOnPullOff =
 -- | Smart constructor for 'HammerOnPullOff'
 mkHammerOnPullOff :: String -> StartStop -> HammerOnPullOff
 mkHammerOnPullOff a b = HammerOnPullOff a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @handbell@ /(complex)/
+--
+-- The handbell element represents notation for various techniques used in handbell and handchime music.
+data Handbell = 
+      Handbell {
+          handbellHandbellValue :: HandbellValue -- ^ text content
+        , handbellDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , handbellDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , handbellRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , handbellRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , handbellFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , handbellFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , handbellFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , handbellFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , handbellColor :: (Maybe Color) -- ^ /color/ attribute
+        , handbellPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Handbell where
+    emitXml (Handbell a b c d e f g h i j k) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
+        []
+parseHandbell :: P.XParse Handbell
+parseHandbell = 
+      Handbell
+        <$> (P.xtext >>= parseHandbellValue)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+
+-- | Smart constructor for 'Handbell'
+mkHandbell :: HandbellValue -> Handbell
+mkHandbell a = Handbell a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @harmon-closed@ /(complex)/
+--
+-- The harmon-closed type represents whether the harmon mute is closed, open, or half-open. The optional location attribute indicates which portion of the symbol is filled in when the element value is half.
+data HarmonClosed = 
+      HarmonClosed {
+          harmonClosedHarmonClosedValue :: HarmonClosedValue -- ^ text content
+        , harmonClosedLocation :: (Maybe HarmonClosedLocation) -- ^ /location/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml HarmonClosed where
+    emitXml (HarmonClosed a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b])
+        []
+parseHarmonClosed :: P.XParse HarmonClosed
+parseHarmonClosed = 
+      HarmonClosed
+        <$> (P.xtext >>= parseHarmonClosedValue)
+        <*> P.optional (P.xattr (P.name "location") >>= parseHarmonClosedLocation)
+
+-- | Smart constructor for 'HarmonClosed'
+mkHarmonClosed :: HarmonClosedValue -> HarmonClosed
+mkHarmonClosed a = HarmonClosed a Nothing
+
+-- | @harmon-mute@ /(complex)/
+--
+-- The harmon-mute type represents the symbols used for harmon mutes in brass notation.
+data HarmonMute = 
+      HarmonMute {
+          harmonMuteDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , harmonMuteDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , harmonMuteRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , harmonMuteRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , harmonMuteFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , harmonMuteFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , harmonMuteFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , harmonMuteFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , harmonMuteColor :: (Maybe Color) -- ^ /color/ attribute
+        , harmonMutePlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , harmonMuteHarmonClosed :: HarmonClosed -- ^ /harmon-closed/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml HarmonMute where
+    emitXml (HarmonMute a b c d e f g h i j k) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
+        ([XElement (QN "harmon-closed" Nothing) (emitXml k)])
+parseHarmonMute :: P.XParse HarmonMute
+parseHarmonMute = 
+      HarmonMute
+        <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> (P.xchild (P.name "harmon-closed") (parseHarmonClosed))
+
+-- | Smart constructor for 'HarmonMute'
+mkHarmonMute :: HarmonClosed -> HarmonMute
+mkHarmonMute k = HarmonMute Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing k
 
 -- | @harmonic@ /(complex)/
 --
@@ -4740,9 +7125,9 @@ mkHarmonic = Harmonic Nothing Nothing Nothing Nothing Nothing Nothing Nothing No
 -- | @harmony@ /(complex)/
 --
 -- The harmony type is based on Humdrum's **harm encoding, extended to support chord symbols in popular music as well as functional harmony analysis in classical music.
--- 	
--- If there are alternate harmonies possible, this can be specified using multiple harmony elements differentiated by type. Explicit harmonies have all note present in the music; implied have some notes missing but implied; alternate represents alternate analyses. 
--- 	
+-- 
+-- If there are alternate harmonies possible, this can be specified using multiple harmony elements differentiated by type. Explicit harmonies have all note present in the music; implied have some notes missing but implied; alternate represents alternate analyses.
+-- 
 -- The harmony object may be used for analysis or for chord symbols. The print-object attribute controls whether or not anything is printed due to the harmony element. The print-frame attribute controls printing of a frame or fretboard diagram. The print-style attribute group sets the default for the harmony, but individual elements can override this with their own print-style values.
 data Harmony = 
       Harmony {
@@ -4759,6 +7144,7 @@ data Harmony =
         , harmonyFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , harmonyColor :: (Maybe Color) -- ^ /color/ attribute
         , harmonyPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , harmonyId :: (Maybe ID) -- ^ /id/ attribute
         , harmonyHarmonyChord :: [HarmonyChord]
         , harmonyFrame :: (Maybe Frame) -- ^ /frame/ child element
         , harmonyOffset :: (Maybe Offset) -- ^ /offset/ child element
@@ -4767,7 +7153,7 @@ data Harmony =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Harmony where
-    emitXml (Harmony a b c d e f g h i j k l m n o p q r) =
+    emitXml (Harmony a b c d e f g h i j k l m n o p q r s) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "print-frame" Nothing).emitXml) b] ++
@@ -4781,12 +7167,13 @@ instance EmitXml Harmony where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m])
-        ([emitXml n] ++
-        [maybe XEmpty (XElement (QN "frame" Nothing).emitXml) o] ++
-        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) p] ++
-        [emitXml q] ++
-        [emitXml r])
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) n])
+        ([emitXml o] ++
+        [maybe XEmpty (XElement (QN "frame" Nothing).emitXml) p] ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) q] ++
+        [emitXml r] ++
+        [emitXml s])
 parseHarmony :: P.XParse Harmony
 parseHarmony = 
       Harmony
@@ -4803,6 +7190,7 @@ parseHarmony =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (parseHarmonyChord)
         <*> P.optional (P.xchild (P.name "frame") (parseFrame))
         <*> P.optional (P.xchild (P.name "offset") (parseOffset))
@@ -4811,7 +7199,7 @@ parseHarmony =
 
 -- | Smart constructor for 'Harmony'
 mkHarmony :: Editorial -> Harmony
-mkHarmony q = Harmony Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing Nothing q Nothing
+mkHarmony r = Harmony Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing Nothing r Nothing
 
 -- | @harp-pedals@ /(complex)/
 --
@@ -4827,11 +7215,14 @@ data HarpPedals =
         , harpPedalsFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , harpPedalsFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , harpPedalsColor :: (Maybe Color) -- ^ /color/ attribute
+        , harpPedalsHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , harpPedalsValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , harpPedalsId :: (Maybe ID) -- ^ /id/ attribute
         , harpPedalsPedalTuning :: [PedalTuning] -- ^ /pedal-tuning/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml HarpPedals where
-    emitXml (HarpPedals a b c d e f g h i j) =
+    emitXml (HarpPedals a b c d e f g h i j k l m) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
@@ -4841,8 +7232,11 @@ instance EmitXml HarpPedals where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
-        (map (XElement (QN "pedal-tuning" Nothing).emitXml) j)
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        (map (XElement (QN "pedal-tuning" Nothing).emitXml) m)
 parseHarpPedals :: P.XParse HarpPedals
 parseHarpPedals = 
       HarpPedals
@@ -4855,11 +7249,14 @@ parseHarpPedals =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (P.xchild (P.name "pedal-tuning") (parsePedalTuning))
 
 -- | Smart constructor for 'HarpPedals'
 mkHarpPedals :: HarpPedals
-mkHarpPedals = HarpPedals Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
+mkHarpPedals = HarpPedals Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing []
 
 -- | @heel-toe@ /(complex)/
 --
@@ -4884,6 +7281,160 @@ parseHeelToe =
 -- | Smart constructor for 'HeelToe'
 mkHeelToe :: HeelToe -> HeelToe
 mkHeelToe a = HeelToe a Nothing
+
+-- | @hole@ /(complex)/
+--
+-- The hole type represents the symbols used for woodwind and brass fingerings as well as other notations.
+data Hole = 
+      Hole {
+          holeDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , holeDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , holeRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , holeRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , holeFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , holeFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , holeFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , holeFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , holeColor :: (Maybe Color) -- ^ /color/ attribute
+        , holePlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , holeHoleType :: (Maybe String) -- ^ /hole-type/ child element
+        , holeHoleClosed :: HoleClosed -- ^ /hole-closed/ child element
+        , holeHoleShape :: (Maybe String) -- ^ /hole-shape/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Hole where
+    emitXml (Hole a b c d e f g h i j k l m) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j])
+        ([maybe XEmpty (XElement (QN "hole-type" Nothing).emitXml) k] ++
+        [XElement (QN "hole-closed" Nothing) (emitXml l)] ++
+        [maybe XEmpty (XElement (QN "hole-shape" Nothing).emitXml) m])
+parseHole :: P.XParse Hole
+parseHole = 
+      Hole
+        <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xchild (P.name "hole-type") (P.xtext >>= return))
+        <*> (P.xchild (P.name "hole-closed") (parseHoleClosed))
+        <*> P.optional (P.xchild (P.name "hole-shape") (P.xtext >>= return))
+
+-- | Smart constructor for 'Hole'
+mkHole :: HoleClosed -> Hole
+mkHole l = Hole Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing l Nothing
+
+-- | @hole-closed@ /(complex)/
+--
+-- The hole-closed type represents whether the hole is closed, open, or half-open. The optional location attribute indicates which portion of the hole is filled in when the element value is half.
+data HoleClosed = 
+      HoleClosed {
+          holeClosedHoleClosedValue :: HoleClosedValue -- ^ text content
+        , holeClosedLocation :: (Maybe HoleClosedLocation) -- ^ /location/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml HoleClosed where
+    emitXml (HoleClosed a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "location" Nothing).emitXml) b])
+        []
+parseHoleClosed :: P.XParse HoleClosed
+parseHoleClosed = 
+      HoleClosed
+        <$> (P.xtext >>= parseHoleClosedValue)
+        <*> P.optional (P.xattr (P.name "location") >>= parseHoleClosedLocation)
+
+-- | Smart constructor for 'HoleClosed'
+mkHoleClosed :: HoleClosedValue -> HoleClosed
+mkHoleClosed a = HoleClosed a Nothing
+
+-- | @horizontal-turn@ /(complex)/
+--
+-- The horizontal-turn type represents turn elements that are horizontal rather than vertical. These are empty elements with print-style, placement, trill-sound, and slash attributes. If the slash attribute is yes, then a vertical line is used to slash the turn; it is no by default.
+data HorizontalTurn = 
+      HorizontalTurn {
+          horizontalTurnSlash :: (Maybe YesNo) -- ^ /slash/ attribute
+        , horizontalTurnDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , horizontalTurnDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , horizontalTurnRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , horizontalTurnRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , horizontalTurnFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , horizontalTurnFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , horizontalTurnFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , horizontalTurnFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , horizontalTurnColor :: (Maybe Color) -- ^ /color/ attribute
+        , horizontalTurnPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , horizontalTurnStartNote :: (Maybe StartNote) -- ^ /start-note/ attribute
+        , horizontalTurnTrillStep :: (Maybe TrillStep) -- ^ /trill-step/ attribute
+        , horizontalTurnTwoNoteTurn :: (Maybe TwoNoteTurn) -- ^ /two-note-turn/ attribute
+        , horizontalTurnAccelerate :: (Maybe YesNo) -- ^ /accelerate/ attribute
+        , horizontalTurnBeats :: (Maybe TrillBeats) -- ^ /beats/ attribute
+        , horizontalTurnSecondBeat :: (Maybe Percent) -- ^ /second-beat/ attribute
+        , horizontalTurnLastBeat :: (Maybe Percent) -- ^ /last-beat/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml HorizontalTurn where
+    emitXml (HorizontalTurn a b c d e f g h i j k l m n o p q r) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "slash" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "start-note" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "trill-step" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "two-note-turn" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "second-beat" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) r])
+        []
+parseHorizontalTurn :: P.XParse HorizontalTurn
+parseHorizontalTurn = 
+      HorizontalTurn
+        <$> P.optional (P.xattr (P.name "slash") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "start-note") >>= parseStartNote)
+        <*> P.optional (P.xattr (P.name "trill-step") >>= parseTrillStep)
+        <*> P.optional (P.xattr (P.name "two-note-turn") >>= parseTwoNoteTurn)
+        <*> P.optional (P.xattr (P.name "accelerate") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "beats") >>= parseTrillBeats)
+        <*> P.optional (P.xattr (P.name "second-beat") >>= parsePercent)
+        <*> P.optional (P.xattr (P.name "last-beat") >>= parsePercent)
+
+-- | Smart constructor for 'HorizontalTurn'
+mkHorizontalTurn :: HorizontalTurn
+mkHorizontalTurn = HorizontalTurn Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @identification@ /(complex)/
 --
@@ -4929,41 +7480,50 @@ data Image =
       Image {
           imageSource :: String -- ^ /source/ attribute
         , imageType :: Token -- ^ /type/ attribute
+        , imageHeight :: (Maybe Tenths) -- ^ /height/ attribute
+        , imageWidth :: (Maybe Tenths) -- ^ /width/ attribute
         , imageDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , imageDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , imageRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , imageRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , imageHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
         , imageValign :: (Maybe ValignImage) -- ^ /valign/ attribute
+        , imageId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Image where
-    emitXml (Image a b c d e f g h) =
+    emitXml (Image a b c d e f g h i j k) =
       XContent XEmpty
         ([XAttr (QN "source" Nothing) (emitXml a)] ++
         [XAttr (QN "type" Nothing) (emitXml b)] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) h])
+        [maybe XEmpty (XAttr (QN "height" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) k])
         []
 parseImage :: P.XParse Image
 parseImage = 
       Image
         <$> (P.xattr (P.name "source") >>= return)
         <*> (P.xattr (P.name "type") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "height") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "width") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
         <*> P.optional (P.xattr (P.name "valign") >>= parseValignImage)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Image'
 mkImage :: String -> Token -> Image
-mkImage a b = Image a b Nothing Nothing Nothing Nothing Nothing Nothing
+mkImage a b = Image a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @instrument@ /(complex)/
 --
@@ -4986,6 +7546,36 @@ parseInstrument =
 -- | Smart constructor for 'Instrument'
 mkInstrument :: IDREF -> Instrument
 mkInstrument a = Instrument a
+
+-- | @interchangeable@ /(complex)/
+--
+-- The interchangeable type is used to represent the second in a pair of interchangeable dual time signatures, such as the 6/8 in 3/4 (6/8). A separate symbol attribute value is available compared to the time element's symbol attribute, which applies to the first of the dual time signatures.
+data Interchangeable = 
+      Interchangeable {
+          interchangeableSymbol :: (Maybe TimeSymbol) -- ^ /symbol/ attribute
+        , interchangeableSeparator :: (Maybe TimeSeparator) -- ^ /separator/ attribute
+        , interchangeableTimeRelation :: (Maybe TimeRelation) -- ^ /time-relation/ child element
+        , interchangeableTimeSignature :: [TimeSignature]
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Interchangeable where
+    emitXml (Interchangeable a b c d) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "separator" Nothing).emitXml) b])
+        ([maybe XEmpty (XElement (QN "time-relation" Nothing).emitXml) c] ++
+        [emitXml d])
+parseInterchangeable :: P.XParse Interchangeable
+parseInterchangeable = 
+      Interchangeable
+        <$> P.optional (P.xattr (P.name "symbol") >>= parseTimeSymbol)
+        <*> P.optional (P.xattr (P.name "separator") >>= parseTimeSeparator)
+        <*> P.optional (P.xchild (P.name "time-relation") (P.xtext >>= parseTimeRelation))
+        <*> P.many (parseTimeSignature)
+
+-- | Smart constructor for 'Interchangeable'
+mkInterchangeable :: Interchangeable
+mkInterchangeable = Interchangeable Nothing Nothing Nothing []
 
 -- | @inversion@ /(complex)/
 --
@@ -5037,7 +7627,7 @@ mkInversion a = Inversion a Nothing Nothing Nothing Nothing Nothing Nothing Noth
 
 -- | @key@ /(complex)/
 --
--- The key type represents a key signature. Both traditional and non-traditional key signatures are supported. The optional number attribute refers to staff numbers. If absent, the key signature applies to all staves in the part.
+-- The key type represents a key signature. Both traditional and non-traditional key signatures are supported. The optional number attribute refers to staff numbers. If absent, the key signature applies to all staves in the part. Key signatures appear at the start of each system unless the print-object attribute has been set to "no".
 data Key = 
       Key {
           keyNumber :: (Maybe StaffNumber) -- ^ /number/ attribute
@@ -5051,12 +7641,13 @@ data Key =
         , keyFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , keyColor :: (Maybe Color) -- ^ /color/ attribute
         , keyPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , keyId :: (Maybe ID) -- ^ /id/ attribute
         , keyKey :: ChxKey
         , keyKeyOctave :: [KeyOctave] -- ^ /key-octave/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Key where
-    emitXml (Key a b c d e f g h i j k l m) =
+    emitXml (Key a b c d e f g h i j k l m n) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
@@ -5068,9 +7659,10 @@ instance EmitXml Key where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k])
-        ([emitXml l] ++
-        map (XElement (QN "key-octave" Nothing).emitXml) m)
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        ([emitXml m] ++
+        map (XElement (QN "key-octave" Nothing).emitXml) n)
 parseKey :: P.XParse Key
 parseKey = 
       Key
@@ -5085,16 +7677,41 @@ parseKey =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxKey
         <*> P.many (P.xchild (P.name "key-octave") (parseKeyOctave))
 
 -- | Smart constructor for 'Key'
 mkKey :: ChxKey -> Key
-mkKey l = Key Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing l []
+mkKey m = Key Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing m []
+
+-- | @key-accidental@ /(complex)/
+--
+-- The key-accidental type indicates the accidental to be displayed in a non-traditional key signature, represented in the same manner as the accidental type without the formatting attributes.
+data KeyAccidental = 
+      KeyAccidental {
+          keyAccidentalAccidentalValue :: AccidentalValue -- ^ text content
+        , keyAccidentalSmufl :: (Maybe SmuflAccidentalGlyphName) -- ^ /smufl/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml KeyAccidental where
+    emitXml (KeyAccidental a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b])
+        []
+parseKeyAccidental :: P.XParse KeyAccidental
+parseKeyAccidental = 
+      KeyAccidental
+        <$> (P.xtext >>= parseAccidentalValue)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflAccidentalGlyphName)
+
+-- | Smart constructor for 'KeyAccidental'
+mkKeyAccidental :: AccidentalValue -> KeyAccidental
+mkKeyAccidental a = KeyAccidental a Nothing
 
 -- | @key-octave@ /(complex)/
 --
--- The key-octave element specifies in which octave an element of a key signature appears. The content specifies the octave value using the same values as the display-octave element. The number attribute is a positive integer that refers to the key signature element in left-to-right order. If the cancel attribute is set to yes, then this number refers to an element specified by the cancel element. It is no by default.
+-- The key-octave element specifies in which octave an element of a key signature appears. The content specifies the octave value using the same values as the display-octave element. The number attribute is a positive integer that refers to the key signature element in left-to-right order. If the cancel attribute is set to yes, then this number refers to the canceling key signature specified by the cancel element in the parent key element. The cancel attribute cannot be set to yes if there is no corresponding cancel element within the parent key element. It is no by default.
 data KeyOctave = 
       KeyOctave {
           keyOctaveOctave :: Octave -- ^ text content
@@ -5124,18 +7741,20 @@ mkKeyOctave a b = KeyOctave a b Nothing
 -- Kind indicates the type of chord. Degree elements can then add, subtract, or alter from these starting points
 --
 -- @
--- 	
+-- 
 -- The attributes are used to indicate the formatting of the symbol. Since the kind element is the constant in all the harmony-chord groups that can make up a polychord, many formatting attributes are here.
--- 	
+-- 
 -- The use-symbols attribute is yes if the kind should be represented when possible with harmony symbols rather than letters and numbers. These symbols include:
--- 	
+-- 
 -- 	major: a triangle, like Unicode 25B3
 -- 	minor: -, like Unicode 002D
 -- 	augmented: +, like Unicode 002B
 -- 	diminished: °, like Unicode 00B0
 -- 	half-diminished: ø, like Unicode 00F8
--- 	
--- The text attribute describes how the kind should be spelled if not using symbols; it is ignored if use-symbols is yes. The stack-degrees attribute is yes if the degree elements should be stacked above each other. The parentheses-degrees attribute is yes if all the degrees should be in parentheses. The bracket-degrees attribute is yes if all the degrees should be in a bracket. If not specified, these values are implementation-specific. The alignment attributes are for the entire harmony-chord group of which this kind element is a part.
+-- 
+-- For the major-minor kind, only the minor symbol is used when use-symbols is yes. The major symbol is set using the symbol attribute in the degree-value element. The corresponding degree-alter value will usually be 0 in this case.
+-- 
+-- The text attribute describes how the kind should be spelled in a score. If use-symbols is yes, the value of the text attribute follows the symbol. The stack-degrees attribute is yes if the degree elements should be stacked above each other. The parentheses-degrees attribute is yes if all the degrees should be in parentheses. The bracket-degrees attribute is yes if all the degrees should be in a bracket. If not specified, these values are implementation-specific. The alignment attributes are for the entire harmony-chord group of which this kind element is a part.
 -- @
 data Kind = 
       Kind {
@@ -5262,7 +7881,7 @@ mkLineWidth a b = LineWidth a b
 
 -- | @link@ /(complex)/
 --
--- The link type serves as an outgoing simple XLink. It is also used to connect a MusicXML score with a MusicXML opus.
+-- The link type serves as an outgoing simple XLink. It is also used to connect a MusicXML score with a MusicXML opus. If a relative link is used within a document that is part of a compressed MusicXML file, the link is relative to the  root folder of the zip file.
 data Link = 
       Link {
           linkName :: (Maybe Token) -- ^ /name/ attribute
@@ -5320,11 +7939,14 @@ mkLink b = Link Nothing b Nothing Nothing Nothing Nothing Nothing Nothing Nothin
 
 -- | @lyric@ /(complex)/
 --
--- The lyric type represents text underlays for lyrics, based on Humdrum with support for other formats. Two text elements that are not separated by an elision element are part of the same syllable, but may have different text formatting. The MusicXML 2.0 XSD is more strict than the 2.0 DTD in enforcing this by disallowing a second syllabic element unless preceded by an elision element. The lyric number indicates multiple lines, though a name can be used as well (as in Finale's verse / chorus / section specification). Justification is center by default; placement is below by default.
+-- The lyric type represents text underlays for lyrics, based on Humdrum with support for other formats. Two text elements that are not separated by an elision element are part of the same syllable, but may have different text formatting. The MusicXML XSD is more strict than the DTD in enforcing this by disallowing a second syllabic element unless preceded by an elision element. The lyric number indicates multiple lines, though a name can be used as well (as in Finale's verse / chorus / section specification).
+-- 
+-- Justification is center by default; placement is below by default. The print-object attribute can override a note's print-lyric attribute in cases where only some lyrics on a note are printed, as when lyrics for later verses are printed in a block of text rather than with each note. The time-only attribute precisely specifies which lyrics are to be sung which time through a repeated section.
 data Lyric = 
       Lyric {
           lyricNumber :: (Maybe NMTOKEN) -- ^ /number/ attribute
         , lyricName :: (Maybe Token) -- ^ /name/ attribute
+        , lyricTimeOnly :: (Maybe TimeOnly) -- ^ /time-only/ attribute
         , lyricJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
         , lyricDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , lyricDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
@@ -5332,6 +7954,8 @@ data Lyric =
         , lyricRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , lyricPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , lyricColor :: (Maybe Color) -- ^ /color/ attribute
+        , lyricPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , lyricId :: (Maybe ID) -- ^ /id/ attribute
         , lyricLyric :: ChxLyric
         , lyricEndLine :: (Maybe Empty) -- ^ /end-line/ child element
         , lyricEndParagraph :: (Maybe Empty) -- ^ /end-paragraph/ child element
@@ -5339,26 +7963,30 @@ data Lyric =
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Lyric where
-    emitXml (Lyric a b c d e f g h i j k l m) =
+    emitXml (Lyric a b c d e f g h i j k l m n o p) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "name" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i])
-        ([emitXml j] ++
-        [maybe XEmpty (XElement (QN "end-line" Nothing).emitXml) k] ++
-        [maybe XEmpty (XElement (QN "end-paragraph" Nothing).emitXml) l] ++
-        [emitXml m])
+        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        ([emitXml m] ++
+        [maybe XEmpty (XElement (QN "end-line" Nothing).emitXml) n] ++
+        [maybe XEmpty (XElement (QN "end-paragraph" Nothing).emitXml) o] ++
+        [emitXml p])
 parseLyric :: P.XParse Lyric
 parseLyric = 
       Lyric
         <$> P.optional (P.xattr (P.name "number") >>= parseNMTOKEN)
         <*> P.optional (P.xattr (P.name "name") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "time-only") >>= parseTimeOnly)
         <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
@@ -5366,6 +7994,8 @@ parseLyric =
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxLyric
         <*> P.optional (P.xchild (P.name "end-line") (parseEmpty))
         <*> P.optional (P.xchild (P.name "end-paragraph") (parseEmpty))
@@ -5373,7 +8003,7 @@ parseLyric =
 
 -- | Smart constructor for 'Lyric'
 mkLyric :: ChxLyric -> Editorial -> Lyric
-mkLyric j m = Lyric Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing j Nothing Nothing m
+mkLyric m p = Lyric Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing m Nothing Nothing p
 
 -- | @lyric-font@ /(complex)/
 --
@@ -5444,32 +8074,38 @@ mkLyricLanguage c = LyricLanguage Nothing Nothing c
 data Measure = 
       Measure {
           measureNumber :: Token -- ^ /number/ attribute
+        , cmpmeasureText :: (Maybe MeasureText) -- ^ /text/ attribute
         , measureImplicit :: (Maybe YesNo) -- ^ /implicit/ attribute
         , measureNonControlling :: (Maybe YesNo) -- ^ /non-controlling/ attribute
         , measureWidth :: (Maybe Tenths) -- ^ /width/ attribute
+        , measureId :: (Maybe ID) -- ^ /id/ attribute
         , measureMusicData :: MusicData
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Measure where
-    emitXml (Measure a b c d e) =
+    emitXml (Measure a b c d e f g) =
       XContent XEmpty
         ([XAttr (QN "number" Nothing) (emitXml a)] ++
-        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
-        ([emitXml e])
+        [maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) f])
+        ([emitXml g])
 parseMeasure :: P.XParse Measure
 parseMeasure = 
       Measure
         <$> (P.xattr (P.name "number") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "text") >>= parseMeasureText)
         <*> P.optional (P.xattr (P.name "implicit") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "non-controlling") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "width") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseMusicData
 
 -- | Smart constructor for 'Measure'
 mkMeasure :: Token -> MusicData -> Measure
-mkMeasure a e = Measure a Nothing Nothing Nothing e
+mkMeasure a g = Measure a Nothing Nothing Nothing Nothing Nothing g
 
 -- | @measure@ /(complex)/
 
@@ -5477,32 +8113,38 @@ mkMeasure a e = Measure a Nothing Nothing Nothing e
 data CmpMeasure = 
       CmpMeasure {
           cmpmeasureNumber :: Token -- ^ /number/ attribute
+        , cmpmeasureText1 :: (Maybe MeasureText) -- ^ /text/ attribute
         , cmpmeasureImplicit :: (Maybe YesNo) -- ^ /implicit/ attribute
         , cmpmeasureNonControlling :: (Maybe YesNo) -- ^ /non-controlling/ attribute
         , cmpmeasureWidth :: (Maybe Tenths) -- ^ /width/ attribute
+        , cmpmeasureId :: (Maybe ID) -- ^ /id/ attribute
         , measurePart :: [Part] -- ^ /part/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml CmpMeasure where
-    emitXml (CmpMeasure a b c d e) =
+    emitXml (CmpMeasure a b c d e f g) =
       XContent XEmpty
         ([XAttr (QN "number" Nothing) (emitXml a)] ++
-        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) d])
-        (map (XElement (QN "part" Nothing).emitXml) e)
+        [maybe XEmpty (XAttr (QN "text" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "implicit" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "non-controlling" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "width" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) f])
+        (map (XElement (QN "part" Nothing).emitXml) g)
 parseCmpMeasure :: P.XParse CmpMeasure
 parseCmpMeasure = 
       CmpMeasure
         <$> (P.xattr (P.name "number") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "text") >>= parseMeasureText)
         <*> P.optional (P.xattr (P.name "implicit") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "non-controlling") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "width") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.many (P.xchild (P.name "part") (parsePart))
 
 -- | Smart constructor for 'CmpMeasure'
 mkCmpMeasure :: Token -> CmpMeasure
-mkCmpMeasure a = CmpMeasure a Nothing Nothing Nothing []
+mkCmpMeasure a = CmpMeasure a Nothing Nothing Nothing Nothing Nothing []
 
 -- | @measure-layout@ /(complex)/
 --
@@ -5541,10 +8183,12 @@ data MeasureNumbering =
         , measureNumberingFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , measureNumberingFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , measureNumberingColor :: (Maybe Color) -- ^ /color/ attribute
+        , measureNumberingHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , measureNumberingValign :: (Maybe Valign) -- ^ /valign/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml MeasureNumbering where
-    emitXml (MeasureNumbering a b c d e f g h i j) =
+    emitXml (MeasureNumbering a b c d e f g h i j k l) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
@@ -5554,7 +8198,9 @@ instance EmitXml MeasureNumbering where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l])
         []
 parseMeasureNumbering :: P.XParse MeasureNumbering
 parseMeasureNumbering = 
@@ -5569,15 +8215,17 @@ parseMeasureNumbering =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
 
 -- | Smart constructor for 'MeasureNumbering'
 mkMeasureNumbering :: MeasureNumberingValue -> MeasureNumbering
-mkMeasureNumbering a = MeasureNumbering a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkMeasureNumbering a = MeasureNumbering a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @measure-repeat@ /(complex)/
 --
 -- The measure-repeat type is used for both single and multiple measure repeats. The text of the element indicates the number of measures to be repeated in a single pattern. The slashes attribute specifies the number of slashes to use in the repeat sign. It is 1 if not specified. Both the start and the stop of the measure-repeat must be specified. The text of the element is ignored when the type is stop.
--- 	
+-- 
 -- The measure-repeat element specifies a notation style for repetitions. The actual music being repeated needs to be repeated within the MusicXML file. This element specifies the notation that indicates the repeat.
 data MeasureRepeat = 
       MeasureRepeat {
@@ -5616,19 +8264,21 @@ data MeasureStyle =
         , measureStyleFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , measureStyleFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , measureStyleColor :: (Maybe Color) -- ^ /color/ attribute
+        , measureStyleId :: (Maybe ID) -- ^ /id/ attribute
         , measureStyleMeasureStyle :: ChxMeasureStyle
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml MeasureStyle where
-    emitXml (MeasureStyle a b c d e f g) =
+    emitXml (MeasureStyle a b c d e f g h) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) c] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) d] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f])
-        ([emitXml g])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) g])
+        ([emitXml h])
 parseMeasureStyle :: P.XParse MeasureStyle
 parseMeasureStyle = 
       MeasureStyle
@@ -5638,15 +8288,16 @@ parseMeasureStyle =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxMeasureStyle
 
 -- | Smart constructor for 'MeasureStyle'
 mkMeasureStyle :: ChxMeasureStyle -> MeasureStyle
-mkMeasureStyle g = MeasureStyle Nothing Nothing Nothing Nothing Nothing Nothing g
+mkMeasureStyle h = MeasureStyle Nothing Nothing Nothing Nothing Nothing Nothing Nothing h
 
 -- | @metronome@ /(complex)/
 --
--- The metronome type represents metronome marks and other metric relationships. The beat-unit group and per-minute element specify regular metronome marks. The metronome-note and metronome-relation elements allow for the specification of more complicated metric relationships, such as swing tempo marks where two eighths are equated to a quarter note / eighth note triplet. The parentheses attribute indicates whether or not to put the metronome mark in parentheses; its value is no if not specified.
+-- The metronome type represents metronome marks and other metric relationships. The beat-unit group and per-minute element specify regular metronome marks. The metronome-note and metronome-relation elements allow for the specification of metric modulations and other metric relationships, such as swing tempo marks where two eighths are equated to a quarter note / eighth note triplet. Tied notes can be represented in both types of metronome marks by using the beat-unit-tied and metronome-tied elements. The parentheses attribute indicates whether or not to put the metronome mark in parentheses; its value is no if not specified.
 data Metronome = 
       Metronome {
           metronomeParentheses :: (Maybe YesNo) -- ^ /parentheses/ attribute
@@ -5659,11 +8310,15 @@ data Metronome =
         , metronomeFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , metronomeFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , metronomeColor :: (Maybe Color) -- ^ /color/ attribute
+        , metronomeHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , metronomeValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , metronomeJustify :: (Maybe LeftCenterRight) -- ^ /justify/ attribute
+        , metronomeId :: (Maybe ID) -- ^ /id/ attribute
         , metronomeMetronome :: ChxMetronome
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Metronome where
-    emitXml (Metronome a b c d e f g h i j k) =
+    emitXml (Metronome a b c d e f g h i j k l m n o) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
@@ -5674,8 +8329,12 @@ instance EmitXml Metronome where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j])
-        ([emitXml k])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "justify" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) n])
+        ([emitXml o])
 parseMetronome :: P.XParse Metronome
 parseMetronome = 
       Metronome
@@ -5689,11 +8348,15 @@ parseMetronome =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "justify") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxMetronome
 
 -- | Smart constructor for 'Metronome'
 mkMetronome :: ChxMetronome -> Metronome
-mkMetronome k = Metronome Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing k
+mkMetronome o = Metronome Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing o
 
 -- | @metronome-beam@ /(complex)/
 --
@@ -5727,28 +8390,53 @@ data MetronomeNote =
           metronomeNoteMetronomeType :: NoteTypeValue -- ^ /metronome-type/ child element
         , metronomeNoteMetronomeDot :: [Empty] -- ^ /metronome-dot/ child element
         , metronomeNoteMetronomeBeam :: [MetronomeBeam] -- ^ /metronome-beam/ child element
+        , metronomeNoteMetronomeTied :: (Maybe MetronomeTied) -- ^ /metronome-tied/ child element
         , metronomeNoteMetronomeTuplet :: (Maybe MetronomeTuplet) -- ^ /metronome-tuplet/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml MetronomeNote where
-    emitXml (MetronomeNote a b c d) =
+    emitXml (MetronomeNote a b c d e) =
       XContent XEmpty
         []
         ([XElement (QN "metronome-type" Nothing) (emitXml a)] ++
         map (XElement (QN "metronome-dot" Nothing).emitXml) b ++
         map (XElement (QN "metronome-beam" Nothing).emitXml) c ++
-        [maybe XEmpty (XElement (QN "metronome-tuplet" Nothing).emitXml) d])
+        [maybe XEmpty (XElement (QN "metronome-tied" Nothing).emitXml) d] ++
+        [maybe XEmpty (XElement (QN "metronome-tuplet" Nothing).emitXml) e])
 parseMetronomeNote :: P.XParse MetronomeNote
 parseMetronomeNote = 
       MetronomeNote
         <$> (P.xchild (P.name "metronome-type") (P.xtext >>= parseNoteTypeValue))
         <*> P.many (P.xchild (P.name "metronome-dot") (parseEmpty))
         <*> P.many (P.xchild (P.name "metronome-beam") (parseMetronomeBeam))
+        <*> P.optional (P.xchild (P.name "metronome-tied") (parseMetronomeTied))
         <*> P.optional (P.xchild (P.name "metronome-tuplet") (parseMetronomeTuplet))
 
 -- | Smart constructor for 'MetronomeNote'
 mkMetronomeNote :: NoteTypeValue -> MetronomeNote
-mkMetronomeNote a = MetronomeNote a [] [] Nothing
+mkMetronomeNote a = MetronomeNote a [] [] Nothing Nothing
+
+-- | @metronome-tied@ /(complex)/
+--
+-- The metronome-tied indicates the presence of a tie within a metric relationship mark. As with the tied element, both the start and stop of the tie should be specified, in this case within separate metronome-note elements.
+data MetronomeTied = 
+      MetronomeTied {
+          metronomeTiedType :: StartStop -- ^ /type/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml MetronomeTied where
+    emitXml (MetronomeTied a) =
+      XContent XEmpty
+        ([XAttr (QN "type" Nothing) (emitXml a)])
+        []
+parseMetronomeTied :: P.XParse MetronomeTied
+parseMetronomeTied = 
+      MetronomeTied
+        <$> (P.xattr (P.name "type") >>= parseStartStop)
+
+-- | Smart constructor for 'MetronomeTied'
+mkMetronomeTied :: StartStop -> MetronomeTied
+mkMetronomeTied a = MetronomeTied a
 
 -- | @metronome-tuplet@ /(complex)/
 --
@@ -5782,27 +8470,30 @@ mkMetronomeTuplet a b = MetronomeTuplet a b Nothing Nothing
 
 -- | @midi-device@ /(complex)/
 --
--- The midi-device type corresponds to the DeviceName meta event in Standard MIDI Files. The optional port attribute is a number from 1 to 16 that can be used with the unofficial MIDI port (or cable) meta event.
+-- The midi-device type corresponds to the DeviceName meta event in Standard MIDI Files. The optional port attribute is a number from 1 to 16 that can be used with the unofficial MIDI port (or cable) meta event. Unlike the DeviceName meta event, there can be multiple midi-device elements per MusicXML part starting in MusicXML 3.0. The optional id attribute refers to the score-instrument assigned to this device. If missing, the device assignment affects all score-instrument elements in the score-part.
 data MidiDevice = 
       MidiDevice {
           midiDeviceString :: String -- ^ text content
         , midiDevicePort :: (Maybe Midi16) -- ^ /port/ attribute
+        , midiDeviceId :: (Maybe IDREF) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml MidiDevice where
-    emitXml (MidiDevice a b) =
+    emitXml (MidiDevice a b c) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "port" Nothing).emitXml) b])
+        ([maybe XEmpty (XAttr (QN "port" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) c])
         []
 parseMidiDevice :: P.XParse MidiDevice
 parseMidiDevice = 
       MidiDevice
         <$> (P.xtext >>= return)
         <*> P.optional (P.xattr (P.name "port") >>= parseMidi16)
+        <*> P.optional (P.xattr (P.name "id") >>= parseIDREF)
 
 -- | Smart constructor for 'MidiDevice'
 mkMidiDevice :: String -> MidiDevice
-mkMidiDevice a = MidiDevice a Nothing
+mkMidiDevice a = MidiDevice a Nothing Nothing
 
 -- | @midi-instrument@ /(complex)/
 --
@@ -5897,31 +8588,37 @@ mkMiscellaneousField a b = MiscellaneousField a b
 
 -- | @mordent@ /(complex)/
 --
--- The mordent type is used for both represents the mordent sign with the vertical line and the inverted-mordent sign without the line. The long attribute is "no" by default.
+-- The mordent type is used for both represents the mordent sign with the vertical line and the inverted-mordent sign without the line. The long attribute is "no" by default. The approach and departure attributes are used for compound ornaments, indicating how the beginning and ending of the ornament look relative to the main part of the mordent.
 data Mordent = 
       Mordent {
           mordentEmptyTrillSound :: Mordent
         , mordentLong :: (Maybe YesNo) -- ^ /long/ attribute
+        , mordentApproach :: (Maybe AboveBelow) -- ^ /approach/ attribute
+        , mordentDeparture :: (Maybe AboveBelow) -- ^ /departure/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Mordent where
-    emitXml (Mordent a b) =
+    emitXml (Mordent a b c d) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "long" Nothing).emitXml) b])
+        ([maybe XEmpty (XAttr (QN "long" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "approach" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "departure" Nothing).emitXml) d])
         ([emitXml a])
 parseMordent :: P.XParse Mordent
 parseMordent = 
       Mordent
         <$> parseMordent
         <*> P.optional (P.xattr (P.name "long") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "approach") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "departure") >>= parseAboveBelow)
 
 -- | Smart constructor for 'Mordent'
 mkMordent :: Mordent -> Mordent
-mkMordent a = Mordent a Nothing
+mkMordent a = Mordent a Nothing Nothing Nothing
 
 -- | @multiple-rest@ /(complex)/
 --
--- The text of the multiple-rest type indicates the number of measures in the multiple rest. Multiple rests may use the 1-bar / 2-bar / 4-bar rest symbols, or a single shape. The use-symbols attribute indicates which to use; it is no if not specified. The element text is ignored when the type is stop.
+-- The text of the multiple-rest type indicates the number of measures in the multiple rest. Multiple rests may use the 1-bar / 2-bar / 4-bar rest symbols, or a single shape. The use-symbols attribute indicates which to use; it is no if not specified.
 data MultipleRest = 
       MultipleRest {
           multipleRestPositiveIntegerOrEmpty :: PositiveIntegerOrEmpty -- ^ text content
@@ -5980,10 +8677,11 @@ data NonArpeggiate =
         , nonArpeggiateRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , nonArpeggiatePlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , nonArpeggiateColor :: (Maybe Color) -- ^ /color/ attribute
+        , nonArpeggiateId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml NonArpeggiate where
-    emitXml (NonArpeggiate a b c d e f g h) =
+    emitXml (NonArpeggiate a b c d e f g h i) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
@@ -5992,7 +8690,8 @@ instance EmitXml NonArpeggiate where
         [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
         [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) i])
         []
 parseNonArpeggiate :: P.XParse NonArpeggiate
 parseNonArpeggiate = 
@@ -6005,45 +8704,66 @@ parseNonArpeggiate =
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'NonArpeggiate'
 mkNonArpeggiate :: TopBottom -> NonArpeggiate
-mkNonArpeggiate a = NonArpeggiate a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkNonArpeggiate a = NonArpeggiate a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @notations@ /(complex)/
 --
--- Notations refer to musical notations, not XML notations. Multiple notations are allowed in order to represent multiple editorial levels. The set of notations may be refined and expanded over time, especially to handle more instrument-specific technical notations.
+-- Notations refer to musical notations, not XML notations. Multiple notations are allowed in order to represent multiple editorial levels. The print-object attribute, added in Version 3.0, allows notations to represent details of performance technique, such as fingerings, without having them appear in the score.
 data Notations = 
       Notations {
-          notationsEditorial :: Editorial
+          notationsPrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , notationsId :: (Maybe ID) -- ^ /id/ attribute
+        , notationsEditorial :: Editorial
         , notationsNotations :: [ChxNotations]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Notations where
-    emitXml (Notations a b) =
-      XReps [emitXml a,emitXml b]
+    emitXml (Notations a b c d) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) b])
+        ([emitXml c] ++
+        [emitXml d])
 parseNotations :: P.XParse Notations
 parseNotations = 
       Notations
-        <$> parseEditorial
+        <$> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> parseEditorial
         <*> P.many (parseChxNotations)
 
 -- | Smart constructor for 'Notations'
 mkNotations :: Editorial -> Notations
-mkNotations a = Notations a []
+mkNotations c = Notations Nothing Nothing c []
 
 -- | @note@ /(complex)/
 --
--- Notes are the most common type of MusicXML data. The MusicXML format keeps the MuseData distinction between elements used for sound information and elements used for notation information (e.g., tie is used for sound, tied for notation). Thus grace notes do not have a duration element. Cue notes have a duration element, as do forward elements, but no tie elements. Having these two types of information available can make interchange considerably easier, as some programs handle one type of information much more readily than the other. 
--- 	
--- The dynamics and end-dynamics attributes correspond to MIDI 1.0's Note On and Note Off velocities, respectively. They are expressed in terms of percentages of the default forte value (90 for MIDI 1.0). The attack and release attributes are used to alter the staring and stopping time of the note from when it would otherwise occur based on the flow of durations - information that is specific to a performance. They are expressed in terms of divisions, either positive or negative. A note that starts a tie should not have a release attribute, and a note that stops a tie should not have an attack attribute. If a note is played only one time through a repeat, the time-only attribute shows which time to play the note. The pizzicato attribute is used when just this note is sounded pizzicato, vs. the pizzicato element which changes overall playback between pizzicato and arco.
+-- Notes are the most common type of MusicXML data. The MusicXML format keeps the MuseData distinction between elements used for sound information and elements used for notation information (e.g., tie is used for sound, tied for notation). Thus grace notes do not have a duration element. Cue notes have a duration element, as do forward elements, but no tie elements. Having these two types of information available can make interchange considerably easier, as some programs handle one type of information much more readily than the other.
+--
+-- @
+-- 
+-- The print-leger attribute is used to indicate whether leger lines are printed. Notes without leger lines are used to indicate indeterminate high and low notes. By default, it is set to yes. If print-object is set to no, print-leger is interpreted to also be set to no if not present. This attribute is ignored for rests.
+-- 
+-- The dynamics and end-dynamics attributes correspond to MIDI 1.0's Note On and Note Off velocities, respectively. They are expressed in terms of percentages of the default forte value (90 for MIDI 1.0).
+-- 
+-- The attack and release attributes are used to alter the starting and stopping time of the note from when it would otherwise occur based on the flow of durations - information that is specific to a performance. They are expressed in terms of divisions, either positive or negative. A note that starts a tie should not have a release attribute, and a note that stops a tie should not have an attack attribute. The attack and release attributes are independent of each other. The attack attribute only changes the starting time of a note, and the release attribute only changes the stopping time of a note.
+-- 
+-- If a note is played only particular times through a repeat, the time-only attribute shows which times to play the note.
+-- 
+-- The pizzicato attribute is used when just this note is sounded pizzicato, vs. the pizzicato element which changes overall playback between pizzicato and arco.
+-- @
 data Note = 
       Note {
-          noteDynamics :: (Maybe NonNegativeDecimal) -- ^ /dynamics/ attribute
+          notePrintLeger :: (Maybe YesNo) -- ^ /print-leger/ attribute
+        , noteDynamics :: (Maybe NonNegativeDecimal) -- ^ /dynamics/ attribute
         , noteEndDynamics :: (Maybe NonNegativeDecimal) -- ^ /end-dynamics/ attribute
         , noteAttack :: (Maybe Divisions) -- ^ /attack/ attribute
         , noteRelease :: (Maybe Divisions) -- ^ /release/ attribute
-        , noteTimeOnly :: (Maybe Token) -- ^ /time-only/ attribute
+        , noteTimeOnly :: (Maybe TimeOnly) -- ^ /time-only/ attribute
         , notePizzicato :: (Maybe YesNo) -- ^ /pizzicato/ attribute
         , noteDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , noteDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
@@ -6058,6 +8778,7 @@ data Note =
         , notePrintLyric :: (Maybe YesNo) -- ^ /print-lyric/ attribute
         , notePrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
         , notePrintSpacing :: (Maybe YesNo) -- ^ /print-spacing/ attribute
+        , noteId :: (Maybe ID) -- ^ /id/ attribute
         , noteNote :: ChxNote
         , noteInstrument :: (Maybe Instrument) -- ^ /instrument/ child element
         , noteEditorialVoice :: EditorialVoice
@@ -6067,55 +8788,62 @@ data Note =
         , noteTimeModification :: (Maybe TimeModification) -- ^ /time-modification/ child element
         , noteStem :: (Maybe Stem) -- ^ /stem/ child element
         , noteNotehead :: (Maybe Notehead) -- ^ /notehead/ child element
+        , noteNoteheadText :: (Maybe NoteheadText) -- ^ /notehead-text/ child element
         , noteStaff :: (Maybe Staff)
         , noteBeam :: [Beam] -- ^ /beam/ child element
         , noteNotations :: [Notations] -- ^ /notations/ child element
         , noteLyric :: [Lyric] -- ^ /lyric/ child element
+        , notePlay :: (Maybe Play) -- ^ /play/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Note where
-    emitXml (Note a b c d e f g h i j k l m n o p q r s t u v w x y z a1 b1 c1 d1 e1 f1) =
+    emitXml (Note a b c d e f g h i j k l m n o p q r s t u v w x y z a1 b1 c1 d1 e1 f1 g1 h1 i1 j1) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) a] ++
-        [maybe XEmpty (XAttr (QN "end-dynamics" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "attack" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "release" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) q] ++
-        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) r] ++
-        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) s])
-        ([emitXml t] ++
-        [maybe XEmpty (XElement (QN "instrument" Nothing).emitXml) u] ++
-        [emitXml v] ++
-        [maybe XEmpty (XElement (QN "type" Nothing).emitXml) w] ++
-        map (XElement (QN "dot" Nothing).emitXml) x ++
-        [maybe XEmpty (XElement (QN "accidental" Nothing).emitXml) y] ++
-        [maybe XEmpty (XElement (QN "time-modification" Nothing).emitXml) z] ++
-        [maybe XEmpty (XElement (QN "stem" Nothing).emitXml) a1] ++
-        [maybe XEmpty (XElement (QN "notehead" Nothing).emitXml) b1] ++
-        [emitXml c1] ++
-        map (XElement (QN "beam" Nothing).emitXml) d1 ++
-        map (XElement (QN "notations" Nothing).emitXml) e1 ++
-        map (XElement (QN "lyric" Nothing).emitXml) f1)
+        ([maybe XEmpty (XAttr (QN "print-leger" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "end-dynamics" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "attack" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "release" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "pizzicato" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "print-dot" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "print-lyric" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "print-spacing" Nothing).emitXml) t] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) u])
+        ([emitXml v] ++
+        [maybe XEmpty (XElement (QN "instrument" Nothing).emitXml) w] ++
+        [emitXml x] ++
+        [maybe XEmpty (XElement (QN "type" Nothing).emitXml) y] ++
+        map (XElement (QN "dot" Nothing).emitXml) z ++
+        [maybe XEmpty (XElement (QN "accidental" Nothing).emitXml) a1] ++
+        [maybe XEmpty (XElement (QN "time-modification" Nothing).emitXml) b1] ++
+        [maybe XEmpty (XElement (QN "stem" Nothing).emitXml) c1] ++
+        [maybe XEmpty (XElement (QN "notehead" Nothing).emitXml) d1] ++
+        [maybe XEmpty (XElement (QN "notehead-text" Nothing).emitXml) e1] ++
+        [emitXml f1] ++
+        map (XElement (QN "beam" Nothing).emitXml) g1 ++
+        map (XElement (QN "notations" Nothing).emitXml) h1 ++
+        map (XElement (QN "lyric" Nothing).emitXml) i1 ++
+        [maybe XEmpty (XElement (QN "play" Nothing).emitXml) j1])
 parseNote :: P.XParse Note
 parseNote = 
       Note
-        <$> P.optional (P.xattr (P.name "dynamics") >>= parseNonNegativeDecimal)
+        <$> P.optional (P.xattr (P.name "print-leger") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "dynamics") >>= parseNonNegativeDecimal)
         <*> P.optional (P.xattr (P.name "end-dynamics") >>= parseNonNegativeDecimal)
         <*> P.optional (P.xattr (P.name "attack") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "release") >>= parseDivisions)
-        <*> P.optional (P.xattr (P.name "time-only") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "time-only") >>= parseTimeOnly)
         <*> P.optional (P.xattr (P.name "pizzicato") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
@@ -6130,6 +8858,7 @@ parseNote =
         <*> P.optional (P.xattr (P.name "print-lyric") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "print-spacing") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxNote
         <*> P.optional (P.xchild (P.name "instrument") (parseInstrument))
         <*> parseEditorialVoice
@@ -6139,14 +8868,16 @@ parseNote =
         <*> P.optional (P.xchild (P.name "time-modification") (parseTimeModification))
         <*> P.optional (P.xchild (P.name "stem") (parseStem))
         <*> P.optional (P.xchild (P.name "notehead") (parseNotehead))
+        <*> P.optional (P.xchild (P.name "notehead-text") (parseNoteheadText))
         <*> P.optional (parseStaff)
         <*> P.many (P.xchild (P.name "beam") (parseBeam))
         <*> P.many (P.xchild (P.name "notations") (parseNotations))
         <*> P.many (P.xchild (P.name "lyric") (parseLyric))
+        <*> P.optional (P.xchild (P.name "play") (parsePlay))
 
 -- | Smart constructor for 'Note'
 mkNote :: ChxNote -> EditorialVoice -> Note
-mkNote t v = Note Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing t Nothing v Nothing [] Nothing Nothing Nothing Nothing Nothing [] [] []
+mkNote v x = Note Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing v Nothing x Nothing [] Nothing Nothing Nothing Nothing Nothing Nothing [] [] [] Nothing
 
 -- | @note-size@ /(complex)/
 --
@@ -6174,7 +8905,7 @@ mkNoteSize a b = NoteSize a b
 
 -- | @note-type@ /(complex)/
 --
--- The note-type type indicates the graphic note type. Values range from 256th to long. The size attribute indicates full, cue, or large size, with full the default for regular notes and cue the default for cue and grace notes.
+-- The note-type type indicates the graphic note type. Values range from 1024th to maxima. The size attribute indicates full, cue, grace-cue, or large size. The default is full for regular notes, grace-cue for notes that contain both grace and cue elements, and cue for notes that contain either a cue or a grace element, but not both.
 data NoteType = 
       NoteType {
           noteTypeNoteTypeValue :: NoteTypeValue -- ^ text content
@@ -6198,10 +8929,12 @@ mkNoteType a = NoteType a Nothing
 
 -- | @notehead@ /(complex)/
 --
--- The notehead element indicates shapes other than the open and closed ovals associated with note durations.
--- 	
+-- The notehead type indicates shapes other than the open and closed ovals associated with note durations.
+-- 
+-- The smufl attribute can be used to specify a particular notehead, allowing application interoperability without requiring every SMuFL glyph to have a MusicXML element equivalent. This attribute can be used either with the "other" value, or to refine a specific notehead value such as "cluster". Noteheads in the SMuFL "Note name noteheads" range (U+E150–U+E1AF) should not use the smufl attribute or the "other" value, but instead use the notehead-text element.
+-- 
 -- For the enclosed shapes, the default is to be hollow for half notes and longer, and filled otherwise. The filled attribute can be set to change this if needed.
--- 	
+-- 
 -- If the parentheses attribute is set to yes, the notehead is parenthesized. It is no by default.
 data Notehead = 
       Notehead {
@@ -6213,10 +8946,11 @@ data Notehead =
         , noteheadFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , noteheadFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , noteheadColor :: (Maybe Color) -- ^ /color/ attribute
+        , noteheadSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Notehead where
-    emitXml (Notehead a b c d e f g h) =
+    emitXml (Notehead a b c d e f g h i) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "filled" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) c] ++
@@ -6224,7 +8958,8 @@ instance EmitXml Notehead where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) e] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) f] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) i])
         []
 parseNotehead :: P.XParse Notehead
 parseNotehead = 
@@ -6237,19 +8972,42 @@ parseNotehead =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
 
 -- | Smart constructor for 'Notehead'
 mkNotehead :: NoteheadValue -> Notehead
-mkNotehead a = Notehead a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkNotehead a = Notehead a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @notehead-text@ /(complex)/
+--
+-- The notehead-text type represents text that is displayed inside a notehead, as is done in some educational music. It is not needed for the numbers used in tablature or jianpu notation. The presence of a TAB or jianpu clefs is sufficient to indicate that numbers are used. The display-text and accidental-text elements allow display of fully formatted text and accidentals.
+data NoteheadText = 
+      NoteheadText {
+          noteheadTextNoteheadText :: [ChxNoteheadText]
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml NoteheadText where
+    emitXml (NoteheadText a) =
+      XReps [emitXml a]
+parseNoteheadText :: P.XParse NoteheadText
+parseNoteheadText = 
+      NoteheadText
+        <$> P.many (parseChxNoteheadText)
+
+-- | Smart constructor for 'NoteheadText'
+mkNoteheadText :: NoteheadText
+mkNoteheadText = NoteheadText []
 
 -- | @octave-shift@ /(complex)/
 --
 -- The octave shift type indicates where notes are shifted up or down from their true pitched values because of printing difficulty. Thus a treble clef line noted with 8va will be indicated with an octave-shift down from the pitch data indicated in the notes. A size of 8 indicates one octave; a size of 15 indicates two octaves.
 data OctaveShift = 
       OctaveShift {
-          octaveShiftType :: UpDownStop -- ^ /type/ attribute
+          octaveShiftType :: UpDownStopContinue -- ^ /type/ attribute
         , octaveShiftNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , octaveShiftSize :: (Maybe PositiveInteger) -- ^ /size/ attribute
+        , octaveShiftDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , octaveShiftSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , octaveShiftDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , octaveShiftDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , octaveShiftRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -6259,30 +9017,36 @@ data OctaveShift =
         , octaveShiftFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , octaveShiftFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , octaveShiftColor :: (Maybe Color) -- ^ /color/ attribute
+        , octaveShiftId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml OctaveShift where
-    emitXml (OctaveShift a b c d e f g h i j k l) =
+    emitXml (OctaveShift a b c d e f g h i j k l m n o) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "size" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l])
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) o])
         []
 parseOctaveShift :: P.XParse OctaveShift
 parseOctaveShift = 
       OctaveShift
-        <$> (P.xattr (P.name "type") >>= parseUpDownStop)
+        <$> (P.xattr (P.name "type") >>= parseUpDownStopContinue)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "size") >>= parsePositiveInteger)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -6292,10 +9056,11 @@ parseOctaveShift =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'OctaveShift'
-mkOctaveShift :: UpDownStop -> OctaveShift
-mkOctaveShift a = OctaveShift a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkOctaveShift :: UpDownStopContinue -> OctaveShift
+mkOctaveShift a = OctaveShift a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @offset@ /(complex)/
 --
@@ -6363,20 +9128,24 @@ mkOpus a = Opus a Nothing Nothing Nothing Nothing Nothing
 -- Ornaments can be any of several types, followed optionally by accidentals. The accidental-mark element's content is represented the same as an accidental element, but with a different name to reflect the different musical meaning.
 data Ornaments = 
       Ornaments {
-          ornamentsOrnaments :: [SeqOrnaments]
+          ornamentsId :: (Maybe ID) -- ^ /id/ attribute
+        , ornamentsOrnaments :: [SeqOrnaments]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Ornaments where
-    emitXml (Ornaments a) =
-      XReps [emitXml a]
+    emitXml (Ornaments a b) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        ([emitXml b])
 parseOrnaments :: P.XParse Ornaments
 parseOrnaments = 
       Ornaments
-        <$> P.many (parseSeqOrnaments)
+        <$> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (parseSeqOrnaments)
 
 -- | Smart constructor for 'Ornaments'
 mkOrnaments :: Ornaments
-mkOrnaments = Ornaments []
+mkOrnaments = Ornaments Nothing []
 
 -- | @other-appearance@ /(complex)/
 --
@@ -6404,7 +9173,7 @@ mkOtherAppearance a b = OtherAppearance a b
 
 -- | @other-direction@ /(complex)/
 --
--- The other-direction type is used to define any direction symbols not yet in the current version of the MusicXML format. This allows extended representation, though without application interoperability.
+-- The other-direction type is used to define any direction symbols not yet in the MusicXML format. The smufl attribute can be used to specify a particular direction symbol, allowing application interoperability without requiring every SMuFL glyph to have a MusicXML element equivalent. Using the other-direction type without the smufl attribute allows for extended representation, though without application interoperability.
 data OtherDirection = 
       OtherDirection {
           otherDirectionString :: String -- ^ text content
@@ -6418,10 +9187,14 @@ data OtherDirection =
         , otherDirectionFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , otherDirectionFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , otherDirectionColor :: (Maybe Color) -- ^ /color/ attribute
+        , otherDirectionHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , otherDirectionValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , otherDirectionSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
+        , otherDirectionId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml OtherDirection where
-    emitXml (OtherDirection a b c d e f g h i j k) =
+    emitXml (OtherDirection a b c d e f g h i j k l m n o) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
@@ -6432,7 +9205,11 @@ instance EmitXml OtherDirection where
         [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) o])
         []
 parseOtherDirection :: P.XParse OtherDirection
 parseOtherDirection = 
@@ -6448,14 +9225,18 @@ parseOtherDirection =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'OtherDirection'
 mkOtherDirection :: String -> OtherDirection
-mkOtherDirection a = OtherDirection a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkOtherDirection a = OtherDirection a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @other-notation@ /(complex)/
 --
--- The other-notation type is used to define any notations not yet in the MusicXML format. This allows extended representation, though without application interoperability. It handles notations where more specific extension elements such as other-dynamics and other-technical are not appropriate.
+-- The other-notation type is used to define any notations not yet in the MusicXML format. It handles notations where more specific extension elements such as other-dynamics and other-technical are not appropriate. The smufl attribute can be used to specify a particular notation, allowing application interoperability without requiring every SMuFL glyph to have a MusicXML element equivalent. Using the other-notation type without the smufl attribute allows for extended representation, though without application interoperability.
 data OtherNotation = 
       OtherNotation {
           otherNotationString :: String -- ^ text content
@@ -6472,10 +9253,12 @@ data OtherNotation =
         , otherNotationFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , otherNotationColor :: (Maybe Color) -- ^ /color/ attribute
         , otherNotationPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , otherNotationSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
+        , otherNotationId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml OtherNotation where
-    emitXml (OtherNotation a b c d e f g h i j k l m n) =
+    emitXml (OtherNotation a b c d e f g h i j k l m n o p) =
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
@@ -6489,7 +9272,9 @@ instance EmitXml OtherNotation where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) n])
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) p])
         []
 parseOtherNotation :: P.XParse OtherNotation
 parseOtherNotation = 
@@ -6508,10 +9293,114 @@ parseOtherNotation =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'OtherNotation'
 mkOtherNotation :: String -> StartStopSingle -> OtherNotation
-mkOtherNotation a b = OtherNotation a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkOtherNotation a b = OtherNotation a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @other-placement-text@ /(complex)/
+--
+-- The other-placement-text type represents a text element with print-style, placement, and smufl attribute groups. This type is used by MusicXML notation extension elements to allow specification of specific SMuFL glyphs without needed to add every glyph as a MusicXML element.
+data OtherPlacementText = 
+      OtherPlacementText {
+          otherPlacementTextString :: String -- ^ text content
+        , otherPlacementTextDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , otherPlacementTextDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , otherPlacementTextRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , otherPlacementTextRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , otherPlacementTextFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , otherPlacementTextFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , otherPlacementTextFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , otherPlacementTextFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , otherPlacementTextColor :: (Maybe Color) -- ^ /color/ attribute
+        , otherPlacementTextPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , otherPlacementTextSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml OtherPlacementText where
+    emitXml (OtherPlacementText a b c d e f g h i j k l) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) l])
+        []
+parseOtherPlacementText :: P.XParse OtherPlacementText
+parseOtherPlacementText = 
+      OtherPlacementText
+        <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
+
+-- | Smart constructor for 'OtherPlacementText'
+mkOtherPlacementText :: String -> OtherPlacementText
+mkOtherPlacementText a = OtherPlacementText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @other-play@ /(complex)/
+--
+-- The other-play element represents other types of playback. The required type attribute indicates the type of playback to which the element content applies.
+data OtherPlay = 
+      OtherPlay {
+          otherPlayString :: String -- ^ text content
+        , otherPlayType :: Token -- ^ /type/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml OtherPlay where
+    emitXml (OtherPlay a b) =
+      XContent (emitXml a)
+        ([XAttr (QN "type" Nothing) (emitXml b)])
+        []
+parseOtherPlay :: P.XParse OtherPlay
+parseOtherPlay = 
+      OtherPlay
+        <$> (P.xtext >>= return)
+        <*> (P.xattr (P.name "type") >>= parseToken)
+
+-- | Smart constructor for 'OtherPlay'
+mkOtherPlay :: String -> Token -> OtherPlay
+mkOtherPlay a b = OtherPlay a b
+
+-- | @other-text@ /(complex)/
+--
+-- The other-text type represents a text element with a smufl attribute group. This type is used by MusicXML direction extension elements to allow specification of specific SMuFL glyphs without needed to add every glyph as a MusicXML element.
+data OtherText = 
+      OtherText {
+          otherTextString :: String -- ^ text content
+        , otherTextSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml OtherText where
+    emitXml (OtherText a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b])
+        []
+parseOtherText :: P.XParse OtherText
+parseOtherText = 
+      OtherText
+        <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
+
+-- | Smart constructor for 'OtherText'
+mkOtherText :: String -> OtherText
+mkOtherText a = OtherText a Nothing
 
 -- | @page-layout@ /(complex)/
 --
@@ -6611,9 +9500,9 @@ mkPart a b = Part a b
 -- | @part-group@ /(complex)/
 --
 -- The part-group element indicates groupings of parts in the score, usually indicated by braces and brackets. Braces that are used for multi-staff parts should be defined in the attributes element for that part. The part-group start element appears before the first score-part in the group. The part-group stop element appears after the last score-part in the group.
--- 	
--- The number attribute is used to distinguish overlapping and nested part-groups, not the sequence of groups. As with parts, groups can have a name and abbreviation. Values for the child elements are ignored at the stop of a group. 
--- 	
+-- 
+-- The number attribute is used to distinguish overlapping and nested part-groups, not the sequence of groups. As with parts, groups can have a name and abbreviation. Values for the child elements are ignored at the stop of a group.
+-- 
 -- A part-group element is not needed for a single multi-staff part. By default, multi-staff parts include a brace symbol and (if appropriate given the bar-style) common barlines. The symbol formatting for a multi-staff part can be more fully specified using the part-symbol element.
 data PartGroup = 
       PartGroup {
@@ -6740,7 +9629,7 @@ mkPartName a = PartName a Nothing Nothing Nothing Nothing Nothing Nothing Nothin
 
 -- | @part-symbol@ /(complex)/
 --
--- The part-symbol element indicates how a symbol for a multi-staff part is indicated in the score. Values include none, brace, line, and bracket; brace is the default. The top-staff and bottom-staff elements are used when the brace does not extend across the entire part. For example, in a 3-staff organ part, the top-staff will typically be 1 for the right hand, while the bottom-staff will typically be 2 for the left hand. Staff 3 for the pedals is usually outside the brace.
+-- The part-symbol type indicates how a symbol for a multi-staff part is indicated in the score; brace is the default value. The top-staff and bottom-staff elements are used when the brace does not extend across the entire part. For example, in a 3-staff organ part, the top-staff will typically be 1 for the right hand, while the bottom-staff will typically be 2 for the left hand. Staff 3 for the pedals is usually outside the brace.
 data PartSymbol = 
       PartSymbol {
           partSymbolGroupSymbolValue :: GroupSymbolValue -- ^ text content
@@ -6782,11 +9671,16 @@ mkPartSymbol a = PartSymbol a Nothing Nothing Nothing Nothing Nothing Nothing No
 
 -- | @pedal@ /(complex)/
 --
--- The pedal type represents piano pedal marks. The line attribute is yes if pedal lines are used, no if Ped and * signs are used. The change type is used with line set to yes.
+-- The pedal type represents piano pedal marks. In MusicXML 3.1 this includes sostenuto as well as damper pedal marks. The line attribute is yes if pedal lines are used. The sign attribute is yes if Ped, Sost, and * signs are used. For MusicXML 2.0 compatibility, the sign attribute is yes by default if the line attribute is no, and is no by default if the line attribute is yes. If the sign attribute is set to yes and the type is start or sostenuto, the abbreviated attribute is yes if the short P and S signs are used, and no if the full Ped and Sost signs are used. It is no by default. Otherwise the abbreviated attribute is ignored.
+-- 
+-- The change and continue types are used when the line attribute is yes. The change type indicates a pedal lift and retake indicated with an inverted V marking. The continue type allows more precise formatting across system breaks and for more complex pedaling lines. The alignment attributes are ignored if the line attribute is yes.
 data Pedal = 
       Pedal {
-          pedalType :: StartStopChange -- ^ /type/ attribute
+          pedalType :: PedalType -- ^ /type/ attribute
+        , pedalNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , pedalLine :: (Maybe YesNo) -- ^ /line/ attribute
+        , pedalSign :: (Maybe YesNo) -- ^ /sign/ attribute
+        , pedalAbbreviated :: (Maybe YesNo) -- ^ /abbreviated/ attribute
         , pedalDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , pedalDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , pedalRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -6796,28 +9690,40 @@ data Pedal =
         , pedalFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , pedalFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , pedalColor :: (Maybe Color) -- ^ /color/ attribute
+        , pedalHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , pedalValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , pedalId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Pedal where
-    emitXml (Pedal a b c d e f g h i j k) =
+    emitXml (Pedal a b c d e f g h i j k l m n o p q) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
-        [maybe XEmpty (XAttr (QN "line" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k])
+        [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "line" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "sign" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "abbreviated" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) q])
         []
 parsePedal :: P.XParse Pedal
 parsePedal = 
       Pedal
-        <$> (P.xattr (P.name "type") >>= parseStartStopChange)
+        <$> (P.xattr (P.name "type") >>= parsePedalType)
+        <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "line") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "sign") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "abbreviated") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -6827,10 +9733,13 @@ parsePedal =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Pedal'
-mkPedal :: StartStopChange -> Pedal
-mkPedal a = Pedal a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkPedal :: PedalType -> Pedal
+mkPedal a = Pedal a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @pedal-tuning@ /(complex)/
 --
@@ -6890,6 +9799,66 @@ parsePerMinute =
 mkPerMinute :: String -> PerMinute
 mkPerMinute a = PerMinute a Nothing Nothing Nothing Nothing
 
+-- | @percussion@ /(complex)/
+--
+-- The percussion element is used to define percussion pictogram symbols. Definitions for these symbols can be found in Kurt Stone's "Music Notation in the Twentieth Century" on pages 206-212 and 223. Some values are added to these based on how usage has evolved in the 30 years since Stone's book was published.
+data Percussion = 
+      Percussion {
+          percussionDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , percussionDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , percussionRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , percussionRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , percussionFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , percussionFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , percussionFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , percussionFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , percussionColor :: (Maybe Color) -- ^ /color/ attribute
+        , percussionHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , percussionValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , percussionEnclosure :: (Maybe EnclosureShape) -- ^ /enclosure/ attribute
+        , percussionId :: (Maybe ID) -- ^ /id/ attribute
+        , percussionPercussion :: ChxPercussion
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Percussion where
+    emitXml (Percussion a b c d e f g h i j k l m n) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
+        ([emitXml n])
+parsePercussion :: P.XParse Percussion
+parsePercussion = 
+      Percussion
+        <$> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "enclosure") >>= parseEnclosureShape)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> parseChxPercussion
+
+-- | Smart constructor for 'Percussion'
+mkPercussion :: ChxPercussion -> Percussion
+mkPercussion n = Percussion Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing n
+
 -- | @pitch@ /(complex)/
 --
 -- Pitch is represented as a combination of the step of the diatonic scale, the chromatic alteration, and the octave.
@@ -6917,6 +9886,30 @@ parsePitch =
 -- | Smart constructor for 'Pitch'
 mkPitch :: Step -> Octave -> Pitch
 mkPitch a c = Pitch a Nothing c
+
+-- | @pitched@ /(complex)/
+--
+-- The pitched-value type represents pictograms for pitched percussion instruments. The smufl attribute is used to distinguish different SMuFL glyphs for a particular pictogram within the tuned mallet percussion pictograms range.
+data Pitched = 
+      Pitched {
+          pitchedPitchedValue :: PitchedValue -- ^ text content
+        , pitchedSmufl :: (Maybe SmuflPictogramGlyphName) -- ^ /smufl/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Pitched where
+    emitXml (Pitched a b) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) b])
+        []
+parsePitched :: P.XParse Pitched
+parsePitched = 
+      Pitched
+        <$> (P.xtext >>= parsePitchedValue)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflPictogramGlyphName)
+
+-- | Smart constructor for 'Pitched'
+mkPitched :: PitchedValue -> Pitched
+mkPitched a = Pitched a Nothing
 
 -- | @placement-text@ /(complex)/
 --
@@ -6969,85 +9962,57 @@ parsePlacementText =
 mkPlacementText :: String -> PlacementText
 mkPlacementText a = PlacementText a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
--- | @print@ /(complex)/
+-- | @play@ /(complex)/
 --
--- The print type contains general printing parameters, including the layout elements defined in the layout.mod file. The part-name-display and part-abbreviation-display elements used in the score.mod file may also be used here to change how a part name or abbreviation is displayed over the course of a piece. They take effect when the current measure or a succeeding measure starts a new system.
--- 	
--- Layout elements in a print statement only apply to the current page, system, staff, or measure. Music that follows continues to take the default values from the layout included in the defaults element.
-data Print = 
-      Print {
-          printStaffSpacing :: (Maybe Tenths) -- ^ /staff-spacing/ attribute
-        , printNewSystem :: (Maybe YesNo) -- ^ /new-system/ attribute
-        , printNewPage :: (Maybe YesNo) -- ^ /new-page/ attribute
-        , printBlankPage :: (Maybe PositiveInteger) -- ^ /blank-page/ attribute
-        , printPageNumber :: (Maybe Token) -- ^ /page-number/ attribute
-        , printLayout :: Layout
-        , printMeasureLayout :: (Maybe MeasureLayout) -- ^ /measure-layout/ child element
-        , printMeasureNumbering :: (Maybe MeasureNumbering) -- ^ /measure-numbering/ child element
-        , printPartNameDisplay :: (Maybe NameDisplay) -- ^ /part-name-display/ child element
-        , printPartAbbreviationDisplay :: (Maybe NameDisplay) -- ^ /part-abbreviation-display/ child element
+-- The play type, new in Version 3.0, specifies playback techniques to be used in conjunction with the instrument-sound element. When used as part of a sound element, it applies to all notes going forward in score order. In multi-instrument parts, the affected instrument should be specified using the id attribute. When used as part of a note element, it applies to the current note only.
+data Play = 
+      Play {
+          playId :: (Maybe IDREF) -- ^ /id/ attribute
+        , playPlay :: [ChxPlay]
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml Print where
-    emitXml (Print a b c d e f g h i j) =
+instance EmitXml Play where
+    emitXml (Play a b) =
       XContent XEmpty
-        ([maybe XEmpty (XAttr (QN "staff-spacing" Nothing).emitXml) a] ++
-        [maybe XEmpty (XAttr (QN "new-system" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "new-page" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "blank-page" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "page-number" Nothing).emitXml) e])
-        ([emitXml f] ++
-        [maybe XEmpty (XElement (QN "measure-layout" Nothing).emitXml) g] ++
-        [maybe XEmpty (XElement (QN "measure-numbering" Nothing).emitXml) h] ++
-        [maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) i] ++
-        [maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) j])
-parsePrint :: P.XParse Print
-parsePrint = 
-      Print
-        <$> P.optional (P.xattr (P.name "staff-spacing") >>= parseTenths)
-        <*> P.optional (P.xattr (P.name "new-system") >>= parseYesNo)
-        <*> P.optional (P.xattr (P.name "new-page") >>= parseYesNo)
-        <*> P.optional (P.xattr (P.name "blank-page") >>= parsePositiveInteger)
-        <*> P.optional (P.xattr (P.name "page-number") >>= parseToken)
-        <*> parseLayout
-        <*> P.optional (P.xchild (P.name "measure-layout") (parseMeasureLayout))
-        <*> P.optional (P.xchild (P.name "measure-numbering") (parseMeasureNumbering))
-        <*> P.optional (P.xchild (P.name "part-name-display") (parseNameDisplay))
-        <*> P.optional (P.xchild (P.name "part-abbreviation-display") (parseNameDisplay))
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        ([emitXml b])
+parsePlay :: P.XParse Play
+parsePlay = 
+      Play
+        <$> P.optional (P.xattr (P.name "id") >>= parseIDREF)
+        <*> P.many (parseChxPlay)
 
--- | Smart constructor for 'Print'
-mkPrint :: Layout -> Print
-mkPrint f = Print Nothing Nothing Nothing Nothing Nothing f Nothing Nothing Nothing Nothing
+-- | Smart constructor for 'Play'
+mkPlay :: Play
+mkPlay = Play Nothing []
 
--- | @rehearsal@ /(complex)/
+-- | @principal-voice@ /(complex)/
 --
--- The rehearsal type specifies a rehearsal mark. Language is Italian ("it") by default. Enclosure is square by default.
-data Rehearsal = 
-      Rehearsal {
-          rehearsalString :: String -- ^ text content
-        , rehearsalLang :: (Maybe Lang) -- ^ /xml:lang/ attribute
-        , rehearsalEnclosure :: (Maybe RehearsalEnclosure) -- ^ /enclosure/ attribute
-        , rehearsalDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
-        , rehearsalDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
-        , rehearsalRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
-        , rehearsalRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
-        , rehearsalFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
-        , rehearsalFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
-        , rehearsalFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
-        , rehearsalFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
-        , rehearsalColor :: (Maybe Color) -- ^ /color/ attribute
-        , rehearsalUnderline :: (Maybe NumberOfLines) -- ^ /underline/ attribute
-        , rehearsalOverline :: (Maybe NumberOfLines) -- ^ /overline/ attribute
-        , rehearsalLineThrough :: (Maybe NumberOfLines) -- ^ /line-through/ attribute
-        , rehearsalDir :: (Maybe TextDirection) -- ^ /dir/ attribute
-        , rehearsalRotation :: (Maybe RotationDegrees) -- ^ /rotation/ attribute
+-- The principal-voice element represents principal and secondary voices in a score, either for analysis or for square bracket symbols that appear in a score. The symbol attribute indicates the type of symbol used at the start of the principal-voice. The content of the principal-voice element is used for analysis and may be any text value. When used for analysis separate from any printed score markings, the symbol attribute should be set to "none".
+data PrincipalVoice = 
+      PrincipalVoice {
+          principalVoiceString :: String -- ^ text content
+        , principalVoiceType :: StartStop -- ^ /type/ attribute
+        , principalVoiceSymbol :: PrincipalVoiceSymbol -- ^ /symbol/ attribute
+        , principalVoiceDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , principalVoiceDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , principalVoiceRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , principalVoiceRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , principalVoiceFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , principalVoiceFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , principalVoiceFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , principalVoiceFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , principalVoiceColor :: (Maybe Color) -- ^ /color/ attribute
+        , principalVoiceHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , principalVoiceValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , principalVoiceId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml Rehearsal where
-    emitXml (Rehearsal a b c d e f g h i j k l m n o p q) =
+instance EmitXml PrincipalVoice where
+    emitXml (PrincipalVoice a b c d e f g h i j k l m n o) =
       XContent (emitXml a)
-        ([maybe XEmpty (XAttr (QN "lang" (Just "xml")).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "enclosure" Nothing).emitXml) c] ++
+        ([XAttr (QN "type" Nothing) (emitXml b)] ++
+        [XAttr (QN "symbol" Nothing) (emitXml c)] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
         [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
@@ -7057,18 +10022,16 @@ instance EmitXml Rehearsal where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "underline" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "overline" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "line-through" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "dir" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "rotation" Nothing).emitXml) q])
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) o])
         []
-parseRehearsal :: P.XParse Rehearsal
-parseRehearsal = 
-      Rehearsal
+parsePrincipalVoice :: P.XParse PrincipalVoice
+parsePrincipalVoice = 
+      PrincipalVoice
         <$> (P.xtext >>= return)
-        <*> P.optional (P.xattr (P.name "xml:lang") >>= parseLang)
-        <*> P.optional (P.xattr (P.name "enclosure") >>= parseRehearsalEnclosure)
+        <*> (P.xattr (P.name "type") >>= parseStartStop)
+        <*> (P.xattr (P.name "symbol") >>= parsePrincipalVoiceSymbol)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -7078,15 +10041,66 @@ parseRehearsal =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
-        <*> P.optional (P.xattr (P.name "underline") >>= parseNumberOfLines)
-        <*> P.optional (P.xattr (P.name "overline") >>= parseNumberOfLines)
-        <*> P.optional (P.xattr (P.name "line-through") >>= parseNumberOfLines)
-        <*> P.optional (P.xattr (P.name "dir") >>= parseTextDirection)
-        <*> P.optional (P.xattr (P.name "rotation") >>= parseRotationDegrees)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
--- | Smart constructor for 'Rehearsal'
-mkRehearsal :: String -> Rehearsal
-mkRehearsal a = Rehearsal a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+-- | Smart constructor for 'PrincipalVoice'
+mkPrincipalVoice :: String -> StartStop -> PrincipalVoiceSymbol -> PrincipalVoice
+mkPrincipalVoice a b c = PrincipalVoice a b c Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @print@ /(complex)/
+--
+-- The print type contains general printing parameters, including the layout elements defined in the layout.mod file. The part-name-display and part-abbreviation-display elements used in the score.mod file may also be used here to change how a part name or abbreviation is displayed over the course of a piece. They take effect when the current measure or a succeeding measure starts a new system.
+-- 
+-- Layout elements in a print statement only apply to the current page, system, staff, or measure. Music that follows continues to take the default values from the layout included in the defaults element.
+data Print = 
+      Print {
+          printStaffSpacing :: (Maybe Tenths) -- ^ /staff-spacing/ attribute
+        , printNewSystem :: (Maybe YesNo) -- ^ /new-system/ attribute
+        , printNewPage :: (Maybe YesNo) -- ^ /new-page/ attribute
+        , printBlankPage :: (Maybe PositiveInteger) -- ^ /blank-page/ attribute
+        , printPageNumber :: (Maybe Token) -- ^ /page-number/ attribute
+        , printId :: (Maybe ID) -- ^ /id/ attribute
+        , printLayout :: Layout
+        , printMeasureLayout :: (Maybe MeasureLayout) -- ^ /measure-layout/ child element
+        , printMeasureNumbering :: (Maybe MeasureNumbering) -- ^ /measure-numbering/ child element
+        , printPartNameDisplay :: (Maybe NameDisplay) -- ^ /part-name-display/ child element
+        , printPartAbbreviationDisplay :: (Maybe NameDisplay) -- ^ /part-abbreviation-display/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Print where
+    emitXml (Print a b c d e f g h i j k) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "staff-spacing" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "new-system" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "new-page" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "blank-page" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "page-number" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) f])
+        ([emitXml g] ++
+        [maybe XEmpty (XElement (QN "measure-layout" Nothing).emitXml) h] ++
+        [maybe XEmpty (XElement (QN "measure-numbering" Nothing).emitXml) i] ++
+        [maybe XEmpty (XElement (QN "part-name-display" Nothing).emitXml) j] ++
+        [maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) k])
+parsePrint :: P.XParse Print
+parsePrint = 
+      Print
+        <$> P.optional (P.xattr (P.name "staff-spacing") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "new-system") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "new-page") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "blank-page") >>= parsePositiveInteger)
+        <*> P.optional (P.xattr (P.name "page-number") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> parseLayout
+        <*> P.optional (P.xchild (P.name "measure-layout") (parseMeasureLayout))
+        <*> P.optional (P.xchild (P.name "measure-numbering") (parseMeasureNumbering))
+        <*> P.optional (P.xchild (P.name "part-name-display") (parseNameDisplay))
+        <*> P.optional (P.xchild (P.name "part-abbreviation-display") (parseNameDisplay))
+
+-- | Smart constructor for 'Print'
+mkPrint :: Layout -> Print
+mkPrint g = Print Nothing Nothing Nothing Nothing Nothing Nothing g Nothing Nothing Nothing Nothing
 
 -- | @repeat@ /(complex)/
 --
@@ -7095,23 +10109,50 @@ data Repeat =
       Repeat {
           repeatDirection :: BackwardForward -- ^ /direction/ attribute
         , repeatTimes :: (Maybe NonNegativeInteger) -- ^ /times/ attribute
+        , repeatWinged :: (Maybe Winged) -- ^ /winged/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Repeat where
-    emitXml (Repeat a b) =
+    emitXml (Repeat a b c) =
       XContent XEmpty
         ([XAttr (QN "direction" Nothing) (emitXml a)] ++
-        [maybe XEmpty (XAttr (QN "times" Nothing).emitXml) b])
+        [maybe XEmpty (XAttr (QN "times" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "winged" Nothing).emitXml) c])
         []
 parseRepeat :: P.XParse Repeat
 parseRepeat = 
       Repeat
         <$> (P.xattr (P.name "direction") >>= parseBackwardForward)
         <*> P.optional (P.xattr (P.name "times") >>= parseNonNegativeInteger)
+        <*> P.optional (P.xattr (P.name "winged") >>= parseWinged)
 
 -- | Smart constructor for 'Repeat'
 mkRepeat :: BackwardForward -> Repeat
-mkRepeat a = Repeat a Nothing
+mkRepeat a = Repeat a Nothing Nothing
+
+-- | @rest@ /(complex)/
+--
+-- The rest element indicates notated rests or silences. Rest elements are usually empty, but placement on the staff can be specified using display-step and display-octave elements. If the measure attribute is set to yes, this indicates this is a complete measure rest.
+data Rest = 
+      Rest {
+          restMeasure :: (Maybe YesNo) -- ^ /measure/ attribute
+        , restDisplayStepOctave :: (Maybe DisplayStepOctave)
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Rest where
+    emitXml (Rest a b) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "measure" Nothing).emitXml) a])
+        ([emitXml b])
+parseRest :: P.XParse Rest
+parseRest = 
+      Rest
+        <$> P.optional (P.xattr (P.name "measure") >>= parseYesNo)
+        <*> P.optional (parseDisplayStepOctave)
+
+-- | Smart constructor for 'Rest'
+mkRest :: Rest
+mkRest = Rest Nothing Nothing
 
 -- | @root@ /(complex)/
 --
@@ -7194,7 +10235,7 @@ mkRootAlter a = RootAlter a Nothing Nothing Nothing Nothing Nothing Nothing Noth
 
 -- | @root-step@ /(complex)/
 --
--- The root-step type represents the pitch step of the root of the current chord within the harmony element. The text attribute indicates how the root should appear on the page if not using the element contents.
+-- The root-step type represents the pitch step of the root of the current chord within the harmony element. The text attribute indicates how the root should appear in a score if not using the element contents.
 data RootStep = 
       RootStep {
           rootStepStep :: Step -- ^ text content
@@ -7273,58 +10314,66 @@ mkScaling a b = Scaling a b
 -- Scordatura string tunings are represented by a series of accord elements, similar to the staff-tuning elements. Strings are numbered from high to low.
 data Scordatura = 
       Scordatura {
-          scordaturaAccord :: [Accord] -- ^ /accord/ child element
+          scordaturaId :: (Maybe ID) -- ^ /id/ attribute
+        , scordaturaAccord :: [Accord] -- ^ /accord/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Scordatura where
-    emitXml (Scordatura a) =
+    emitXml (Scordatura a b) =
       XContent XEmpty
-        []
-        (map (XElement (QN "accord" Nothing).emitXml) a)
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        (map (XElement (QN "accord" Nothing).emitXml) b)
 parseScordatura :: P.XParse Scordatura
 parseScordatura = 
       Scordatura
-        <$> P.many (P.xchild (P.name "accord") (parseAccord))
+        <$> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (P.xchild (P.name "accord") (parseAccord))
 
 -- | Smart constructor for 'Scordatura'
 mkScordatura :: Scordatura
-mkScordatura = Scordatura []
+mkScordatura = Scordatura Nothing []
 
 -- | @score-instrument@ /(complex)/
 --
 -- The score-instrument type represents a single instrument within a score-part. As with the score-part type, each score-instrument has a required ID attribute, a name, and an optional abbreviation.
--- 	
+-- 
 -- A score-instrument type is also required if the score specifies MIDI 1.0 channels, banks, or programs. An initial midi-instrument assignment can also be made here. MusicXML software should be able to automatically assign reasonable channels and instruments without these elements in simple cases, such as where part names match General MIDI instrument names.
 data ScoreInstrument = 
       ScoreInstrument {
           scoreInstrumentId :: ID -- ^ /id/ attribute
         , scoreInstrumentInstrumentName :: String -- ^ /instrument-name/ child element
         , scoreInstrumentInstrumentAbbreviation :: (Maybe String) -- ^ /instrument-abbreviation/ child element
+        , scoreInstrumentInstrumentSound :: (Maybe String) -- ^ /instrument-sound/ child element
         , scoreInstrumentScoreInstrument :: (Maybe ChxScoreInstrument)
+        , scoreInstrumentVirtualInstrument :: (Maybe VirtualInstrument) -- ^ /virtual-instrument/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ScoreInstrument where
-    emitXml (ScoreInstrument a b c d) =
+    emitXml (ScoreInstrument a b c d e f) =
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([XElement (QN "instrument-name" Nothing) (emitXml b)] ++
         [maybe XEmpty (XElement (QN "instrument-abbreviation" Nothing).emitXml) c] ++
-        [emitXml d])
+        [maybe XEmpty (XElement (QN "instrument-sound" Nothing).emitXml) d] ++
+        [emitXml e] ++
+        [maybe XEmpty (XElement (QN "virtual-instrument" Nothing).emitXml) f])
 parseScoreInstrument :: P.XParse ScoreInstrument
 parseScoreInstrument = 
       ScoreInstrument
         <$> (P.xattr (P.name "id") >>= parseID)
         <*> (P.xchild (P.name "instrument-name") (P.xtext >>= return))
         <*> P.optional (P.xchild (P.name "instrument-abbreviation") (P.xtext >>= return))
+        <*> P.optional (P.xchild (P.name "instrument-sound") (P.xtext >>= return))
         <*> P.optional (parseChxScoreInstrument)
+        <*> P.optional (P.xchild (P.name "virtual-instrument") (parseVirtualInstrument))
 
 -- | Smart constructor for 'ScoreInstrument'
 mkScoreInstrument :: ID -> String -> ScoreInstrument
-mkScoreInstrument a b = ScoreInstrument a b Nothing Nothing
+mkScoreInstrument a b = ScoreInstrument a b Nothing Nothing Nothing Nothing
 
 -- | @score-part@ /(complex)/
 --
--- Each MusicXML part corresponds to a track in a Standard MIDI Format 1 file. The score-instrument elements are used when there are multiple instruments per track. The midi-device element is used to make a MIDI device or port assignment for the given track. Initial midi-instrument assignments may be made here as well.
+-- Each MusicXML part corresponds to a track in a Standard MIDI Format 1 file. The score-instrument elements are used when there are multiple instruments per track. The midi-device element is used to make a MIDI device or port assignment for the given track or specific MIDI instruments. Initial midi-instrument assignments may be made here as well.
 data CmpScorePart = 
       CmpScorePart {
           scorePartId :: ID -- ^ /id/ attribute
@@ -7335,12 +10384,11 @@ data CmpScorePart =
         , scorePartPartAbbreviationDisplay :: (Maybe NameDisplay) -- ^ /part-abbreviation-display/ child element
         , scorePartGroup :: [String] -- ^ /group/ child element
         , scorePartScoreInstrument :: [ScoreInstrument] -- ^ /score-instrument/ child element
-        , scorePartMidiDevice :: (Maybe MidiDevice) -- ^ /midi-device/ child element
-        , scorePartMidiInstrument :: [MidiInstrument] -- ^ /midi-instrument/ child element
+        , scorePartScorePart :: [SeqScorePart]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml CmpScorePart where
-    emitXml (CmpScorePart a b c d e f g h i j) =
+    emitXml (CmpScorePart a b c d e f g h i) =
       XContent XEmpty
         ([XAttr (QN "id" Nothing) (emitXml a)])
         ([maybe XEmpty (XElement (QN "identification" Nothing).emitXml) b] ++
@@ -7350,8 +10398,7 @@ instance EmitXml CmpScorePart where
         [maybe XEmpty (XElement (QN "part-abbreviation-display" Nothing).emitXml) f] ++
         map (XElement (QN "group" Nothing).emitXml) g ++
         map (XElement (QN "score-instrument" Nothing).emitXml) h ++
-        [maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) i] ++
-        map (XElement (QN "midi-instrument" Nothing).emitXml) j)
+        [emitXml i])
 parseCmpScorePart :: P.XParse CmpScorePart
 parseCmpScorePart = 
       CmpScorePart
@@ -7363,12 +10410,11 @@ parseCmpScorePart =
         <*> P.optional (P.xchild (P.name "part-abbreviation-display") (parseNameDisplay))
         <*> P.many (P.xchild (P.name "group") (P.xtext >>= return))
         <*> P.many (P.xchild (P.name "score-instrument") (parseScoreInstrument))
-        <*> P.optional (P.xchild (P.name "midi-device") (parseMidiDevice))
-        <*> P.many (P.xchild (P.name "midi-instrument") (parseMidiInstrument))
+        <*> P.many (parseSeqScorePart)
 
 -- | Smart constructor for 'CmpScorePart'
 mkCmpScorePart :: ID -> PartName -> CmpScorePart
-mkCmpScorePart a c = CmpScorePart a Nothing c Nothing Nothing Nothing [] [] Nothing []
+mkCmpScorePart a c = CmpScorePart a Nothing c Nothing Nothing Nothing [] [] []
 
 -- | @score-partwise@ /(complex)/
 data ScorePartwise = 
@@ -7420,6 +10466,64 @@ parseScoreTimewise =
 mkScoreTimewise :: ScoreHeader -> ScoreTimewise
 mkScoreTimewise b = ScoreTimewise Nothing b []
 
+-- | @segno@ /(complex)/
+--
+-- The segno type is the visual indicator of a segno sign. The exact glyph can be specified with the smufl attribute. A sound element is also needed to guide playback applications reliably.
+data Segno = 
+      Segno {
+          segnoSmufl :: (Maybe SmuflSegnoGlyphName) -- ^ /smufl/ attribute
+        , segnoDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , segnoDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , segnoRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , segnoRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , segnoFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , segnoFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , segnoFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , segnoFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , segnoColor :: (Maybe Color) -- ^ /color/ attribute
+        , segnoHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , segnoValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , segnoId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Segno where
+    emitXml (Segno a b c d e f g h i j k l m) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
+        []
+parseSegno :: P.XParse Segno
+parseSegno = 
+      Segno
+        <$> P.optional (P.xattr (P.name "smufl") >>= parseSmuflSegnoGlyphName)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'Segno'
+mkSegno :: Segno
+mkSegno = Segno Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
 -- | @slash@ /(complex)/
 --
 -- The slash type is used to indicate that slash notation is to be used. If the slash is on every beat, use-stems is no (the default). To indicate rhythms but not pitches, use-stems is set to yes. The type attribute indicates whether this is the start or stop of a slash notation style. The use-dots attribute works as for the beat-repeat element, and only has effect if use-stems is no.
@@ -7459,6 +10563,8 @@ data Slide =
         , slideType :: StartStop -- ^ /type/ attribute
         , slideNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , slideLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , slideDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , slideSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , slideDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , slideDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , slideRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -7472,27 +10578,31 @@ data Slide =
         , slideBeats :: (Maybe TrillBeats) -- ^ /beats/ attribute
         , slideFirstBeat :: (Maybe Percent) -- ^ /first-beat/ attribute
         , slideLastBeat :: (Maybe Percent) -- ^ /last-beat/ attribute
+        , slideId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Slide where
-    emitXml (Slide a b c d e f g h i j k l m n o p q) =
+    emitXml (Slide a b c d e f g h i j k l m n o p q r s t) =
       XContent (emitXml a)
         ([XAttr (QN "type" Nothing) (emitXml b)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) c] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) l] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) m] ++
-        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) n] ++
-        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) q])
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "accelerate" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "beats" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "first-beat" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "last-beat" Nothing).emitXml) s] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) t])
         []
 parseSlide :: P.XParse Slide
 parseSlide = 
@@ -7501,6 +10611,8 @@ parseSlide =
         <*> (P.xattr (P.name "type") >>= parseStartStop)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -7514,10 +10626,11 @@ parseSlide =
         <*> P.optional (P.xattr (P.name "beats") >>= parseTrillBeats)
         <*> P.optional (P.xattr (P.name "first-beat") >>= parsePercent)
         <*> P.optional (P.xattr (P.name "last-beat") >>= parsePercent)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Slide'
 mkSlide :: String -> StartStop -> Slide
-mkSlide a b = Slide a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkSlide a b = Slide a b Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @slur@ /(complex)/
 --
@@ -7527,40 +10640,46 @@ data Slur =
           slurType :: StartStopContinue -- ^ /type/ attribute
         , slurNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , slurLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , slurDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , slurSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , slurDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , slurDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , slurRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , slurRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , slurPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , slurOrientation :: (Maybe OverUnder) -- ^ /orientation/ attribute
-        , slurBezierOffset :: (Maybe Divisions) -- ^ /bezier-offset/ attribute
-        , slurBezierOffset2 :: (Maybe Divisions) -- ^ /bezier-offset2/ attribute
         , slurBezierX :: (Maybe Tenths) -- ^ /bezier-x/ attribute
         , slurBezierY :: (Maybe Tenths) -- ^ /bezier-y/ attribute
         , slurBezierX2 :: (Maybe Tenths) -- ^ /bezier-x2/ attribute
         , slurBezierY2 :: (Maybe Tenths) -- ^ /bezier-y2/ attribute
+        , slurBezierOffset :: (Maybe Divisions) -- ^ /bezier-offset/ attribute
+        , slurBezierOffset2 :: (Maybe Divisions) -- ^ /bezier-offset2/ attribute
         , slurColor :: (Maybe Color) -- ^ /color/ attribute
+        , slurId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Slur where
-    emitXml (Slur a b c d e f g h i j k l m n o p) =
+    emitXml (Slur a b c d e f g h i j k l m n o p q r s) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l] ++
         [maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m] ++
         [maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n] ++
         [maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
+        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) s])
         []
 parseSlur :: P.XParse Slur
 parseSlur = 
@@ -7568,53 +10687,56 @@ parseSlur =
         <$> (P.xattr (P.name "type") >>= parseStartStopContinue)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "orientation") >>= parseOverUnder)
-        <*> P.optional (P.xattr (P.name "bezier-offset") >>= parseDivisions)
-        <*> P.optional (P.xattr (P.name "bezier-offset2") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "bezier-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-x2") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-y2") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "bezier-offset") >>= parseDivisions)
+        <*> P.optional (P.xattr (P.name "bezier-offset2") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Slur'
 mkSlur :: StartStopContinue -> Slur
-mkSlur a = Slur a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkSlur a = Slur a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @sound@ /(complex)/
 --
 -- The sound element contains general playback parameters. They can stand alone within a part/measure, or be a component element within a direction.
 --
 -- @
--- 	
+-- 
 -- Tempo is expressed in quarter notes per minute. If 0, the sound-generating program should prompt the user at the time of compiling a sound (MIDI) file.
--- 	
+-- 
 -- Dynamics (or MIDI velocity) are expressed as a percentage of the default forte value (90 for MIDI 1.0).
--- 	
+-- 
 -- Dacapo indicates to go back to the beginning of the movement. When used it always has the value "yes".
--- 	
+-- 
 -- Segno and dalsegno are used for backwards jumps to a segno sign; coda and tocoda are used for forward jumps to a coda sign. If there are multiple jumps, the value of these parameters can be used to name and distinguish them. If segno or coda is used, the divisions attribute can also be used to indicate the number of divisions per quarter note. Otherwise sound and MIDI generating programs may have to recompute this.
--- 	
+-- 
 -- By default, a dalsegno or dacapo attribute indicates that the jump should occur the first time through, while a tocoda attribute indicates the jump should occur the second time through. The time that jumps occur can be changed by using the time-only attribute.
--- 	
+-- 
 -- Forward-repeat is used when a forward repeat sign is implied, and usually follows a bar line. When used it always has the value of "yes".
--- 	
+-- 
 -- The fine attribute follows the final note or rest in a movement with a da capo or dal segno direction. If numeric, the value represents the actual duration of the final note or rest, which can be ambiguous in written notation and different among parts and voices. The value may also be "yes" to indicate no change to the final duration.
--- 	
--- If the sound element applies only one time through a repeat, the time-only attribute indicates which time to apply the sound element.
--- 	
+-- 
+-- If the sound element applies only particular times through a repeat, the time-only attribute indicates which times to apply the sound element.
+-- 
 -- Pizzicato in a sound element effects all following notes. Yes indicates pizzicato, no indicates arco.
 -- 
 -- The pan and elevation attributes are deprecated in Version 2.0. The pan and elevation elements in the midi-instrument element should be used instead. The meaning of the pan and elevation attributes is the same as for the pan and elevation elements. If both are present, the mid-instrument elements take priority.
--- 	
+-- 
 -- The damper-pedal, soft-pedal, and sostenuto-pedal attributes effect playback of the three common piano pedals and their MIDI controller equivalents. The yes value indicates the pedal is depressed; no indicates the pedal is released. A numeric value from 0 to 100 may also be used for half pedaling. This value is the percentage that the pedal is depressed. A value of 0 is equivalent to no, and a value of 100 is equivalent to yes.
--- 	
--- MIDI instruments are changed using the midi-instrument element.
+-- 
+-- MIDI devices, MIDI instruments, and playback techniques are changed using the midi-device, midi-instrument, and play elements. When there are multiple instances of these elements, they should be grouped together by instrument using the id attribute values.
 -- 
 -- The offset element is used to indicate that the sound takes place offset from the current score position. If the sound element is a child of a direction element, the sound offset element overrides the direction offset element if both elements are present. Note that the offset reflects the intended musical position for the change in sound. It should not be used to compensate for latency issues in particular hardware configurations.
 -- @
@@ -7630,19 +10752,20 @@ data Sound =
         , soundDivisions :: (Maybe Divisions) -- ^ /divisions/ attribute
         , soundForwardRepeat :: (Maybe YesNo) -- ^ /forward-repeat/ attribute
         , soundFine :: (Maybe Token) -- ^ /fine/ attribute
-        , soundTimeOnly :: (Maybe Token) -- ^ /time-only/ attribute
+        , soundTimeOnly :: (Maybe TimeOnly) -- ^ /time-only/ attribute
         , soundPizzicato :: (Maybe YesNo) -- ^ /pizzicato/ attribute
         , soundPan :: (Maybe RotationDegrees) -- ^ /pan/ attribute
         , soundElevation :: (Maybe RotationDegrees) -- ^ /elevation/ attribute
         , soundDamperPedal :: (Maybe YesNoNumber) -- ^ /damper-pedal/ attribute
         , soundSoftPedal :: (Maybe YesNoNumber) -- ^ /soft-pedal/ attribute
         , soundSostenutoPedal :: (Maybe YesNoNumber) -- ^ /sostenuto-pedal/ attribute
-        , soundMidiInstrument :: [MidiInstrument] -- ^ /midi-instrument/ child element
+        , soundId :: (Maybe ID) -- ^ /id/ attribute
+        , soundSound :: [SeqSound]
         , soundOffset :: (Maybe Offset) -- ^ /offset/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Sound where
-    emitXml (Sound a b c d e f g h i j k l m n o p q r s) =
+    emitXml (Sound a b c d e f g h i j k l m n o p q r s t) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "tempo" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "dynamics" Nothing).emitXml) b] ++
@@ -7660,9 +10783,10 @@ instance EmitXml Sound where
         [maybe XEmpty (XAttr (QN "elevation" Nothing).emitXml) n] ++
         [maybe XEmpty (XAttr (QN "damper-pedal" Nothing).emitXml) o] ++
         [maybe XEmpty (XAttr (QN "soft-pedal" Nothing).emitXml) p] ++
-        [maybe XEmpty (XAttr (QN "sostenuto-pedal" Nothing).emitXml) q])
-        (map (XElement (QN "midi-instrument" Nothing).emitXml) r ++
-        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) s])
+        [maybe XEmpty (XAttr (QN "sostenuto-pedal" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) r])
+        ([emitXml s] ++
+        [maybe XEmpty (XElement (QN "offset" Nothing).emitXml) t])
 parseSound :: P.XParse Sound
 parseSound = 
       Sound
@@ -7676,19 +10800,20 @@ parseSound =
         <*> P.optional (P.xattr (P.name "divisions") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "forward-repeat") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "fine") >>= parseToken)
-        <*> P.optional (P.xattr (P.name "time-only") >>= parseToken)
+        <*> P.optional (P.xattr (P.name "time-only") >>= parseTimeOnly)
         <*> P.optional (P.xattr (P.name "pizzicato") >>= parseYesNo)
         <*> P.optional (P.xattr (P.name "pan") >>= parseRotationDegrees)
         <*> P.optional (P.xattr (P.name "elevation") >>= parseRotationDegrees)
         <*> P.optional (P.xattr (P.name "damper-pedal") >>= parseYesNoNumber)
         <*> P.optional (P.xattr (P.name "soft-pedal") >>= parseYesNoNumber)
         <*> P.optional (P.xattr (P.name "sostenuto-pedal") >>= parseYesNoNumber)
-        <*> P.many (P.xchild (P.name "midi-instrument") (parseMidiInstrument))
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (parseSeqSound)
         <*> P.optional (P.xchild (P.name "offset") (parseOffset))
 
 -- | Smart constructor for 'Sound'
 mkSound :: Sound
-mkSound = Sound Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing
+mkSound = Sound Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing
 
 -- | @staff-details@ /(complex)/
 --
@@ -7734,6 +10859,64 @@ parseStaffDetails =
 -- | Smart constructor for 'StaffDetails'
 mkStaffDetails :: StaffDetails
 mkStaffDetails = StaffDetails Nothing Nothing Nothing Nothing Nothing Nothing [] Nothing Nothing
+
+-- | @staff-divide@ /(complex)/
+--
+-- The staff-divide element represents the staff division arrow symbols found at SMuFL code points U+E00B, U+E00C, and U+E00D.
+data StaffDivide = 
+      StaffDivide {
+          staffDivideType :: StaffDivideSymbol -- ^ /type/ attribute
+        , staffDivideDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , staffDivideDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , staffDivideRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , staffDivideRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , staffDivideFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , staffDivideFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , staffDivideFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , staffDivideFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , staffDivideColor :: (Maybe Color) -- ^ /color/ attribute
+        , staffDivideHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , staffDivideValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , staffDivideId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml StaffDivide where
+    emitXml (StaffDivide a b c d e f g h i j k l m) =
+      XContent XEmpty
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
+        []
+parseStaffDivide :: P.XParse StaffDivide
+parseStaffDivide = 
+      StaffDivide
+        <$> (P.xattr (P.name "type") >>= parseStaffDivideSymbol)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'StaffDivide'
+mkStaffDivide :: StaffDivideSymbol -> StaffDivide
+mkStaffDivide a = StaffDivide a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @staff-layout@ /(complex)/
 --
@@ -7785,7 +10968,7 @@ mkStaffTuning b = StaffTuning Nothing b
 
 -- | @stem@ /(complex)/
 --
--- Stems can be down, up, none, or double. For down and up stems, the position attributes can be used to specify stem length. The relative values specify the end of the stem relative to the program default. Default values specify an absolute end stem position. Negative values of relative-y that would flip a stem instead of shortening it are ignored.
+-- Stems can be down, up, none, or double. For down and up stems, the position attributes can be used to specify stem length. The relative values specify the end of the stem relative to the program default. Default values specify an absolute end stem position. Negative values of relative-y that would flip a stem instead of shortening it are ignored. A stem element associated with a rest refers to a stemlet.
 data Stem = 
       Stem {
           stemStemValue :: StemValue -- ^ text content
@@ -7819,9 +11002,42 @@ parseStem =
 mkStem :: StemValue -> Stem
 mkStem a = Stem a Nothing Nothing Nothing Nothing Nothing
 
+-- | @stick@ /(complex)/
+--
+-- The stick type represents pictograms where the material of the stick, mallet, or beater is included.The parentheses and dashed-circle attributes indicate the presence of these marks around the round beater part of a pictogram. Values for these attributes are "no" if not present.
+data Stick = 
+      Stick {
+          stickTip :: (Maybe TipDirection) -- ^ /tip/ attribute
+        , stickParentheses :: (Maybe YesNo) -- ^ /parentheses/ attribute
+        , stickDashedCircle :: (Maybe YesNo) -- ^ /dashed-circle/ attribute
+        , stickStickType :: StickType -- ^ /stick-type/ child element
+        , stickStickMaterial :: StickMaterial -- ^ /stick-material/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Stick where
+    emitXml (Stick a b c d e) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "tip" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "parentheses" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "dashed-circle" Nothing).emitXml) c])
+        ([XElement (QN "stick-type" Nothing) (emitXml d)] ++
+        [XElement (QN "stick-material" Nothing) (emitXml e)])
+parseStick :: P.XParse Stick
+parseStick = 
+      Stick
+        <$> P.optional (P.xattr (P.name "tip") >>= parseTipDirection)
+        <*> P.optional (P.xattr (P.name "parentheses") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "dashed-circle") >>= parseYesNo)
+        <*> (P.xchild (P.name "stick-type") (P.xtext >>= parseStickType))
+        <*> (P.xchild (P.name "stick-material") (P.xtext >>= parseStickMaterial))
+
+-- | Smart constructor for 'Stick'
+mkStick :: StickType -> StickMaterial -> Stick
+mkStick d e = Stick Nothing Nothing Nothing d e
+
 -- | @string@ /(complex)/
 --
--- The string type is used with tablature notation, regular notation (where it is often circled), and chord diagrams. String numbers start with 1 for the highest string.
+-- The string type is used with tablature notation, regular notation (where it is often circled), and chord diagrams. String numbers start with 1 for the highest pitched full-length string.
 data CmpString = 
       CmpString {
           stringStringNumber :: StringNumber -- ^ text content
@@ -7869,6 +11085,64 @@ parseCmpString =
 -- | Smart constructor for 'CmpString'
 mkCmpString :: StringNumber -> CmpString
 mkCmpString a = CmpString a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | @string-mute@ /(complex)/
+--
+-- The string-mute type represents string mute on and mute off symbols.
+data StringMute = 
+      StringMute {
+          stringMuteType :: OnOff -- ^ /type/ attribute
+        , stringMuteDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , stringMuteDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , stringMuteRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , stringMuteRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , stringMuteFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , stringMuteFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , stringMuteFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , stringMuteFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , stringMuteColor :: (Maybe Color) -- ^ /color/ attribute
+        , stringMuteHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , stringMuteValign :: (Maybe Valign) -- ^ /valign/ attribute
+        , stringMuteId :: (Maybe ID) -- ^ /id/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml StringMute where
+    emitXml (StringMute a b c d e f g h i j k l m) =
+      XContent XEmpty
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
+        []
+parseStringMute :: P.XParse StringMute
+parseStringMute = 
+      StringMute
+        <$> (P.xattr (P.name "type") >>= parseOnOff)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+
+-- | Smart constructor for 'StringMute'
+mkStringMute :: OnOff -> StringMute
+mkStringMute a = StringMute a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @strong-accent@ /(complex)/
 --
@@ -7973,35 +11247,65 @@ parseSupports =
 mkSupports :: YesNo -> NMTOKEN -> Supports
 mkSupports a b = Supports a b Nothing Nothing
 
+-- | @system-dividers@ /(complex)/
+--
+-- The system-dividers element indicates the presence or absence of system dividers (also known as system separation marks) between systems displayed on the same page. Dividers on the left and right side of the page are controlled by the left-divider and right-divider elements respectively. The default vertical position is half the system-distance value from the top of the system that is below the divider. The default horizontal position is the left and right system margin, respectively.
+-- 
+-- When used in the print element, the system-dividers element affects the dividers that would appear between the current system and the previous system.
+data SystemDividers = 
+      SystemDividers {
+          systemDividersLeftDivider :: EmptyPrintObjectStyleAlign -- ^ /left-divider/ child element
+        , systemDividersRightDivider :: EmptyPrintObjectStyleAlign -- ^ /right-divider/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml SystemDividers where
+    emitXml (SystemDividers a b) =
+      XContent XEmpty
+        []
+        ([XElement (QN "left-divider" Nothing) (emitXml a)] ++
+        [XElement (QN "right-divider" Nothing) (emitXml b)])
+parseSystemDividers :: P.XParse SystemDividers
+parseSystemDividers = 
+      SystemDividers
+        <$> (P.xchild (P.name "left-divider") (parseEmptyPrintObjectStyleAlign))
+        <*> (P.xchild (P.name "right-divider") (parseEmptyPrintObjectStyleAlign))
+
+-- | Smart constructor for 'SystemDividers'
+mkSystemDividers :: EmptyPrintObjectStyleAlign -> EmptyPrintObjectStyleAlign -> SystemDividers
+mkSystemDividers a b = SystemDividers a b
+
 -- | @system-layout@ /(complex)/
 --
--- System layout includes left and right margins and the vertical distance from the previous system. The system distance is measured from the bottom line of the previous system to the top line of the current system. It is ignored for the first system on a page. The top system distance is measured from the page's top margin to the top line of the first system. It is ignored for all but the first system on a page.
--- 	
+-- A system is a group of staves that are read and played simultaneously. System layout includes left and right margins and the vertical distance from the previous system. The system distance is measured from the bottom line of the previous system to the top line of the current system. It is ignored for the first system on a page. The top system distance is measured from the page's top margin to the top line of the first system. It is ignored for all but the first system on a page.
+-- 
 -- Sometimes the sum of measure widths in a system may not equal the system width specified by the layout elements due to roundoff or other errors. The behavior when reading MusicXML files in these cases is application-dependent. For instance, applications may find that the system layout data is more reliable than the sum of the measure widths, and adjust the measure widths accordingly.
 data SystemLayout = 
       SystemLayout {
           systemLayoutSystemMargins :: (Maybe SystemMargins) -- ^ /system-margins/ child element
         , systemLayoutSystemDistance :: (Maybe Tenths) -- ^ /system-distance/ child element
         , systemLayoutTopSystemDistance :: (Maybe Tenths) -- ^ /top-system-distance/ child element
+        , systemLayoutSystemDividers :: (Maybe SystemDividers) -- ^ /system-dividers/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml SystemLayout where
-    emitXml (SystemLayout a b c) =
+    emitXml (SystemLayout a b c d) =
       XContent XEmpty
         []
         ([maybe XEmpty (XElement (QN "system-margins" Nothing).emitXml) a] ++
         [maybe XEmpty (XElement (QN "system-distance" Nothing).emitXml) b] ++
-        [maybe XEmpty (XElement (QN "top-system-distance" Nothing).emitXml) c])
+        [maybe XEmpty (XElement (QN "top-system-distance" Nothing).emitXml) c] ++
+        [maybe XEmpty (XElement (QN "system-dividers" Nothing).emitXml) d])
 parseSystemLayout :: P.XParse SystemLayout
 parseSystemLayout = 
       SystemLayout
         <$> P.optional (P.xchild (P.name "system-margins") (parseSystemMargins))
         <*> P.optional (P.xchild (P.name "system-distance") (P.xtext >>= parseTenths))
         <*> P.optional (P.xchild (P.name "top-system-distance") (P.xtext >>= parseTenths))
+        <*> P.optional (P.xchild (P.name "system-dividers") (parseSystemDividers))
 
 -- | Smart constructor for 'SystemLayout'
 mkSystemLayout :: SystemLayout
-mkSystemLayout = SystemLayout Nothing Nothing Nothing
+mkSystemLayout = SystemLayout Nothing Nothing Nothing Nothing
 
 -- | @system-margins@ /(complex)/
 --
@@ -8023,25 +11327,83 @@ parseSystemMargins =
 mkSystemMargins :: LeftRightMargins -> SystemMargins
 mkSystemMargins a = SystemMargins a
 
+-- | @tap@ /(complex)/
+--
+-- The tap type indicates a tap on the fretboard. The text content allows specification of the notation; + and T are common choices. If the element is empty, the hand attribute is used to specify the symbol to use. The hand attribute is ignored if the tap glyph is already specified by the text content. If neither text content nor the hand attribute are present, the display is application-specific.
+data Tap = 
+      Tap {
+          tapString :: String -- ^ text content
+        , tapHand :: (Maybe TapHand) -- ^ /hand/ attribute
+        , tapDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
+        , tapDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
+        , tapRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
+        , tapRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
+        , tapFontFamily :: (Maybe CommaSeparatedText) -- ^ /font-family/ attribute
+        , tapFontStyle :: (Maybe FontStyle) -- ^ /font-style/ attribute
+        , tapFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
+        , tapFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
+        , tapColor :: (Maybe Color) -- ^ /color/ attribute
+        , tapPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Tap where
+    emitXml (Tap a b c d e f g h i j k l) =
+      XContent (emitXml a)
+        ([maybe XEmpty (XAttr (QN "hand" Nothing).emitXml) b] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
+        []
+parseTap :: P.XParse Tap
+parseTap = 
+      Tap
+        <$> (P.xtext >>= return)
+        <*> P.optional (P.xattr (P.name "hand") >>= parseTapHand)
+        <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "font-family") >>= parseCommaSeparatedText)
+        <*> P.optional (P.xattr (P.name "font-style") >>= parseFontStyle)
+        <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
+        <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
+        <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+
+-- | Smart constructor for 'Tap'
+mkTap :: String -> Tap
+mkTap a = Tap a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
 -- | @technical@ /(complex)/
 --
 -- Technical indications give performance information for individual instruments.
 data Technical = 
       Technical {
-          technicalTechnical :: [ChxTechnical]
+          technicalId :: (Maybe ID) -- ^ /id/ attribute
+        , technicalTechnical :: [ChxTechnical]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Technical where
-    emitXml (Technical a) =
-      XReps [emitXml a]
+    emitXml (Technical a b) =
+      XContent XEmpty
+        ([maybe XEmpty (XAttr (QN "id" Nothing).emitXml) a])
+        ([emitXml b])
 parseTechnical :: P.XParse Technical
 parseTechnical = 
       Technical
-        <$> P.many (parseChxTechnical)
+        <$> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.many (parseChxTechnical)
 
 -- | Smart constructor for 'Technical'
 mkTechnical :: Technical
-mkTechnical = Technical []
+mkTechnical = Technical Nothing []
 
 -- | @text-element-data@ /(complex)/
 --
@@ -8102,92 +11464,112 @@ mkTextElementData a = TextElementData a Nothing Nothing Nothing Nothing Nothing 
 
 -- | @tie@ /(complex)/
 --
--- The tie element indicates that a tie begins or ends with this note. The tie element indicates sound; the tied element indicates notation.
+-- The tie element indicates that a tie begins or ends with this note. If the tie element applies only particular times through a repeat, the time-only attribute indicates which times to apply it. The tie element indicates sound; the tied element indicates notation.
 data Tie = 
       Tie {
           tieType :: StartStop -- ^ /type/ attribute
+        , tieTimeOnly :: (Maybe TimeOnly) -- ^ /time-only/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Tie where
-    emitXml (Tie a) =
+    emitXml (Tie a b) =
       XContent XEmpty
-        ([XAttr (QN "type" Nothing) (emitXml a)])
+        ([XAttr (QN "type" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XAttr (QN "time-only" Nothing).emitXml) b])
         []
 parseTie :: P.XParse Tie
 parseTie = 
       Tie
         <$> (P.xattr (P.name "type") >>= parseStartStop)
+        <*> P.optional (P.xattr (P.name "time-only") >>= parseTimeOnly)
 
 -- | Smart constructor for 'Tie'
 mkTie :: StartStop -> Tie
-mkTie a = Tie a
+mkTie a = Tie a Nothing
 
 -- | @tied@ /(complex)/
 --
--- The tied type represents the notated tie. The tie element represents the tie sound.
+-- The tied element represents the notated tie. The tie element represents the tie sound.
+-- 
+-- The number attribute is rarely needed to disambiguate ties, since note pitches will usually suffice. The attribute is implied rather than defaulting to 1 as with most elements. It is available for use in more complex tied notation situations.
+-- 
+-- Ties that join two notes of the same pitch together should be represented with a tied element on the first note with type="start" and a tied element on the second note with type="stop".  This can also be done if the two notes being tied are enharmonically equivalent, but have different step values. It is not recommended to use tied elements to join two notes with enharmonically inequivalent pitches.
+-- 
+-- Ties that indicate that an instrument should be undamped are specified with a single tied element with type="let-ring".
+-- 
+-- Ties that are visually attached to only one note, other than undamped ties, should be specified with two tied elements on the same note, first type="start" then type="stop". This can be used to represent ties into or out of repeated sections or codas.
 data Tied = 
       Tied {
-          tiedType :: StartStop -- ^ /type/ attribute
+          tiedType :: TiedType -- ^ /type/ attribute
         , tiedNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , tiedLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , tiedDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , tiedSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , tiedDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , tiedDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , tiedRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , tiedRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , tiedPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
         , tiedOrientation :: (Maybe OverUnder) -- ^ /orientation/ attribute
-        , tiedBezierOffset :: (Maybe Divisions) -- ^ /bezier-offset/ attribute
-        , tiedBezierOffset2 :: (Maybe Divisions) -- ^ /bezier-offset2/ attribute
         , tiedBezierX :: (Maybe Tenths) -- ^ /bezier-x/ attribute
         , tiedBezierY :: (Maybe Tenths) -- ^ /bezier-y/ attribute
         , tiedBezierX2 :: (Maybe Tenths) -- ^ /bezier-x2/ attribute
         , tiedBezierY2 :: (Maybe Tenths) -- ^ /bezier-y2/ attribute
+        , tiedBezierOffset :: (Maybe Divisions) -- ^ /bezier-offset/ attribute
+        , tiedBezierOffset2 :: (Maybe Divisions) -- ^ /bezier-offset2/ attribute
         , tiedColor :: (Maybe Color) -- ^ /color/ attribute
+        , tiedId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Tied where
-    emitXml (Tied a b c d e f g h i j k l m n o p) =
+    emitXml (Tied a b c d e f g h i j k l m n o p q r s) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "orientation" Nothing).emitXml) k] ++
         [maybe XEmpty (XAttr (QN "bezier-x" Nothing).emitXml) l] ++
         [maybe XEmpty (XAttr (QN "bezier-y" Nothing).emitXml) m] ++
         [maybe XEmpty (XAttr (QN "bezier-x2" Nothing).emitXml) n] ++
         [maybe XEmpty (XAttr (QN "bezier-y2" Nothing).emitXml) o] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) p])
+        [maybe XEmpty (XAttr (QN "bezier-offset" Nothing).emitXml) p] ++
+        [maybe XEmpty (XAttr (QN "bezier-offset2" Nothing).emitXml) q] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) r] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) s])
         []
 parseTied :: P.XParse Tied
 parseTied = 
       Tied
-        <$> (P.xattr (P.name "type") >>= parseStartStop)
+        <$> (P.xattr (P.name "type") >>= parseTiedType)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
         <*> P.optional (P.xattr (P.name "orientation") >>= parseOverUnder)
-        <*> P.optional (P.xattr (P.name "bezier-offset") >>= parseDivisions)
-        <*> P.optional (P.xattr (P.name "bezier-offset2") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "bezier-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-x2") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "bezier-y2") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "bezier-offset") >>= parseDivisions)
+        <*> P.optional (P.xattr (P.name "bezier-offset2") >>= parseDivisions)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Tied'
-mkTied :: StartStop -> Tied
-mkTied a = Tied a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkTied :: TiedType -> Tied
+mkTied a = Tied a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @time@ /(complex)/
 --
@@ -8198,6 +11580,7 @@ data Time =
       Time {
           timeNumber :: (Maybe StaffNumber) -- ^ /number/ attribute
         , timeSymbol :: (Maybe TimeSymbol) -- ^ /symbol/ attribute
+        , timeSeparator :: (Maybe TimeSeparator) -- ^ /separator/ attribute
         , timeDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , timeDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , timeRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -8207,31 +11590,39 @@ data Time =
         , timeFontSize :: (Maybe FontSize) -- ^ /font-size/ attribute
         , timeFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , timeColor :: (Maybe Color) -- ^ /color/ attribute
+        , timeHalign :: (Maybe LeftCenterRight) -- ^ /halign/ attribute
+        , timeValign :: (Maybe Valign) -- ^ /valign/ attribute
         , timePrintObject :: (Maybe YesNo) -- ^ /print-object/ attribute
+        , timeId :: (Maybe ID) -- ^ /id/ attribute
         , timeTime :: ChxTime
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Time where
-    emitXml (Time a b c d e f g h i j k l m) =
+    emitXml (Time a b c d e f g h i j k l m n o p q) =
       XContent XEmpty
         ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
         [maybe XEmpty (XAttr (QN "symbol" Nothing).emitXml) b] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) h] ++
-        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
-        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) l])
-        ([emitXml m])
+        [maybe XEmpty (XAttr (QN "separator" Nothing).emitXml) c] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "font-family" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "font-style" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "halign" Nothing).emitXml) m] ++
+        [maybe XEmpty (XAttr (QN "valign" Nothing).emitXml) n] ++
+        [maybe XEmpty (XAttr (QN "print-object" Nothing).emitXml) o] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) p])
+        ([emitXml q])
 parseTime :: P.XParse Time
 parseTime = 
       Time
         <$> P.optional (P.xattr (P.name "number") >>= parseStaffNumber)
         <*> P.optional (P.xattr (P.name "symbol") >>= parseTimeSymbol)
+        <*> P.optional (P.xattr (P.name "separator") >>= parseTimeSeparator)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -8241,16 +11632,19 @@ parseTime =
         <*> P.optional (P.xattr (P.name "font-size") >>= parseFontSize)
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "halign") >>= parseLeftCenterRight)
+        <*> P.optional (P.xattr (P.name "valign") >>= parseValign)
         <*> P.optional (P.xattr (P.name "print-object") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> parseChxTime
 
 -- | Smart constructor for 'Time'
 mkTime :: ChxTime -> Time
-mkTime m = Time Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing m
+mkTime q = Time Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing q
 
 -- | @time-modification@ /(complex)/
 --
--- The time-modification type represents tuplets and other durational changes.
+-- Time modification indicates tuplets, double-note tremolos, and other durational changes. A time-modification element shows how the cumulative, sounding effect of tuplets and double-note tremolos compare to the written note type represented by the type and dot elements. Nested tuplets and other notations that use more detailed information need both the time-modification and tuplet elements to be represented accurately.
 data TimeModification = 
       TimeModification {
           timeModificationActualNotes :: NonNegativeInteger -- ^ /actual-notes/ child element
@@ -8278,42 +11672,53 @@ mkTimeModification a b = TimeModification a b Nothing
 
 -- | @transpose@ /(complex)/
 --
--- The transpose type represents what must be added to a written pitch to get a correct sounding pitch.
+-- The transpose type represents what must be added to a written pitch to get a correct sounding pitch. The optional number attribute refers to staff numbers, from top to bottom on the system. If absent, the transposition applies to all staves in the part. Per-staff transposition is most often used in parts that represent multiple instruments.
 data Transpose = 
       Transpose {
-          transposeDiatonic :: (Maybe Int) -- ^ /diatonic/ child element
+          transposeNumber :: (Maybe StaffNumber) -- ^ /number/ attribute
+        , transposeId :: (Maybe ID) -- ^ /id/ attribute
+        , transposeDiatonic :: (Maybe Int) -- ^ /diatonic/ child element
         , transposeChromatic :: Semitones -- ^ /chromatic/ child element
         , transposeOctaveChange :: (Maybe Int) -- ^ /octave-change/ child element
         , transposeDouble :: (Maybe Empty) -- ^ /double/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Transpose where
-    emitXml (Transpose a b c d) =
+    emitXml (Transpose a b c d e f) =
       XContent XEmpty
-        []
-        ([maybe XEmpty (XElement (QN "diatonic" Nothing).emitXml) a] ++
-        [XElement (QN "chromatic" Nothing) (emitXml b)] ++
-        [maybe XEmpty (XElement (QN "octave-change" Nothing).emitXml) c] ++
-        [maybe XEmpty (XElement (QN "double" Nothing).emitXml) d])
+        ([maybe XEmpty (XAttr (QN "number" Nothing).emitXml) a] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) b])
+        ([maybe XEmpty (XElement (QN "diatonic" Nothing).emitXml) c] ++
+        [XElement (QN "chromatic" Nothing) (emitXml d)] ++
+        [maybe XEmpty (XElement (QN "octave-change" Nothing).emitXml) e] ++
+        [maybe XEmpty (XElement (QN "double" Nothing).emitXml) f])
 parseTranspose :: P.XParse Transpose
 parseTranspose = 
       Transpose
-        <$> P.optional (P.xchild (P.name "diatonic") (P.xtext >>= (P.xread "Integer")))
+        <$> P.optional (P.xattr (P.name "number") >>= parseStaffNumber)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
+        <*> P.optional (P.xchild (P.name "diatonic") (P.xtext >>= (P.xread "Integer")))
         <*> (P.xchild (P.name "chromatic") (P.xtext >>= parseSemitones))
         <*> P.optional (P.xchild (P.name "octave-change") (P.xtext >>= (P.xread "Integer")))
         <*> P.optional (P.xchild (P.name "double") (parseEmpty))
 
 -- | Smart constructor for 'Transpose'
 mkTranspose :: Semitones -> Transpose
-mkTranspose b = Transpose Nothing b Nothing Nothing
+mkTranspose d = Transpose Nothing Nothing Nothing d Nothing Nothing
 
 -- | @tremolo@ /(complex)/
 --
--- While using repeater beams was the original method for indicating tremolos, often playback and display are not well-enough integrated in an application to make that feasible. The tremolo ornament can be used to indicate either single-note or double-note tremolos. Single-note tremolos use the single type, while double-note tremolos use the start and stop types. The default is "single" for compatibility with Version 1.1. The text of the element indicates the number of tremolo marks and is an integer from 0 to 6. Note that the number of attached beams is not included in this value, but is represented separately using the beam element.
+-- The tremolo ornament can be used to indicate single-note, double-note, or unmeasured tremolos. Single-note tremolos use the single type, double-note tremolos use the start and stop types, and unmeasured tremolos use the unmeasured type. The default is "single" for compatibility with Version 1.1. The text of the element indicates the number of tremolo marks and is an integer from 0 to 8. Note that the number of attached beams is not included in this value, but is represented separately using the beam element. The value should be 0 for unmeasured tremolos.
+-- 
+-- 	When using double-note tremolos, the duration of each note in the tremolo should correspond to half of the notated type value. A time-modification element should also be added with an actual-notes value of 2 and a normal-notes value of 1. If used within a tuplet, this 2/1 ratio should be multiplied by the existing tuplet ratio.
+-- 
+-- 	The smufl attribute specifies the glyph to use from the SMuFL tremolos range for an unmeasured tremolo. It is ignored for other tremolo types. The SMuFL buzzRoll glyph is used by default if the attribute is missing.
+-- 
+-- 	Using repeater beams for indicating tremolos is deprecated as of MusicXML 3.0.
 data Tremolo = 
       Tremolo {
           tremoloTremoloMarks :: TremoloMarks -- ^ text content
-        , tremoloType :: (Maybe StartStopSingle) -- ^ /type/ attribute
+        , tremoloType :: (Maybe TremoloType) -- ^ /type/ attribute
         , tremoloDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , tremoloDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , tremoloRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
@@ -8324,10 +11729,11 @@ data Tremolo =
         , tremoloFontWeight :: (Maybe FontWeight) -- ^ /font-weight/ attribute
         , tremoloColor :: (Maybe Color) -- ^ /color/ attribute
         , tremoloPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , tremoloSmufl :: (Maybe SmuflGlyphName) -- ^ /smufl/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Tremolo where
-    emitXml (Tremolo a b c d e f g h i j k l) =
+    emitXml (Tremolo a b c d e f g h i j k l m) =
       XContent (emitXml a)
         ([maybe XEmpty (XAttr (QN "type" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) c] ++
@@ -8339,13 +11745,14 @@ instance EmitXml Tremolo where
         [maybe XEmpty (XAttr (QN "font-size" Nothing).emitXml) i] ++
         [maybe XEmpty (XAttr (QN "font-weight" Nothing).emitXml) j] ++
         [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) k] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l])
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "smufl" Nothing).emitXml) m])
         []
 parseTremolo :: P.XParse Tremolo
 parseTremolo = 
       Tremolo
         <$> (P.xtext >>= parseTremoloMarks)
-        <*> P.optional (P.xattr (P.name "type") >>= parseStartStopSingle)
+        <*> P.optional (P.xattr (P.name "type") >>= parseTremoloType)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
@@ -8356,17 +11763,18 @@ parseTremolo =
         <*> P.optional (P.xattr (P.name "font-weight") >>= parseFontWeight)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "smufl") >>= parseSmuflGlyphName)
 
 -- | Smart constructor for 'Tremolo'
 mkTremolo :: TremoloMarks -> Tremolo
-mkTremolo a = Tremolo a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkTremolo a = Tremolo a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @tuplet@ /(complex)/
 --
 -- A tuplet element is present when a tuplet is to be displayed graphically, in addition to the sound data provided by the time-modification elements. The number attribute is used to distinguish nested tuplets. The bracket attribute is used to indicate the presence of a bracket. If unspecified, the results are implementation-dependent. The line-shape attribute is used to specify whether the bracket is straight or in the older curved or slurred style. It is straight by default.
--- 	
--- Whereas a time-modification element shows how the cumulative, sounding effect of tuplets compare to the written note type, the tuplet element describes how each tuplet is displayed.
--- 	
+-- 
+-- Whereas a time-modification element shows how the cumulative, sounding effect of tuplets and double-note tremolos compare to the written note type, the tuplet element describes how this is displayed. The tuplet element also provides more detailed representation information than the time-modification element, and is needed to represent nested tuplets and other complex tuplets accurately.
+-- 
 -- The show-number attribute is used to display either the number of actual notes, the number of both actual and normal notes, or neither. It is actual by default. The show-type attribute is used to display either the actual type, both the actual and normal types, or neither. It is none by default.
 data Tuplet = 
       Tuplet {
@@ -8381,12 +11789,13 @@ data Tuplet =
         , tupletRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , tupletRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , tupletPlacement :: (Maybe AboveBelow) -- ^ /placement/ attribute
+        , tupletId :: (Maybe ID) -- ^ /id/ attribute
         , tupletTupletActual :: (Maybe TupletPortion) -- ^ /tuplet-actual/ child element
         , tupletTupletNormal :: (Maybe TupletPortion) -- ^ /tuplet-normal/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Tuplet where
-    emitXml (Tuplet a b c d e f g h i j k l m) =
+    emitXml (Tuplet a b c d e f g h i j k l m n) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
@@ -8398,9 +11807,10 @@ instance EmitXml Tuplet where
         [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) h] ++
         [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) i] ++
         [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) j] ++
-        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k])
-        ([maybe XEmpty (XElement (QN "tuplet-actual" Nothing).emitXml) l] ++
-        [maybe XEmpty (XElement (QN "tuplet-normal" Nothing).emitXml) m])
+        [maybe XEmpty (XAttr (QN "placement" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) l])
+        ([maybe XEmpty (XElement (QN "tuplet-actual" Nothing).emitXml) m] ++
+        [maybe XEmpty (XElement (QN "tuplet-normal" Nothing).emitXml) n])
 parseTuplet :: P.XParse Tuplet
 parseTuplet = 
       Tuplet
@@ -8415,12 +11825,13 @@ parseTuplet =
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "placement") >>= parseAboveBelow)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
         <*> P.optional (P.xchild (P.name "tuplet-actual") (parseTupletPortion))
         <*> P.optional (P.xchild (P.name "tuplet-normal") (parseTupletPortion))
 
 -- | Smart constructor for 'Tuplet'
 mkTuplet :: StartStop -> Tuplet
-mkTuplet a = Tuplet a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkTuplet a = Tuplet a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @tuplet-dot@ /(complex)/
 --
@@ -8580,9 +11991,54 @@ parseTypedText =
 mkTypedText :: String -> TypedText
 mkTypedText a = TypedText a Nothing
 
+-- | @unpitched@ /(complex)/
+--
+-- The unpitched type represents musical elements that are notated on the staff but lack definite pitch, such as unpitched percussion and speaking voice.
+data Unpitched = 
+      Unpitched {
+          unpitchedDisplayStepOctave :: (Maybe DisplayStepOctave)
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml Unpitched where
+    emitXml (Unpitched a) =
+      XReps [emitXml a]
+parseUnpitched :: P.XParse Unpitched
+parseUnpitched = 
+      Unpitched
+        <$> P.optional (parseDisplayStepOctave)
+
+-- | Smart constructor for 'Unpitched'
+mkUnpitched :: Unpitched
+mkUnpitched = Unpitched Nothing
+
+-- | @virtual-instrument@ /(complex)/
+--
+-- The virtual-instrument element defines a specific virtual instrument used for an instrument sound.
+data VirtualInstrument = 
+      VirtualInstrument {
+          virtualInstrumentVirtualLibrary :: (Maybe String) -- ^ /virtual-library/ child element
+        , virtualInstrumentVirtualName :: (Maybe String) -- ^ /virtual-name/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml VirtualInstrument where
+    emitXml (VirtualInstrument a b) =
+      XContent XEmpty
+        []
+        ([maybe XEmpty (XElement (QN "virtual-library" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "virtual-name" Nothing).emitXml) b])
+parseVirtualInstrument :: P.XParse VirtualInstrument
+parseVirtualInstrument = 
+      VirtualInstrument
+        <$> P.optional (P.xchild (P.name "virtual-library") (P.xtext >>= return))
+        <*> P.optional (P.xchild (P.name "virtual-name") (P.xtext >>= return))
+
+-- | Smart constructor for 'VirtualInstrument'
+mkVirtualInstrument :: VirtualInstrument
+mkVirtualInstrument = VirtualInstrument Nothing Nothing
+
 -- | @wavy-line@ /(complex)/
 --
--- Wavy lines are one way to indicate trills. When used with a measure element, they should always have type="continue" set.
+-- Wavy lines are one way to indicate trills. When used with a barline element, they should always have type="continue" set.
 data WavyLine = 
       WavyLine {
           wavyLineType :: StartStopContinue -- ^ /type/ attribute
@@ -8646,30 +12102,40 @@ mkWavyLine a = WavyLine a Nothing Nothing Nothing Nothing Nothing Nothing Nothin
 
 -- | @wedge@ /(complex)/
 --
--- The wedge type represents crescendo and diminuendo wedge symbols. The type attribute is crescendo for the start of a wedge that is closed at the left side, and diminuendo for the start of a wedge that is closed on the right side. Spread values are measured in tenths; those at the start of a crescendo wedge or end of a diminuendo wedge are ignored.
+-- The wedge type represents crescendo and diminuendo wedge symbols. The type attribute is crescendo for the start of a wedge that is closed at the left side, and diminuendo for the start of a wedge that is closed on the right side. Spread values are measured in tenths; those at the start of a crescendo wedge or end of a diminuendo wedge are ignored. The niente attribute is yes if a circle appears at the point of the wedge, indicating a crescendo from nothing or diminuendo to nothing. It is no by default, and used only when the type is crescendo, or the type is stop for a wedge that began with a diminuendo type. The line-type is solid by default.
 data Wedge = 
       Wedge {
           wedgeType :: WedgeType -- ^ /type/ attribute
         , wedgeNumber :: (Maybe NumberLevel) -- ^ /number/ attribute
         , wedgeSpread :: (Maybe Tenths) -- ^ /spread/ attribute
+        , wedgeNiente :: (Maybe YesNo) -- ^ /niente/ attribute
+        , wedgeLineType :: (Maybe LineType) -- ^ /line-type/ attribute
+        , wedgeDashLength :: (Maybe Tenths) -- ^ /dash-length/ attribute
+        , wedgeSpaceLength :: (Maybe Tenths) -- ^ /space-length/ attribute
         , wedgeDefaultX :: (Maybe Tenths) -- ^ /default-x/ attribute
         , wedgeDefaultY :: (Maybe Tenths) -- ^ /default-y/ attribute
         , wedgeRelativeX :: (Maybe Tenths) -- ^ /relative-x/ attribute
         , wedgeRelativeY :: (Maybe Tenths) -- ^ /relative-y/ attribute
         , wedgeColor :: (Maybe Color) -- ^ /color/ attribute
+        , wedgeId :: (Maybe ID) -- ^ /id/ attribute
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Wedge where
-    emitXml (Wedge a b c d e f g h) =
+    emitXml (Wedge a b c d e f g h i j k l m) =
       XContent XEmpty
         ([XAttr (QN "type" Nothing) (emitXml a)] ++
         [maybe XEmpty (XAttr (QN "number" Nothing).emitXml) b] ++
         [maybe XEmpty (XAttr (QN "spread" Nothing).emitXml) c] ++
-        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) d] ++
-        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) e] ++
-        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) f] ++
-        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) g] ++
-        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) h])
+        [maybe XEmpty (XAttr (QN "niente" Nothing).emitXml) d] ++
+        [maybe XEmpty (XAttr (QN "line-type" Nothing).emitXml) e] ++
+        [maybe XEmpty (XAttr (QN "dash-length" Nothing).emitXml) f] ++
+        [maybe XEmpty (XAttr (QN "space-length" Nothing).emitXml) g] ++
+        [maybe XEmpty (XAttr (QN "default-x" Nothing).emitXml) h] ++
+        [maybe XEmpty (XAttr (QN "default-y" Nothing).emitXml) i] ++
+        [maybe XEmpty (XAttr (QN "relative-x" Nothing).emitXml) j] ++
+        [maybe XEmpty (XAttr (QN "relative-y" Nothing).emitXml) k] ++
+        [maybe XEmpty (XAttr (QN "color" Nothing).emitXml) l] ++
+        [maybe XEmpty (XAttr (QN "id" Nothing).emitXml) m])
         []
 parseWedge :: P.XParse Wedge
 parseWedge = 
@@ -8677,15 +12143,20 @@ parseWedge =
         <$> (P.xattr (P.name "type") >>= parseWedgeType)
         <*> P.optional (P.xattr (P.name "number") >>= parseNumberLevel)
         <*> P.optional (P.xattr (P.name "spread") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "niente") >>= parseYesNo)
+        <*> P.optional (P.xattr (P.name "line-type") >>= parseLineType)
+        <*> P.optional (P.xattr (P.name "dash-length") >>= parseTenths)
+        <*> P.optional (P.xattr (P.name "space-length") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "default-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-x") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "relative-y") >>= parseTenths)
         <*> P.optional (P.xattr (P.name "color") >>= parseColor)
+        <*> P.optional (P.xattr (P.name "id") >>= parseID)
 
 -- | Smart constructor for 'Wedge'
 mkWedge :: WedgeType -> Wedge
-mkWedge a = Wedge a Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+mkWedge a = Wedge a Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | @work@ /(complex)/
 --
@@ -8714,6 +12185,44 @@ parseWork =
 -- | Smart constructor for 'Work'
 mkWork :: Work
 mkWork = Work Nothing Nothing Nothing
+
+-- | @arrow@ /(choice)/
+data ChxArrow = 
+      ArrowArrowDirection {
+          arrowArrowDirection :: ArrowDirection -- ^ /arrow-direction/ child element
+        , arrowArrowStyle :: (Maybe ArrowStyle) -- ^ /arrow-style/ child element
+        , arrowArrowhead :: (Maybe Empty) -- ^ /arrowhead/ child element
+       }
+    | ArrowCircularArrow {
+          arrowCircularArrow :: CircularArrow -- ^ /circular-arrow/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxArrow where
+    emitXml (ArrowArrowDirection a b c) =
+      XContent XEmpty
+        []
+        ([XElement (QN "arrow-direction" Nothing) (emitXml a)] ++
+        [maybe XEmpty (XElement (QN "arrow-style" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "arrowhead" Nothing).emitXml) c])
+    emitXml (ArrowCircularArrow a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "circular-arrow" Nothing) (emitXml a)])
+parseChxArrow :: P.XParse ChxArrow
+parseChxArrow = 
+      ArrowArrowDirection
+        <$> (P.xchild (P.name "arrow-direction") (P.xtext >>= parseArrowDirection))
+        <*> P.optional (P.xchild (P.name "arrow-style") (P.xtext >>= parseArrowStyle))
+        <*> P.optional (P.xchild (P.name "arrowhead") (parseEmpty))
+      <|> ArrowCircularArrow
+        <$> (P.xchild (P.name "circular-arrow") (P.xtext >>= parseCircularArrow))
+
+-- | Smart constructor for 'ArrowArrowDirection'
+mkArrowArrowDirection :: ArrowDirection -> ChxArrow
+mkArrowArrowDirection a = ArrowArrowDirection a Nothing Nothing
+-- | Smart constructor for 'ArrowCircularArrow'
+mkArrowCircularArrow :: CircularArrow -> ChxArrow
+mkArrowCircularArrow a = ArrowCircularArrow a
 
 -- | @articulations@ /(choice)/
 data ChxArticulations = 
@@ -8751,10 +12260,10 @@ data ChxArticulations =
           articulationsFalloff :: EmptyLine -- ^ /falloff/ child element
        }
     | ArticulationsBreathMark {
-          articulationsBreathMark :: EmptyPlacement -- ^ /breath-mark/ child element
+          articulationsBreathMark :: BreathMark -- ^ /breath-mark/ child element
        }
     | ArticulationsCaesura {
-          articulationsCaesura :: EmptyPlacement -- ^ /caesura/ child element
+          articulationsCaesura :: Caesura -- ^ /caesura/ child element
        }
     | ArticulationsStress {
           articulationsStress :: EmptyPlacement -- ^ /stress/ child element
@@ -8762,8 +12271,11 @@ data ChxArticulations =
     | ArticulationsUnstress {
           articulationsUnstress :: EmptyPlacement -- ^ /unstress/ child element
        }
+    | ArticulationsSoftAccent {
+          articulationsSoftAccent :: EmptyPlacement -- ^ /soft-accent/ child element
+       }
     | ArticulationsOtherArticulation {
-          articulationsOtherArticulation :: PlacementText -- ^ /other-articulation/ child element
+          articulationsOtherArticulation :: OtherPlacementText -- ^ /other-articulation/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxArticulations where
@@ -8827,6 +12339,10 @@ instance EmitXml ChxArticulations where
       XContent XEmpty
         []
         ([XElement (QN "unstress" Nothing) (emitXml a)])
+    emitXml (ArticulationsSoftAccent a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "soft-accent" Nothing) (emitXml a)])
     emitXml (ArticulationsOtherArticulation a) =
       XContent XEmpty
         []
@@ -8856,15 +12372,17 @@ parseChxArticulations =
       <|> ArticulationsFalloff
         <$> (P.xchild (P.name "falloff") (parseEmptyLine))
       <|> ArticulationsBreathMark
-        <$> (P.xchild (P.name "breath-mark") (parseEmptyPlacement))
+        <$> (P.xchild (P.name "breath-mark") (parseBreathMark))
       <|> ArticulationsCaesura
-        <$> (P.xchild (P.name "caesura") (parseEmptyPlacement))
+        <$> (P.xchild (P.name "caesura") (parseCaesura))
       <|> ArticulationsStress
         <$> (P.xchild (P.name "stress") (parseEmptyPlacement))
       <|> ArticulationsUnstress
         <$> (P.xchild (P.name "unstress") (parseEmptyPlacement))
+      <|> ArticulationsSoftAccent
+        <$> (P.xchild (P.name "soft-accent") (parseEmptyPlacement))
       <|> ArticulationsOtherArticulation
-        <$> (P.xchild (P.name "other-articulation") (parsePlacementText))
+        <$> (P.xchild (P.name "other-articulation") (parseOtherPlacementText))
 
 -- | Smart constructor for 'ArticulationsAccent'
 mkArticulationsAccent :: EmptyPlacement -> ChxArticulations
@@ -8900,10 +12418,10 @@ mkArticulationsDoit a = ArticulationsDoit a
 mkArticulationsFalloff :: EmptyLine -> ChxArticulations
 mkArticulationsFalloff a = ArticulationsFalloff a
 -- | Smart constructor for 'ArticulationsBreathMark'
-mkArticulationsBreathMark :: EmptyPlacement -> ChxArticulations
+mkArticulationsBreathMark :: BreathMark -> ChxArticulations
 mkArticulationsBreathMark a = ArticulationsBreathMark a
 -- | Smart constructor for 'ArticulationsCaesura'
-mkArticulationsCaesura :: EmptyPlacement -> ChxArticulations
+mkArticulationsCaesura :: Caesura -> ChxArticulations
 mkArticulationsCaesura a = ArticulationsCaesura a
 -- | Smart constructor for 'ArticulationsStress'
 mkArticulationsStress :: EmptyPlacement -> ChxArticulations
@@ -8911,8 +12429,11 @@ mkArticulationsStress a = ArticulationsStress a
 -- | Smart constructor for 'ArticulationsUnstress'
 mkArticulationsUnstress :: EmptyPlacement -> ChxArticulations
 mkArticulationsUnstress a = ArticulationsUnstress a
+-- | Smart constructor for 'ArticulationsSoftAccent'
+mkArticulationsSoftAccent :: EmptyPlacement -> ChxArticulations
+mkArticulationsSoftAccent a = ArticulationsSoftAccent a
 -- | Smart constructor for 'ArticulationsOtherArticulation'
-mkArticulationsOtherArticulation :: PlacementText -> ChxArticulations
+mkArticulationsOtherArticulation :: OtherPlacementText -> ChxArticulations
 mkArticulationsOtherArticulation a = ArticulationsOtherArticulation a
 
 -- | @bend@ /(choice)/
@@ -8948,13 +12469,81 @@ mkBendRelease :: Empty -> ChxBend
 mkBendRelease a = BendRelease a
 
 -- | @credit@ /(choice)/
+data ChxCredit0 = 
+      CreditCreditWords {
+          creditCreditWords :: FormattedTextId -- ^ /credit-words/ child element
+       }
+    | CreditCreditSymbol {
+          creditCreditSymbol :: FormattedSymbolId -- ^ /credit-symbol/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxCredit0 where
+    emitXml (CreditCreditWords a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "credit-words" Nothing) (emitXml a)])
+    emitXml (CreditCreditSymbol a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "credit-symbol" Nothing) (emitXml a)])
+parseChxCredit0 :: P.XParse ChxCredit0
+parseChxCredit0 = 
+      CreditCreditWords
+        <$> (P.xchild (P.name "credit-words") (parseFormattedTextId))
+      <|> CreditCreditSymbol
+        <$> (P.xchild (P.name "credit-symbol") (parseFormattedSymbolId))
+
+-- | Smart constructor for 'CreditCreditWords'
+mkCreditCreditWords :: FormattedTextId -> ChxCredit0
+mkCreditCreditWords a = CreditCreditWords a
+-- | Smart constructor for 'CreditCreditSymbol'
+mkCreditCreditSymbol :: FormattedSymbolId -> ChxCredit0
+mkCreditCreditSymbol a = CreditCreditSymbol a
+
+-- | @credit@ /(choice)/
+
+-- mangled: 1
+data ChxCredit1 = 
+      ChxCreditCreditWords {
+          chxcreditCreditWords :: FormattedTextId -- ^ /credit-words/ child element
+       }
+    | ChxCreditCreditSymbol {
+          chxcreditCreditSymbol :: FormattedSymbolId -- ^ /credit-symbol/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxCredit1 where
+    emitXml (ChxCreditCreditWords a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "credit-words" Nothing) (emitXml a)])
+    emitXml (ChxCreditCreditSymbol a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "credit-symbol" Nothing) (emitXml a)])
+parseChxCredit1 :: P.XParse ChxCredit1
+parseChxCredit1 = 
+      ChxCreditCreditWords
+        <$> (P.xchild (P.name "credit-words") (parseFormattedTextId))
+      <|> ChxCreditCreditSymbol
+        <$> (P.xchild (P.name "credit-symbol") (parseFormattedSymbolId))
+
+-- | Smart constructor for 'ChxCreditCreditWords'
+mkChxCreditCreditWords :: FormattedTextId -> ChxCredit1
+mkChxCreditCreditWords a = ChxCreditCreditWords a
+-- | Smart constructor for 'ChxCreditCreditSymbol'
+mkChxCreditCreditSymbol :: FormattedSymbolId -> ChxCredit1
+mkChxCreditCreditSymbol a = ChxCreditCreditSymbol a
+
+-- | @credit@ /(choice)/
+
+-- mangled: 2
 data ChxCredit = 
       CreditCreditImage {
           creditCreditImage :: Image -- ^ /credit-image/ child element
        }
-    | CreditCreditWords {
-          creditCreditWords :: FormattedText -- ^ /credit-words/ child element
-        , chxcreditCredit :: [SeqCredit]
+    | CreditCredit {
+          chxcreditCredit :: ChxCredit0
+        , creditCredit1 :: [SeqCredit]
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxCredit where
@@ -8962,39 +12551,70 @@ instance EmitXml ChxCredit where
       XContent XEmpty
         []
         ([XElement (QN "credit-image" Nothing) (emitXml a)])
-    emitXml (CreditCreditWords a b) =
-      XContent XEmpty
-        []
-        ([XElement (QN "credit-words" Nothing) (emitXml a)] ++
-        [emitXml b])
+    emitXml (CreditCredit a b) =
+      XReps [emitXml a,emitXml b]
 parseChxCredit :: P.XParse ChxCredit
 parseChxCredit = 
       CreditCreditImage
         <$> (P.xchild (P.name "credit-image") (parseImage))
-      <|> CreditCreditWords
-        <$> (P.xchild (P.name "credit-words") (parseFormattedText))
+      <|> CreditCredit
+        <$> parseChxCredit0
         <*> P.many (parseSeqCredit)
 
 -- | Smart constructor for 'CreditCreditImage'
 mkCreditCreditImage :: Image -> ChxCredit
 mkCreditCreditImage a = CreditCreditImage a
--- | Smart constructor for 'CreditCreditWords'
-mkCreditCreditWords :: FormattedText -> ChxCredit
-mkCreditCreditWords a = CreditCreditWords a []
+-- | Smart constructor for 'CreditCredit'
+mkCreditCredit :: ChxCredit0 -> ChxCredit
+mkCreditCredit a = CreditCredit a []
 
 -- | @direction-type@ /(choice)/
+data ChxDirectionType0 = 
+      DirectionTypeWords {
+          directionTypeWords :: FormattedTextId -- ^ /words/ child element
+       }
+    | DirectionTypeSymbol {
+          directionTypeSymbol :: FormattedSymbolId -- ^ /symbol/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxDirectionType0 where
+    emitXml (DirectionTypeWords a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "words" Nothing) (emitXml a)])
+    emitXml (DirectionTypeSymbol a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "symbol" Nothing) (emitXml a)])
+parseChxDirectionType0 :: P.XParse ChxDirectionType0
+parseChxDirectionType0 = 
+      DirectionTypeWords
+        <$> (P.xchild (P.name "words") (parseFormattedTextId))
+      <|> DirectionTypeSymbol
+        <$> (P.xchild (P.name "symbol") (parseFormattedSymbolId))
+
+-- | Smart constructor for 'DirectionTypeWords'
+mkDirectionTypeWords :: FormattedTextId -> ChxDirectionType0
+mkDirectionTypeWords a = DirectionTypeWords a
+-- | Smart constructor for 'DirectionTypeSymbol'
+mkDirectionTypeSymbol :: FormattedSymbolId -> ChxDirectionType0
+mkDirectionTypeSymbol a = DirectionTypeSymbol a
+
+-- | @direction-type@ /(choice)/
+
+-- mangled: 1
 data ChxDirectionType = 
       DirectionTypeRehearsal {
-          directionTypeRehearsal :: [Rehearsal] -- ^ /rehearsal/ child element
+          directionTypeRehearsal :: [FormattedTextId] -- ^ /rehearsal/ child element
        }
     | DirectionTypeSegno {
-          directionTypeSegno :: [EmptyPrintStyle] -- ^ /segno/ child element
-       }
-    | DirectionTypeWords {
-          directionTypeWords :: [FormattedText] -- ^ /words/ child element
+          directionTypeSegno :: [Segno] -- ^ /segno/ child element
        }
     | DirectionTypeCoda {
-          directionTypeCoda :: [EmptyPrintStyle] -- ^ /coda/ child element
+          directionTypeCoda :: [Coda] -- ^ /coda/ child element
+       }
+    | DirectionTypeDirectionType {
+          chxdirectionTypeDirectionType :: [ChxDirectionType0]
        }
     | DirectionTypeWedge {
           directionTypeWedge :: Wedge -- ^ /wedge/ child element
@@ -9021,13 +12641,16 @@ data ChxDirectionType =
           directionTypeHarpPedals :: HarpPedals -- ^ /harp-pedals/ child element
        }
     | DirectionTypeDamp {
-          directionTypeDamp :: EmptyPrintStyle -- ^ /damp/ child element
+          directionTypeDamp :: EmptyPrintStyleAlignId -- ^ /damp/ child element
        }
     | DirectionTypeDampAll {
-          directionTypeDampAll :: EmptyPrintStyle -- ^ /damp-all/ child element
+          directionTypeDampAll :: EmptyPrintStyleAlignId -- ^ /damp-all/ child element
        }
     | DirectionTypeEyeglasses {
-          directionTypeEyeglasses :: EmptyPrintStyle -- ^ /eyeglasses/ child element
+          directionTypeEyeglasses :: EmptyPrintStyleAlignId -- ^ /eyeglasses/ child element
+       }
+    | DirectionTypeStringMute {
+          directionTypeStringMute :: StringMute -- ^ /string-mute/ child element
        }
     | DirectionTypeScordatura {
           directionTypeScordatura :: Scordatura -- ^ /scordatura/ child element
@@ -9035,8 +12658,17 @@ data ChxDirectionType =
     | DirectionTypeImage {
           directionTypeImage :: Image -- ^ /image/ child element
        }
+    | DirectionTypePrincipalVoice {
+          directionTypePrincipalVoice :: PrincipalVoice -- ^ /principal-voice/ child element
+       }
+    | DirectionTypePercussion {
+          directionTypePercussion :: [Percussion] -- ^ /percussion/ child element
+       }
     | DirectionTypeAccordionRegistration {
           directionTypeAccordionRegistration :: AccordionRegistration -- ^ /accordion-registration/ child element
+       }
+    | DirectionTypeStaffDivide {
+          directionTypeStaffDivide :: StaffDivide -- ^ /staff-divide/ child element
        }
     | DirectionTypeOtherDirection {
           directionTypeOtherDirection :: OtherDirection -- ^ /other-direction/ child element
@@ -9051,14 +12683,12 @@ instance EmitXml ChxDirectionType where
       XContent XEmpty
         []
         (map (XElement (QN "segno" Nothing).emitXml) a)
-    emitXml (DirectionTypeWords a) =
-      XContent XEmpty
-        []
-        (map (XElement (QN "words" Nothing).emitXml) a)
     emitXml (DirectionTypeCoda a) =
       XContent XEmpty
         []
         (map (XElement (QN "coda" Nothing).emitXml) a)
+    emitXml (DirectionTypeDirectionType a) =
+      XReps [emitXml a]
     emitXml (DirectionTypeWedge a) =
       XContent XEmpty
         []
@@ -9103,6 +12733,10 @@ instance EmitXml ChxDirectionType where
       XContent XEmpty
         []
         ([XElement (QN "eyeglasses" Nothing) (emitXml a)])
+    emitXml (DirectionTypeStringMute a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "string-mute" Nothing) (emitXml a)])
     emitXml (DirectionTypeScordatura a) =
       XContent XEmpty
         []
@@ -9111,10 +12745,22 @@ instance EmitXml ChxDirectionType where
       XContent XEmpty
         []
         ([XElement (QN "image" Nothing) (emitXml a)])
+    emitXml (DirectionTypePrincipalVoice a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "principal-voice" Nothing) (emitXml a)])
+    emitXml (DirectionTypePercussion a) =
+      XContent XEmpty
+        []
+        (map (XElement (QN "percussion" Nothing).emitXml) a)
     emitXml (DirectionTypeAccordionRegistration a) =
       XContent XEmpty
         []
         ([XElement (QN "accordion-registration" Nothing) (emitXml a)])
+    emitXml (DirectionTypeStaffDivide a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "staff-divide" Nothing) (emitXml a)])
     emitXml (DirectionTypeOtherDirection a) =
       XContent XEmpty
         []
@@ -9122,13 +12768,13 @@ instance EmitXml ChxDirectionType where
 parseChxDirectionType :: P.XParse ChxDirectionType
 parseChxDirectionType = 
       DirectionTypeRehearsal
-        <$> P.some (P.xchild (P.name "rehearsal") (parseRehearsal))
+        <$> P.some (P.xchild (P.name "rehearsal") (parseFormattedTextId))
       <|> DirectionTypeSegno
-        <$> P.some (P.xchild (P.name "segno") (parseEmptyPrintStyle))
-      <|> DirectionTypeWords
-        <$> P.some (P.xchild (P.name "words") (parseFormattedText))
+        <$> P.some (P.xchild (P.name "segno") (parseSegno))
       <|> DirectionTypeCoda
-        <$> P.some (P.xchild (P.name "coda") (parseEmptyPrintStyle))
+        <$> P.some (P.xchild (P.name "coda") (parseCoda))
+      <|> DirectionTypeDirectionType
+        <$> P.many (parseChxDirectionType0)
       <|> DirectionTypeWedge
         <$> (P.xchild (P.name "wedge") (parseWedge))
       <|> DirectionTypeDynamics
@@ -9146,17 +12792,25 @@ parseChxDirectionType =
       <|> DirectionTypeHarpPedals
         <$> (P.xchild (P.name "harp-pedals") (parseHarpPedals))
       <|> DirectionTypeDamp
-        <$> (P.xchild (P.name "damp") (parseEmptyPrintStyle))
+        <$> (P.xchild (P.name "damp") (parseEmptyPrintStyleAlignId))
       <|> DirectionTypeDampAll
-        <$> (P.xchild (P.name "damp-all") (parseEmptyPrintStyle))
+        <$> (P.xchild (P.name "damp-all") (parseEmptyPrintStyleAlignId))
       <|> DirectionTypeEyeglasses
-        <$> (P.xchild (P.name "eyeglasses") (parseEmptyPrintStyle))
+        <$> (P.xchild (P.name "eyeglasses") (parseEmptyPrintStyleAlignId))
+      <|> DirectionTypeStringMute
+        <$> (P.xchild (P.name "string-mute") (parseStringMute))
       <|> DirectionTypeScordatura
         <$> (P.xchild (P.name "scordatura") (parseScordatura))
       <|> DirectionTypeImage
         <$> (P.xchild (P.name "image") (parseImage))
+      <|> DirectionTypePrincipalVoice
+        <$> (P.xchild (P.name "principal-voice") (parsePrincipalVoice))
+      <|> DirectionTypePercussion
+        <$> P.some (P.xchild (P.name "percussion") (parsePercussion))
       <|> DirectionTypeAccordionRegistration
         <$> (P.xchild (P.name "accordion-registration") (parseAccordionRegistration))
+      <|> DirectionTypeStaffDivide
+        <$> (P.xchild (P.name "staff-divide") (parseStaffDivide))
       <|> DirectionTypeOtherDirection
         <$> (P.xchild (P.name "other-direction") (parseOtherDirection))
 
@@ -9166,12 +12820,12 @@ mkDirectionTypeRehearsal = DirectionTypeRehearsal []
 -- | Smart constructor for 'DirectionTypeSegno'
 mkDirectionTypeSegno :: ChxDirectionType
 mkDirectionTypeSegno = DirectionTypeSegno []
--- | Smart constructor for 'DirectionTypeWords'
-mkDirectionTypeWords :: ChxDirectionType
-mkDirectionTypeWords = DirectionTypeWords []
 -- | Smart constructor for 'DirectionTypeCoda'
 mkDirectionTypeCoda :: ChxDirectionType
 mkDirectionTypeCoda = DirectionTypeCoda []
+-- | Smart constructor for 'DirectionTypeDirectionType'
+mkDirectionTypeDirectionType :: ChxDirectionType
+mkDirectionTypeDirectionType = DirectionTypeDirectionType []
 -- | Smart constructor for 'DirectionTypeWedge'
 mkDirectionTypeWedge :: Wedge -> ChxDirectionType
 mkDirectionTypeWedge a = DirectionTypeWedge a
@@ -9197,23 +12851,35 @@ mkDirectionTypeOctaveShift a = DirectionTypeOctaveShift a
 mkDirectionTypeHarpPedals :: HarpPedals -> ChxDirectionType
 mkDirectionTypeHarpPedals a = DirectionTypeHarpPedals a
 -- | Smart constructor for 'DirectionTypeDamp'
-mkDirectionTypeDamp :: EmptyPrintStyle -> ChxDirectionType
+mkDirectionTypeDamp :: EmptyPrintStyleAlignId -> ChxDirectionType
 mkDirectionTypeDamp a = DirectionTypeDamp a
 -- | Smart constructor for 'DirectionTypeDampAll'
-mkDirectionTypeDampAll :: EmptyPrintStyle -> ChxDirectionType
+mkDirectionTypeDampAll :: EmptyPrintStyleAlignId -> ChxDirectionType
 mkDirectionTypeDampAll a = DirectionTypeDampAll a
 -- | Smart constructor for 'DirectionTypeEyeglasses'
-mkDirectionTypeEyeglasses :: EmptyPrintStyle -> ChxDirectionType
+mkDirectionTypeEyeglasses :: EmptyPrintStyleAlignId -> ChxDirectionType
 mkDirectionTypeEyeglasses a = DirectionTypeEyeglasses a
+-- | Smart constructor for 'DirectionTypeStringMute'
+mkDirectionTypeStringMute :: StringMute -> ChxDirectionType
+mkDirectionTypeStringMute a = DirectionTypeStringMute a
 -- | Smart constructor for 'DirectionTypeScordatura'
 mkDirectionTypeScordatura :: Scordatura -> ChxDirectionType
 mkDirectionTypeScordatura a = DirectionTypeScordatura a
 -- | Smart constructor for 'DirectionTypeImage'
 mkDirectionTypeImage :: Image -> ChxDirectionType
 mkDirectionTypeImage a = DirectionTypeImage a
+-- | Smart constructor for 'DirectionTypePrincipalVoice'
+mkDirectionTypePrincipalVoice :: PrincipalVoice -> ChxDirectionType
+mkDirectionTypePrincipalVoice a = DirectionTypePrincipalVoice a
+-- | Smart constructor for 'DirectionTypePercussion'
+mkDirectionTypePercussion :: ChxDirectionType
+mkDirectionTypePercussion = DirectionTypePercussion []
 -- | Smart constructor for 'DirectionTypeAccordionRegistration'
 mkDirectionTypeAccordionRegistration :: AccordionRegistration -> ChxDirectionType
 mkDirectionTypeAccordionRegistration a = DirectionTypeAccordionRegistration a
+-- | Smart constructor for 'DirectionTypeStaffDivide'
+mkDirectionTypeStaffDivide :: StaffDivide -> ChxDirectionType
+mkDirectionTypeStaffDivide a = DirectionTypeStaffDivide a
 -- | Smart constructor for 'DirectionTypeOtherDirection'
 mkDirectionTypeOtherDirection :: OtherDirection -> ChxDirectionType
 mkDirectionTypeOtherDirection a = DirectionTypeOtherDirection a
@@ -9289,8 +12955,17 @@ data ChxDynamics =
     | DynamicsFz {
           dynamicsFz :: Empty -- ^ /fz/ child element
        }
+    | DynamicsN {
+          dynamicsN :: Empty -- ^ /n/ child element
+       }
+    | DynamicsPf {
+          dynamicsPf :: Empty -- ^ /pf/ child element
+       }
+    | DynamicsSfzp {
+          dynamicsSfzp :: Empty -- ^ /sfzp/ child element
+       }
     | DynamicsOtherDynamics {
-          dynamicsOtherDynamics :: String -- ^ /other-dynamics/ child element
+          dynamicsOtherDynamics :: OtherText -- ^ /other-dynamics/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxDynamics where
@@ -9386,6 +13061,18 @@ instance EmitXml ChxDynamics where
       XContent XEmpty
         []
         ([XElement (QN "fz" Nothing) (emitXml a)])
+    emitXml (DynamicsN a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "n" Nothing) (emitXml a)])
+    emitXml (DynamicsPf a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "pf" Nothing) (emitXml a)])
+    emitXml (DynamicsSfzp a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "sfzp" Nothing) (emitXml a)])
     emitXml (DynamicsOtherDynamics a) =
       XContent XEmpty
         []
@@ -9438,8 +13125,14 @@ parseChxDynamics =
         <$> (P.xchild (P.name "sffz") (parseEmpty))
       <|> DynamicsFz
         <$> (P.xchild (P.name "fz") (parseEmpty))
+      <|> DynamicsN
+        <$> (P.xchild (P.name "n") (parseEmpty))
+      <|> DynamicsPf
+        <$> (P.xchild (P.name "pf") (parseEmpty))
+      <|> DynamicsSfzp
+        <$> (P.xchild (P.name "sfzp") (parseEmpty))
       <|> DynamicsOtherDynamics
-        <$> (P.xchild (P.name "other-dynamics") (P.xtext >>= return))
+        <$> (P.xchild (P.name "other-dynamics") (parseOtherText))
 
 -- | Smart constructor for 'DynamicsP'
 mkDynamicsP :: Empty -> ChxDynamics
@@ -9510,8 +13203,17 @@ mkDynamicsSffz a = DynamicsSffz a
 -- | Smart constructor for 'DynamicsFz'
 mkDynamicsFz :: Empty -> ChxDynamics
 mkDynamicsFz a = DynamicsFz a
+-- | Smart constructor for 'DynamicsN'
+mkDynamicsN :: Empty -> ChxDynamics
+mkDynamicsN a = DynamicsN a
+-- | Smart constructor for 'DynamicsPf'
+mkDynamicsPf :: Empty -> ChxDynamics
+mkDynamicsPf a = DynamicsPf a
+-- | Smart constructor for 'DynamicsSfzp'
+mkDynamicsSfzp :: Empty -> ChxDynamics
+mkDynamicsSfzp a = DynamicsSfzp a
 -- | Smart constructor for 'DynamicsOtherDynamics'
-mkDynamicsOtherDynamics :: String -> ChxDynamics
+mkDynamicsOtherDynamics :: OtherText -> ChxDynamics
 mkDynamicsOtherDynamics a = DynamicsOtherDynamics a
 
 -- | @encoding@ /(choice)/
@@ -9588,10 +13290,10 @@ data FullNote =
           fullNotePitch :: Pitch -- ^ /pitch/ child element
        }
     | FullNoteUnpitched {
-          fullNoteUnpitched :: DisplayStepOctave -- ^ /unpitched/ child element
+          fullNoteUnpitched :: Unpitched -- ^ /unpitched/ child element
        }
     | FullNoteRest {
-          fullNoteRest :: DisplayStepOctave -- ^ /rest/ child element
+          fullNoteRest :: Rest -- ^ /rest/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml FullNote where
@@ -9612,18 +13314,18 @@ parseFullNote =
       FullNotePitch
         <$> (P.xchild (P.name "pitch") (parsePitch))
       <|> FullNoteUnpitched
-        <$> (P.xchild (P.name "unpitched") (parseDisplayStepOctave))
+        <$> (P.xchild (P.name "unpitched") (parseUnpitched))
       <|> FullNoteRest
-        <$> (P.xchild (P.name "rest") (parseDisplayStepOctave))
+        <$> (P.xchild (P.name "rest") (parseRest))
 
 -- | Smart constructor for 'FullNotePitch'
 mkFullNotePitch :: Pitch -> FullNote
 mkFullNotePitch a = FullNotePitch a
 -- | Smart constructor for 'FullNoteUnpitched'
-mkFullNoteUnpitched :: DisplayStepOctave -> FullNote
+mkFullNoteUnpitched :: Unpitched -> FullNote
 mkFullNoteUnpitched a = FullNoteUnpitched a
 -- | Smart constructor for 'FullNoteRest'
-mkFullNoteRest :: DisplayStepOctave -> FullNote
+mkFullNoteRest :: Rest -> FullNote
 mkFullNoteRest a = FullNoteRest a
 
 -- | @harmonic@ /(choice)/
@@ -9892,6 +13594,7 @@ data ChxMetronome0 =
        }
     | MetronomeBeatUnit {
           metronomeBeatUnit :: BeatUnit
+        , metronomeBeatUnitTied :: [BeatUnitTied] -- ^ /beat-unit-tied/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxMetronome0 where
@@ -9899,21 +13602,25 @@ instance EmitXml ChxMetronome0 where
       XContent XEmpty
         []
         ([XElement (QN "per-minute" Nothing) (emitXml a)])
-    emitXml (MetronomeBeatUnit a) =
-      XReps [emitXml a]
+    emitXml (MetronomeBeatUnit a b) =
+      XContent XEmpty
+        []
+        ([emitXml a] ++
+        map (XElement (QN "beat-unit-tied" Nothing).emitXml) b)
 parseChxMetronome0 :: P.XParse ChxMetronome0
 parseChxMetronome0 = 
       MetronomePerMinute
         <$> (P.xchild (P.name "per-minute") (parsePerMinute))
       <|> MetronomeBeatUnit
         <$> parseBeatUnit
+        <*> P.many (P.xchild (P.name "beat-unit-tied") (parseBeatUnitTied))
 
 -- | Smart constructor for 'MetronomePerMinute'
 mkMetronomePerMinute :: PerMinute -> ChxMetronome0
 mkMetronomePerMinute a = MetronomePerMinute a
 -- | Smart constructor for 'MetronomeBeatUnit'
 mkMetronomeBeatUnit :: BeatUnit -> ChxMetronome0
-mkMetronomeBeatUnit a = MetronomeBeatUnit a
+mkMetronomeBeatUnit a = MetronomeBeatUnit a []
 
 -- | @metronome@ /(choice)/
 
@@ -9921,36 +13628,45 @@ mkMetronomeBeatUnit a = MetronomeBeatUnit a
 data ChxMetronome = 
       ChxMetronomeBeatUnit {
           chxmetronomeBeatUnit :: BeatUnit
+        , chxmetronomeBeatUnitTied :: [BeatUnitTied] -- ^ /beat-unit-tied/ child element
         , chxmetronomeMetronome :: ChxMetronome0
        }
-    | MetronomeMetronomeNote {
-          metronomeMetronomeNote :: [MetronomeNote] -- ^ /metronome-note/ child element
+    | MetronomeMetronomeArrows {
+          metronomeMetronomeArrows :: (Maybe Empty) -- ^ /metronome-arrows/ child element
+        , metronomeMetronomeNote :: [MetronomeNote] -- ^ /metronome-note/ child element
         , metronomeMetronome1 :: (Maybe SeqMetronome)
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxMetronome where
-    emitXml (ChxMetronomeBeatUnit a b) =
-      XReps [emitXml a,emitXml b]
-    emitXml (MetronomeMetronomeNote a b) =
+    emitXml (ChxMetronomeBeatUnit a b c) =
       XContent XEmpty
         []
-        (map (XElement (QN "metronome-note" Nothing).emitXml) a ++
-        [emitXml b])
+        ([emitXml a] ++
+        map (XElement (QN "beat-unit-tied" Nothing).emitXml) b ++
+        [emitXml c])
+    emitXml (MetronomeMetronomeArrows a b c) =
+      XContent XEmpty
+        []
+        ([maybe XEmpty (XElement (QN "metronome-arrows" Nothing).emitXml) a] ++
+        map (XElement (QN "metronome-note" Nothing).emitXml) b ++
+        [emitXml c])
 parseChxMetronome :: P.XParse ChxMetronome
 parseChxMetronome = 
       ChxMetronomeBeatUnit
         <$> parseBeatUnit
+        <*> P.many (P.xchild (P.name "beat-unit-tied") (parseBeatUnitTied))
         <*> parseChxMetronome0
-      <|> MetronomeMetronomeNote
-        <$> P.many (P.xchild (P.name "metronome-note") (parseMetronomeNote))
+      <|> MetronomeMetronomeArrows
+        <$> P.optional (P.xchild (P.name "metronome-arrows") (parseEmpty))
+        <*> P.many (P.xchild (P.name "metronome-note") (parseMetronomeNote))
         <*> P.optional (parseSeqMetronome)
 
 -- | Smart constructor for 'ChxMetronomeBeatUnit'
 mkChxMetronomeBeatUnit :: BeatUnit -> ChxMetronome0 -> ChxMetronome
-mkChxMetronomeBeatUnit a b = ChxMetronomeBeatUnit a b
--- | Smart constructor for 'MetronomeMetronomeNote'
-mkMetronomeMetronomeNote :: ChxMetronome
-mkMetronomeMetronomeNote = MetronomeMetronomeNote [] Nothing
+mkChxMetronomeBeatUnit a c = ChxMetronomeBeatUnit a [] c
+-- | Smart constructor for 'MetronomeMetronomeArrows'
+mkMetronomeMetronomeArrows :: ChxMetronome
+mkMetronomeMetronomeArrows = MetronomeMetronomeArrows Nothing [] Nothing
 
 -- | @music-data@ /(choice)/
 data ChxMusicData = 
@@ -10325,37 +14041,75 @@ mkNotationsOtherNotation :: OtherNotation -> ChxNotations
 mkNotationsOtherNotation a = NotationsOtherNotation a
 
 -- | @note@ /(choice)/
-data ChxNote = 
-      NoteGrace {
-          noteGrace :: Grace -- ^ /grace/ child element
-        , noteFullNote :: GrpFullNote
+data ChxNote0 = 
+      NoteFullNote {
+          noteFullNote :: GrpFullNote
         , noteTie :: [Tie] -- ^ /tie/ child element
        }
     | NoteCue {
           noteCue :: Empty -- ^ /cue/ child element
         , noteFullNote1 :: GrpFullNote
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxNote0 where
+    emitXml (NoteFullNote a b) =
+      XContent XEmpty
+        []
+        ([emitXml a] ++
+        map (XElement (QN "tie" Nothing).emitXml) b)
+    emitXml (NoteCue a b) =
+      XContent XEmpty
+        []
+        ([XElement (QN "cue" Nothing) (emitXml a)] ++
+        [emitXml b])
+parseChxNote0 :: P.XParse ChxNote0
+parseChxNote0 = 
+      NoteFullNote
+        <$> parseGrpFullNote
+        <*> P.many (P.xchild (P.name "tie") (parseTie))
+      <|> NoteCue
+        <$> (P.xchild (P.name "cue") (parseEmpty))
+        <*> parseGrpFullNote
+
+-- | Smart constructor for 'NoteFullNote'
+mkNoteFullNote :: GrpFullNote -> ChxNote0
+mkNoteFullNote a = NoteFullNote a []
+-- | Smart constructor for 'NoteCue'
+mkNoteCue :: Empty -> GrpFullNote -> ChxNote0
+mkNoteCue a b = NoteCue a b
+
+-- | @note@ /(choice)/
+
+-- mangled: 1
+data ChxNote = 
+      NoteGrace {
+          noteGrace :: Grace -- ^ /grace/ child element
+        , chxnoteNote :: ChxNote0
+       }
+    | ChxNoteCue {
+          chxnoteCue :: Empty -- ^ /cue/ child element
+        , chxnoteFullNote :: GrpFullNote
         , noteDuration :: Duration
        }
-    | NoteFullNote {
-          noteFullNote2 :: GrpFullNote
+    | ChxNoteFullNote {
+          chxnoteFullNote1 :: GrpFullNote
         , noteDuration1 :: Duration
-        , noteTie1 :: [Tie] -- ^ /tie/ child element
+        , chxnoteTie :: [Tie] -- ^ /tie/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxNote where
-    emitXml (NoteGrace a b c) =
+    emitXml (NoteGrace a b) =
       XContent XEmpty
         []
         ([XElement (QN "grace" Nothing) (emitXml a)] ++
-        [emitXml b] ++
-        map (XElement (QN "tie" Nothing).emitXml) c)
-    emitXml (NoteCue a b c) =
+        [emitXml b])
+    emitXml (ChxNoteCue a b c) =
       XContent XEmpty
         []
         ([XElement (QN "cue" Nothing) (emitXml a)] ++
         [emitXml b] ++
         [emitXml c])
-    emitXml (NoteFullNote a b c) =
+    emitXml (ChxNoteFullNote a b c) =
       XContent XEmpty
         []
         ([emitXml a] ++
@@ -10365,26 +14119,57 @@ parseChxNote :: P.XParse ChxNote
 parseChxNote = 
       NoteGrace
         <$> (P.xchild (P.name "grace") (parseGrace))
-        <*> parseGrpFullNote
-        <*> P.many (P.xchild (P.name "tie") (parseTie))
-      <|> NoteCue
+        <*> parseChxNote0
+      <|> ChxNoteCue
         <$> (P.xchild (P.name "cue") (parseEmpty))
         <*> parseGrpFullNote
         <*> parseDuration
-      <|> NoteFullNote
+      <|> ChxNoteFullNote
         <$> parseGrpFullNote
         <*> parseDuration
         <*> P.many (P.xchild (P.name "tie") (parseTie))
 
 -- | Smart constructor for 'NoteGrace'
-mkNoteGrace :: Grace -> GrpFullNote -> ChxNote
-mkNoteGrace a b = NoteGrace a b []
--- | Smart constructor for 'NoteCue'
-mkNoteCue :: Empty -> GrpFullNote -> Duration -> ChxNote
-mkNoteCue a b c = NoteCue a b c
--- | Smart constructor for 'NoteFullNote'
-mkNoteFullNote :: GrpFullNote -> Duration -> ChxNote
-mkNoteFullNote a b = NoteFullNote a b []
+mkNoteGrace :: Grace -> ChxNote0 -> ChxNote
+mkNoteGrace a b = NoteGrace a b
+-- | Smart constructor for 'ChxNoteCue'
+mkChxNoteCue :: Empty -> GrpFullNote -> Duration -> ChxNote
+mkChxNoteCue a b c = ChxNoteCue a b c
+-- | Smart constructor for 'ChxNoteFullNote'
+mkChxNoteFullNote :: GrpFullNote -> Duration -> ChxNote
+mkChxNoteFullNote a b = ChxNoteFullNote a b []
+
+-- | @notehead-text@ /(choice)/
+data ChxNoteheadText = 
+      NoteheadTextDisplayText {
+          noteheadTextDisplayText :: FormattedText -- ^ /display-text/ child element
+       }
+    | NoteheadTextAccidentalText {
+          noteheadTextAccidentalText :: AccidentalText -- ^ /accidental-text/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxNoteheadText where
+    emitXml (NoteheadTextDisplayText a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "display-text" Nothing) (emitXml a)])
+    emitXml (NoteheadTextAccidentalText a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "accidental-text" Nothing) (emitXml a)])
+parseChxNoteheadText :: P.XParse ChxNoteheadText
+parseChxNoteheadText = 
+      NoteheadTextDisplayText
+        <$> (P.xchild (P.name "display-text") (parseFormattedText))
+      <|> NoteheadTextAccidentalText
+        <$> (P.xchild (P.name "accidental-text") (parseAccidentalText))
+
+-- | Smart constructor for 'NoteheadTextDisplayText'
+mkNoteheadTextDisplayText :: FormattedText -> ChxNoteheadText
+mkNoteheadTextDisplayText a = NoteheadTextDisplayText a
+-- | Smart constructor for 'NoteheadTextAccidentalText'
+mkNoteheadTextAccidentalText :: AccidentalText -> ChxNoteheadText
+mkNoteheadTextAccidentalText a = NoteheadTextAccidentalText a
 
 -- | @ornaments@ /(choice)/
 data ChxOrnaments = 
@@ -10392,13 +14177,22 @@ data ChxOrnaments =
           ornamentsTrillMark :: EmptyTrillSound -- ^ /trill-mark/ child element
        }
     | OrnamentsTurn {
-          ornamentsTurn :: EmptyTrillSound -- ^ /turn/ child element
+          ornamentsTurn :: HorizontalTurn -- ^ /turn/ child element
        }
     | OrnamentsDelayedTurn {
-          ornamentsDelayedTurn :: EmptyTrillSound -- ^ /delayed-turn/ child element
+          ornamentsDelayedTurn :: HorizontalTurn -- ^ /delayed-turn/ child element
        }
     | OrnamentsInvertedTurn {
-          ornamentsInvertedTurn :: EmptyTrillSound -- ^ /inverted-turn/ child element
+          ornamentsInvertedTurn :: HorizontalTurn -- ^ /inverted-turn/ child element
+       }
+    | OrnamentsDelayedInvertedTurn {
+          ornamentsDelayedInvertedTurn :: HorizontalTurn -- ^ /delayed-inverted-turn/ child element
+       }
+    | OrnamentsVerticalTurn {
+          ornamentsVerticalTurn :: EmptyTrillSound -- ^ /vertical-turn/ child element
+       }
+    | OrnamentsInvertedVerticalTurn {
+          ornamentsInvertedVerticalTurn :: EmptyTrillSound -- ^ /inverted-vertical-turn/ child element
        }
     | OrnamentsShake {
           ornamentsShake :: EmptyTrillSound -- ^ /shake/ child element
@@ -10418,8 +14212,11 @@ data ChxOrnaments =
     | OrnamentsTremolo {
           ornamentsTremolo :: Tremolo -- ^ /tremolo/ child element
        }
+    | OrnamentsHaydn {
+          ornamentsHaydn :: EmptyTrillSound -- ^ /haydn/ child element
+       }
     | OrnamentsOtherOrnament {
-          ornamentsOtherOrnament :: PlacementText -- ^ /other-ornament/ child element
+          ornamentsOtherOrnament :: OtherPlacementText -- ^ /other-ornament/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxOrnaments where
@@ -10439,6 +14236,18 @@ instance EmitXml ChxOrnaments where
       XContent XEmpty
         []
         ([XElement (QN "inverted-turn" Nothing) (emitXml a)])
+    emitXml (OrnamentsDelayedInvertedTurn a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "delayed-inverted-turn" Nothing) (emitXml a)])
+    emitXml (OrnamentsVerticalTurn a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "vertical-turn" Nothing) (emitXml a)])
+    emitXml (OrnamentsInvertedVerticalTurn a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "inverted-vertical-turn" Nothing) (emitXml a)])
     emitXml (OrnamentsShake a) =
       XContent XEmpty
         []
@@ -10463,6 +14272,10 @@ instance EmitXml ChxOrnaments where
       XContent XEmpty
         []
         ([XElement (QN "tremolo" Nothing) (emitXml a)])
+    emitXml (OrnamentsHaydn a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "haydn" Nothing) (emitXml a)])
     emitXml (OrnamentsOtherOrnament a) =
       XContent XEmpty
         []
@@ -10472,11 +14285,17 @@ parseChxOrnaments =
       OrnamentsTrillMark
         <$> (P.xchild (P.name "trill-mark") (parseEmptyTrillSound))
       <|> OrnamentsTurn
-        <$> (P.xchild (P.name "turn") (parseEmptyTrillSound))
+        <$> (P.xchild (P.name "turn") (parseHorizontalTurn))
       <|> OrnamentsDelayedTurn
-        <$> (P.xchild (P.name "delayed-turn") (parseEmptyTrillSound))
+        <$> (P.xchild (P.name "delayed-turn") (parseHorizontalTurn))
       <|> OrnamentsInvertedTurn
-        <$> (P.xchild (P.name "inverted-turn") (parseEmptyTrillSound))
+        <$> (P.xchild (P.name "inverted-turn") (parseHorizontalTurn))
+      <|> OrnamentsDelayedInvertedTurn
+        <$> (P.xchild (P.name "delayed-inverted-turn") (parseHorizontalTurn))
+      <|> OrnamentsVerticalTurn
+        <$> (P.xchild (P.name "vertical-turn") (parseEmptyTrillSound))
+      <|> OrnamentsInvertedVerticalTurn
+        <$> (P.xchild (P.name "inverted-vertical-turn") (parseEmptyTrillSound))
       <|> OrnamentsShake
         <$> (P.xchild (P.name "shake") (parseEmptyTrillSound))
       <|> OrnamentsWavyLine
@@ -10489,21 +14308,32 @@ parseChxOrnaments =
         <$> (P.xchild (P.name "schleifer") (parseEmptyPlacement))
       <|> OrnamentsTremolo
         <$> (P.xchild (P.name "tremolo") (parseTremolo))
+      <|> OrnamentsHaydn
+        <$> (P.xchild (P.name "haydn") (parseEmptyTrillSound))
       <|> OrnamentsOtherOrnament
-        <$> (P.xchild (P.name "other-ornament") (parsePlacementText))
+        <$> (P.xchild (P.name "other-ornament") (parseOtherPlacementText))
 
 -- | Smart constructor for 'OrnamentsTrillMark'
 mkOrnamentsTrillMark :: EmptyTrillSound -> ChxOrnaments
 mkOrnamentsTrillMark a = OrnamentsTrillMark a
 -- | Smart constructor for 'OrnamentsTurn'
-mkOrnamentsTurn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsTurn :: HorizontalTurn -> ChxOrnaments
 mkOrnamentsTurn a = OrnamentsTurn a
 -- | Smart constructor for 'OrnamentsDelayedTurn'
-mkOrnamentsDelayedTurn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsDelayedTurn :: HorizontalTurn -> ChxOrnaments
 mkOrnamentsDelayedTurn a = OrnamentsDelayedTurn a
 -- | Smart constructor for 'OrnamentsInvertedTurn'
-mkOrnamentsInvertedTurn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsInvertedTurn :: HorizontalTurn -> ChxOrnaments
 mkOrnamentsInvertedTurn a = OrnamentsInvertedTurn a
+-- | Smart constructor for 'OrnamentsDelayedInvertedTurn'
+mkOrnamentsDelayedInvertedTurn :: HorizontalTurn -> ChxOrnaments
+mkOrnamentsDelayedInvertedTurn a = OrnamentsDelayedInvertedTurn a
+-- | Smart constructor for 'OrnamentsVerticalTurn'
+mkOrnamentsVerticalTurn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsVerticalTurn a = OrnamentsVerticalTurn a
+-- | Smart constructor for 'OrnamentsInvertedVerticalTurn'
+mkOrnamentsInvertedVerticalTurn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsInvertedVerticalTurn a = OrnamentsInvertedVerticalTurn a
 -- | Smart constructor for 'OrnamentsShake'
 mkOrnamentsShake :: EmptyTrillSound -> ChxOrnaments
 mkOrnamentsShake a = OrnamentsShake a
@@ -10522,8 +14352,11 @@ mkOrnamentsSchleifer a = OrnamentsSchleifer a
 -- | Smart constructor for 'OrnamentsTremolo'
 mkOrnamentsTremolo :: Tremolo -> ChxOrnaments
 mkOrnamentsTremolo a = OrnamentsTremolo a
+-- | Smart constructor for 'OrnamentsHaydn'
+mkOrnamentsHaydn :: EmptyTrillSound -> ChxOrnaments
+mkOrnamentsHaydn a = OrnamentsHaydn a
 -- | Smart constructor for 'OrnamentsOtherOrnament'
-mkOrnamentsOtherOrnament :: PlacementText -> ChxOrnaments
+mkOrnamentsOtherOrnament :: OtherPlacementText -> ChxOrnaments
 mkOrnamentsOtherOrnament a = OrnamentsOtherOrnament a
 
 -- | @part-list@ /(choice)/
@@ -10553,6 +14386,202 @@ mkPartListPartGroup a = PartListPartGroup a
 -- | Smart constructor for 'PartListScorePart'
 mkPartListScorePart :: ScorePart -> ChxPartList
 mkPartListScorePart a = PartListScorePart a
+
+-- | @percussion@ /(choice)/
+data ChxPercussion = 
+      PercussionGlass {
+          percussionGlass :: Glass -- ^ /glass/ child element
+       }
+    | PercussionMetal {
+          percussionMetal :: Metal -- ^ /metal/ child element
+       }
+    | PercussionWood {
+          percussionWood :: Wood -- ^ /wood/ child element
+       }
+    | PercussionPitched {
+          percussionPitched :: Pitched -- ^ /pitched/ child element
+       }
+    | PercussionMembrane {
+          percussionMembrane :: Membrane -- ^ /membrane/ child element
+       }
+    | PercussionEffect {
+          percussionEffect :: Effect -- ^ /effect/ child element
+       }
+    | PercussionTimpani {
+          percussionTimpani :: Empty -- ^ /timpani/ child element
+       }
+    | PercussionBeater {
+          percussionBeater :: Beater -- ^ /beater/ child element
+       }
+    | PercussionStick {
+          percussionStick :: Stick -- ^ /stick/ child element
+       }
+    | PercussionStickLocation {
+          percussionStickLocation :: StickLocation -- ^ /stick-location/ child element
+       }
+    | PercussionOtherPercussion {
+          percussionOtherPercussion :: OtherText -- ^ /other-percussion/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxPercussion where
+    emitXml (PercussionGlass a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "glass" Nothing) (emitXml a)])
+    emitXml (PercussionMetal a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "metal" Nothing) (emitXml a)])
+    emitXml (PercussionWood a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "wood" Nothing) (emitXml a)])
+    emitXml (PercussionPitched a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "pitched" Nothing) (emitXml a)])
+    emitXml (PercussionMembrane a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "membrane" Nothing) (emitXml a)])
+    emitXml (PercussionEffect a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "effect" Nothing) (emitXml a)])
+    emitXml (PercussionTimpani a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "timpani" Nothing) (emitXml a)])
+    emitXml (PercussionBeater a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "beater" Nothing) (emitXml a)])
+    emitXml (PercussionStick a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "stick" Nothing) (emitXml a)])
+    emitXml (PercussionStickLocation a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "stick-location" Nothing) (emitXml a)])
+    emitXml (PercussionOtherPercussion a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "other-percussion" Nothing) (emitXml a)])
+parseChxPercussion :: P.XParse ChxPercussion
+parseChxPercussion = 
+      PercussionGlass
+        <$> (P.xchild (P.name "glass") (parseGlass))
+      <|> PercussionMetal
+        <$> (P.xchild (P.name "metal") (P.xtext >>= parseMetal))
+      <|> PercussionWood
+        <$> (P.xchild (P.name "wood") (P.xtext >>= parseWood))
+      <|> PercussionPitched
+        <$> (P.xchild (P.name "pitched") (parsePitched))
+      <|> PercussionMembrane
+        <$> (P.xchild (P.name "membrane") (P.xtext >>= parseMembrane))
+      <|> PercussionEffect
+        <$> (P.xchild (P.name "effect") (P.xtext >>= parseEffect))
+      <|> PercussionTimpani
+        <$> (P.xchild (P.name "timpani") (parseEmpty))
+      <|> PercussionBeater
+        <$> (P.xchild (P.name "beater") (parseBeater))
+      <|> PercussionStick
+        <$> (P.xchild (P.name "stick") (parseStick))
+      <|> PercussionStickLocation
+        <$> (P.xchild (P.name "stick-location") (P.xtext >>= parseStickLocation))
+      <|> PercussionOtherPercussion
+        <$> (P.xchild (P.name "other-percussion") (parseOtherText))
+
+-- | Smart constructor for 'PercussionGlass'
+mkPercussionGlass :: Glass -> ChxPercussion
+mkPercussionGlass a = PercussionGlass a
+-- | Smart constructor for 'PercussionMetal'
+mkPercussionMetal :: Metal -> ChxPercussion
+mkPercussionMetal a = PercussionMetal a
+-- | Smart constructor for 'PercussionWood'
+mkPercussionWood :: Wood -> ChxPercussion
+mkPercussionWood a = PercussionWood a
+-- | Smart constructor for 'PercussionPitched'
+mkPercussionPitched :: Pitched -> ChxPercussion
+mkPercussionPitched a = PercussionPitched a
+-- | Smart constructor for 'PercussionMembrane'
+mkPercussionMembrane :: Membrane -> ChxPercussion
+mkPercussionMembrane a = PercussionMembrane a
+-- | Smart constructor for 'PercussionEffect'
+mkPercussionEffect :: Effect -> ChxPercussion
+mkPercussionEffect a = PercussionEffect a
+-- | Smart constructor for 'PercussionTimpani'
+mkPercussionTimpani :: Empty -> ChxPercussion
+mkPercussionTimpani a = PercussionTimpani a
+-- | Smart constructor for 'PercussionBeater'
+mkPercussionBeater :: Beater -> ChxPercussion
+mkPercussionBeater a = PercussionBeater a
+-- | Smart constructor for 'PercussionStick'
+mkPercussionStick :: Stick -> ChxPercussion
+mkPercussionStick a = PercussionStick a
+-- | Smart constructor for 'PercussionStickLocation'
+mkPercussionStickLocation :: StickLocation -> ChxPercussion
+mkPercussionStickLocation a = PercussionStickLocation a
+-- | Smart constructor for 'PercussionOtherPercussion'
+mkPercussionOtherPercussion :: OtherText -> ChxPercussion
+mkPercussionOtherPercussion a = PercussionOtherPercussion a
+
+-- | @play@ /(choice)/
+data ChxPlay = 
+      PlayIpa {
+          playIpa :: String -- ^ /ipa/ child element
+       }
+    | PlayMute {
+          playMute :: Mute -- ^ /mute/ child element
+       }
+    | PlaySemiPitched {
+          playSemiPitched :: SemiPitched -- ^ /semi-pitched/ child element
+       }
+    | PlayOtherPlay {
+          playOtherPlay :: OtherPlay -- ^ /other-play/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml ChxPlay where
+    emitXml (PlayIpa a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "ipa" Nothing) (emitXml a)])
+    emitXml (PlayMute a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "mute" Nothing) (emitXml a)])
+    emitXml (PlaySemiPitched a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "semi-pitched" Nothing) (emitXml a)])
+    emitXml (PlayOtherPlay a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "other-play" Nothing) (emitXml a)])
+parseChxPlay :: P.XParse ChxPlay
+parseChxPlay = 
+      PlayIpa
+        <$> (P.xchild (P.name "ipa") (P.xtext >>= return))
+      <|> PlayMute
+        <$> (P.xchild (P.name "mute") (P.xtext >>= parseMute))
+      <|> PlaySemiPitched
+        <$> (P.xchild (P.name "semi-pitched") (P.xtext >>= parseSemiPitched))
+      <|> PlayOtherPlay
+        <$> (P.xchild (P.name "other-play") (parseOtherPlay))
+
+-- | Smart constructor for 'PlayIpa'
+mkPlayIpa :: String -> ChxPlay
+mkPlayIpa a = PlayIpa a
+-- | Smart constructor for 'PlayMute'
+mkPlayMute :: Mute -> ChxPlay
+mkPlayMute a = PlayMute a
+-- | Smart constructor for 'PlaySemiPitched'
+mkPlaySemiPitched :: SemiPitched -> ChxPlay
+mkPlaySemiPitched a = PlaySemiPitched a
+-- | Smart constructor for 'PlayOtherPlay'
+mkPlayOtherPlay :: OtherPlay -> ChxPlay
+mkPlayOtherPlay a = PlayOtherPlay a
 
 -- | @score-instrument@ /(choice)/
 data ChxScoreInstrument = 
@@ -10616,7 +14645,7 @@ data ChxTechnical =
           technicalTripleTongue :: EmptyPlacement -- ^ /triple-tongue/ child element
        }
     | TechnicalStopped {
-          technicalStopped :: EmptyPlacement -- ^ /stopped/ child element
+          technicalStopped :: EmptyPlacementSmufl -- ^ /stopped/ child element
        }
     | TechnicalSnapPizzicato {
           technicalSnapPizzicato :: EmptyPlacement -- ^ /snap-pizzicato/ child element
@@ -10637,7 +14666,7 @@ data ChxTechnical =
           technicalBend :: Bend -- ^ /bend/ child element
        }
     | TechnicalTap {
-          technicalTap :: PlacementText -- ^ /tap/ child element
+          technicalTap :: Tap -- ^ /tap/ child element
        }
     | TechnicalHeel {
           technicalHeel :: HeelToe -- ^ /heel/ child element
@@ -10648,8 +14677,38 @@ data ChxTechnical =
     | TechnicalFingernails {
           technicalFingernails :: EmptyPlacement -- ^ /fingernails/ child element
        }
+    | TechnicalHole {
+          technicalHole :: Hole -- ^ /hole/ child element
+       }
+    | TechnicalArrow {
+          technicalArrow :: Arrow -- ^ /arrow/ child element
+       }
+    | TechnicalHandbell {
+          technicalHandbell :: Handbell -- ^ /handbell/ child element
+       }
+    | TechnicalBrassBend {
+          technicalBrassBend :: EmptyPlacement -- ^ /brass-bend/ child element
+       }
+    | TechnicalFlip {
+          technicalFlip :: EmptyPlacement -- ^ /flip/ child element
+       }
+    | TechnicalSmear {
+          technicalSmear :: EmptyPlacement -- ^ /smear/ child element
+       }
+    | TechnicalOpen {
+          technicalOpen :: EmptyPlacementSmufl -- ^ /open/ child element
+       }
+    | TechnicalHalfMuted {
+          technicalHalfMuted :: EmptyPlacementSmufl -- ^ /half-muted/ child element
+       }
+    | TechnicalHarmonMute {
+          technicalHarmonMute :: HarmonMute -- ^ /harmon-mute/ child element
+       }
+    | TechnicalGolpe {
+          technicalGolpe :: EmptyPlacement -- ^ /golpe/ child element
+       }
     | TechnicalOtherTechnical {
-          technicalOtherTechnical :: PlacementText -- ^ /other-technical/ child element
+          technicalOtherTechnical :: OtherPlacementText -- ^ /other-technical/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxTechnical where
@@ -10733,6 +14792,46 @@ instance EmitXml ChxTechnical where
       XContent XEmpty
         []
         ([XElement (QN "fingernails" Nothing) (emitXml a)])
+    emitXml (TechnicalHole a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "hole" Nothing) (emitXml a)])
+    emitXml (TechnicalArrow a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "arrow" Nothing) (emitXml a)])
+    emitXml (TechnicalHandbell a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "handbell" Nothing) (emitXml a)])
+    emitXml (TechnicalBrassBend a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "brass-bend" Nothing) (emitXml a)])
+    emitXml (TechnicalFlip a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "flip" Nothing) (emitXml a)])
+    emitXml (TechnicalSmear a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "smear" Nothing) (emitXml a)])
+    emitXml (TechnicalOpen a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "open" Nothing) (emitXml a)])
+    emitXml (TechnicalHalfMuted a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "half-muted" Nothing) (emitXml a)])
+    emitXml (TechnicalHarmonMute a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "harmon-mute" Nothing) (emitXml a)])
+    emitXml (TechnicalGolpe a) =
+      XContent XEmpty
+        []
+        ([XElement (QN "golpe" Nothing) (emitXml a)])
     emitXml (TechnicalOtherTechnical a) =
       XContent XEmpty
         []
@@ -10758,7 +14857,7 @@ parseChxTechnical =
       <|> TechnicalTripleTongue
         <$> (P.xchild (P.name "triple-tongue") (parseEmptyPlacement))
       <|> TechnicalStopped
-        <$> (P.xchild (P.name "stopped") (parseEmptyPlacement))
+        <$> (P.xchild (P.name "stopped") (parseEmptyPlacementSmufl))
       <|> TechnicalSnapPizzicato
         <$> (P.xchild (P.name "snap-pizzicato") (parseEmptyPlacement))
       <|> TechnicalFret
@@ -10772,15 +14871,35 @@ parseChxTechnical =
       <|> TechnicalBend
         <$> (P.xchild (P.name "bend") (parseBend))
       <|> TechnicalTap
-        <$> (P.xchild (P.name "tap") (parsePlacementText))
+        <$> (P.xchild (P.name "tap") (parseTap))
       <|> TechnicalHeel
         <$> (P.xchild (P.name "heel") (parseHeelToe))
       <|> TechnicalToe
         <$> (P.xchild (P.name "toe") (parseHeelToe))
       <|> TechnicalFingernails
         <$> (P.xchild (P.name "fingernails") (parseEmptyPlacement))
+      <|> TechnicalHole
+        <$> (P.xchild (P.name "hole") (parseHole))
+      <|> TechnicalArrow
+        <$> (P.xchild (P.name "arrow") (parseArrow))
+      <|> TechnicalHandbell
+        <$> (P.xchild (P.name "handbell") (parseHandbell))
+      <|> TechnicalBrassBend
+        <$> (P.xchild (P.name "brass-bend") (parseEmptyPlacement))
+      <|> TechnicalFlip
+        <$> (P.xchild (P.name "flip") (parseEmptyPlacement))
+      <|> TechnicalSmear
+        <$> (P.xchild (P.name "smear") (parseEmptyPlacement))
+      <|> TechnicalOpen
+        <$> (P.xchild (P.name "open") (parseEmptyPlacementSmufl))
+      <|> TechnicalHalfMuted
+        <$> (P.xchild (P.name "half-muted") (parseEmptyPlacementSmufl))
+      <|> TechnicalHarmonMute
+        <$> (P.xchild (P.name "harmon-mute") (parseHarmonMute))
+      <|> TechnicalGolpe
+        <$> (P.xchild (P.name "golpe") (parseEmptyPlacement))
       <|> TechnicalOtherTechnical
-        <$> (P.xchild (P.name "other-technical") (parsePlacementText))
+        <$> (P.xchild (P.name "other-technical") (parseOtherPlacementText))
 
 -- | Smart constructor for 'TechnicalUpBow'
 mkTechnicalUpBow :: EmptyPlacement -> ChxTechnical
@@ -10810,7 +14929,7 @@ mkTechnicalDoubleTongue a = TechnicalDoubleTongue a
 mkTechnicalTripleTongue :: EmptyPlacement -> ChxTechnical
 mkTechnicalTripleTongue a = TechnicalTripleTongue a
 -- | Smart constructor for 'TechnicalStopped'
-mkTechnicalStopped :: EmptyPlacement -> ChxTechnical
+mkTechnicalStopped :: EmptyPlacementSmufl -> ChxTechnical
 mkTechnicalStopped a = TechnicalStopped a
 -- | Smart constructor for 'TechnicalSnapPizzicato'
 mkTechnicalSnapPizzicato :: EmptyPlacement -> ChxTechnical
@@ -10831,7 +14950,7 @@ mkTechnicalPullOff a = TechnicalPullOff a
 mkTechnicalBend :: Bend -> ChxTechnical
 mkTechnicalBend a = TechnicalBend a
 -- | Smart constructor for 'TechnicalTap'
-mkTechnicalTap :: PlacementText -> ChxTechnical
+mkTechnicalTap :: Tap -> ChxTechnical
 mkTechnicalTap a = TechnicalTap a
 -- | Smart constructor for 'TechnicalHeel'
 mkTechnicalHeel :: HeelToe -> ChxTechnical
@@ -10842,38 +14961,73 @@ mkTechnicalToe a = TechnicalToe a
 -- | Smart constructor for 'TechnicalFingernails'
 mkTechnicalFingernails :: EmptyPlacement -> ChxTechnical
 mkTechnicalFingernails a = TechnicalFingernails a
+-- | Smart constructor for 'TechnicalHole'
+mkTechnicalHole :: Hole -> ChxTechnical
+mkTechnicalHole a = TechnicalHole a
+-- | Smart constructor for 'TechnicalArrow'
+mkTechnicalArrow :: Arrow -> ChxTechnical
+mkTechnicalArrow a = TechnicalArrow a
+-- | Smart constructor for 'TechnicalHandbell'
+mkTechnicalHandbell :: Handbell -> ChxTechnical
+mkTechnicalHandbell a = TechnicalHandbell a
+-- | Smart constructor for 'TechnicalBrassBend'
+mkTechnicalBrassBend :: EmptyPlacement -> ChxTechnical
+mkTechnicalBrassBend a = TechnicalBrassBend a
+-- | Smart constructor for 'TechnicalFlip'
+mkTechnicalFlip :: EmptyPlacement -> ChxTechnical
+mkTechnicalFlip a = TechnicalFlip a
+-- | Smart constructor for 'TechnicalSmear'
+mkTechnicalSmear :: EmptyPlacement -> ChxTechnical
+mkTechnicalSmear a = TechnicalSmear a
+-- | Smart constructor for 'TechnicalOpen'
+mkTechnicalOpen :: EmptyPlacementSmufl -> ChxTechnical
+mkTechnicalOpen a = TechnicalOpen a
+-- | Smart constructor for 'TechnicalHalfMuted'
+mkTechnicalHalfMuted :: EmptyPlacementSmufl -> ChxTechnical
+mkTechnicalHalfMuted a = TechnicalHalfMuted a
+-- | Smart constructor for 'TechnicalHarmonMute'
+mkTechnicalHarmonMute :: HarmonMute -> ChxTechnical
+mkTechnicalHarmonMute a = TechnicalHarmonMute a
+-- | Smart constructor for 'TechnicalGolpe'
+mkTechnicalGolpe :: EmptyPlacement -> ChxTechnical
+mkTechnicalGolpe a = TechnicalGolpe a
 -- | Smart constructor for 'TechnicalOtherTechnical'
-mkTechnicalOtherTechnical :: PlacementText -> ChxTechnical
+mkTechnicalOtherTechnical :: OtherPlacementText -> ChxTechnical
 mkTechnicalOtherTechnical a = TechnicalOtherTechnical a
 
 -- | @time@ /(choice)/
 data ChxTime = 
-      TimeTime {
-          chxtimeTime :: [SeqTime]
+      TimeTimeSignature {
+          timeTimeSignature :: [TimeSignature]
+        , timeInterchangeable :: (Maybe Interchangeable) -- ^ /interchangeable/ child element
        }
     | TimeSenzaMisura {
-          timeSenzaMisura :: Empty -- ^ /senza-misura/ child element
+          timeSenzaMisura :: String -- ^ /senza-misura/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ChxTime where
-    emitXml (TimeTime a) =
-      XReps [emitXml a]
+    emitXml (TimeTimeSignature a b) =
+      XContent XEmpty
+        []
+        ([emitXml a] ++
+        [maybe XEmpty (XElement (QN "interchangeable" Nothing).emitXml) b])
     emitXml (TimeSenzaMisura a) =
       XContent XEmpty
         []
         ([XElement (QN "senza-misura" Nothing) (emitXml a)])
 parseChxTime :: P.XParse ChxTime
 parseChxTime = 
-      TimeTime
-        <$> P.many (parseSeqTime)
+      TimeTimeSignature
+        <$> P.many (parseTimeSignature)
+        <*> P.optional (P.xchild (P.name "interchangeable") (parseInterchangeable))
       <|> TimeSenzaMisura
-        <$> (P.xchild (P.name "senza-misura") (parseEmpty))
+        <$> (P.xchild (P.name "senza-misura") (P.xtext >>= return))
 
--- | Smart constructor for 'TimeTime'
-mkTimeTime :: ChxTime
-mkTimeTime = TimeTime []
+-- | Smart constructor for 'TimeTimeSignature'
+mkTimeTimeSignature :: ChxTime
+mkTimeTimeSignature = TimeTimeSignature [] Nothing
 -- | Smart constructor for 'TimeSenzaMisura'
-mkTimeSenzaMisura :: Empty -> ChxTime
+mkTimeSenzaMisura :: String -> ChxTime
 mkTimeSenzaMisura a = TimeSenzaMisura a
 
 -- | @credit@ /(sequence)/
@@ -10881,7 +15035,7 @@ data SeqCredit =
       SeqCredit {
           seqcreditLink :: [Link] -- ^ /link/ child element
         , seqcreditBookmark :: [Bookmark] -- ^ /bookmark/ child element
-        , seqcreditCreditWords :: FormattedText -- ^ /credit-words/ child element
+        , seqcreditCredit :: ChxCredit1
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml SeqCredit where
@@ -10890,40 +15044,17 @@ instance EmitXml SeqCredit where
         []
         (map (XElement (QN "link" Nothing).emitXml) a ++
         map (XElement (QN "bookmark" Nothing).emitXml) b ++
-        [XElement (QN "credit-words" Nothing) (emitXml c)])
+        [emitXml c])
 parseSeqCredit :: P.XParse SeqCredit
 parseSeqCredit = 
       SeqCredit
         <$> P.many (P.xchild (P.name "link") (parseLink))
         <*> P.many (P.xchild (P.name "bookmark") (parseBookmark))
-        <*> (P.xchild (P.name "credit-words") (parseFormattedText))
+        <*> parseChxCredit1
 
 -- | Smart constructor for 'SeqCredit'
-mkSeqCredit :: FormattedText -> SeqCredit
+mkSeqCredit :: ChxCredit1 -> SeqCredit
 mkSeqCredit c = SeqCredit [] [] c
-
--- | @display-step-octave@ /(sequence)/
-data SeqDisplayStepOctave = 
-      SeqDisplayStepOctave {
-          displayStepOctaveDisplayStep :: Step -- ^ /display-step/ child element
-        , displayStepOctaveDisplayOctave :: Octave -- ^ /display-octave/ child element
-       }
-    deriving (Eq,Typeable,Generic,Show)
-instance EmitXml SeqDisplayStepOctave where
-    emitXml (SeqDisplayStepOctave a b) =
-      XContent XEmpty
-        []
-        ([XElement (QN "display-step" Nothing) (emitXml a)] ++
-        [XElement (QN "display-octave" Nothing) (emitXml b)])
-parseSeqDisplayStepOctave :: P.XParse SeqDisplayStepOctave
-parseSeqDisplayStepOctave = 
-      SeqDisplayStepOctave
-        <$> (P.xchild (P.name "display-step") (P.xtext >>= parseStep))
-        <*> (P.xchild (P.name "display-octave") (P.xtext >>= parseOctave))
-
--- | Smart constructor for 'SeqDisplayStepOctave'
-mkSeqDisplayStepOctave :: Step -> Octave -> SeqDisplayStepOctave
-mkSeqDisplayStepOctave a b = SeqDisplayStepOctave a b
 
 -- | @lyric@ /(sequence)/
 data SeqLyric0 = 
@@ -11065,28 +15196,77 @@ parseSeqPageLayout =
 mkSeqPageLayout :: Tenths -> Tenths -> SeqPageLayout
 mkSeqPageLayout a b = SeqPageLayout a b
 
--- | @time@ /(sequence)/
-data SeqTime = 
-      SeqTime {
-          timeBeats :: String -- ^ /beats/ child element
-        , timeBeatType :: String -- ^ /beat-type/ child element
+-- | @score-part@ /(sequence)/
+data SeqScorePart = 
+      SeqScorePart {
+          scorePartMidiDevice :: (Maybe MidiDevice) -- ^ /midi-device/ child element
+        , scorePartMidiInstrument :: (Maybe MidiInstrument) -- ^ /midi-instrument/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
-instance EmitXml SeqTime where
-    emitXml (SeqTime a b) =
+instance EmitXml SeqScorePart where
+    emitXml (SeqScorePart a b) =
       XContent XEmpty
         []
-        ([XElement (QN "beats" Nothing) (emitXml a)] ++
-        [XElement (QN "beat-type" Nothing) (emitXml b)])
-parseSeqTime :: P.XParse SeqTime
-parseSeqTime = 
-      SeqTime
-        <$> (P.xchild (P.name "beats") (P.xtext >>= return))
-        <*> (P.xchild (P.name "beat-type") (P.xtext >>= return))
+        ([maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "midi-instrument" Nothing).emitXml) b])
+parseSeqScorePart :: P.XParse SeqScorePart
+parseSeqScorePart = 
+      SeqScorePart
+        <$> P.optional (P.xchild (P.name "midi-device") (parseMidiDevice))
+        <*> P.optional (P.xchild (P.name "midi-instrument") (parseMidiInstrument))
 
--- | Smart constructor for 'SeqTime'
-mkSeqTime :: String -> String -> SeqTime
-mkSeqTime a b = SeqTime a b
+-- | Smart constructor for 'SeqScorePart'
+mkSeqScorePart :: SeqScorePart
+mkSeqScorePart = SeqScorePart Nothing Nothing
+
+-- | @slash@ /(sequence)/
+data SeqSlash = 
+      SeqSlash {
+          slashSlashType :: NoteTypeValue -- ^ /slash-type/ child element
+        , slashSlashDot :: [Empty] -- ^ /slash-dot/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml SeqSlash where
+    emitXml (SeqSlash a b) =
+      XContent XEmpty
+        []
+        ([XElement (QN "slash-type" Nothing) (emitXml a)] ++
+        map (XElement (QN "slash-dot" Nothing).emitXml) b)
+parseSeqSlash :: P.XParse SeqSlash
+parseSeqSlash = 
+      SeqSlash
+        <$> (P.xchild (P.name "slash-type") (P.xtext >>= parseNoteTypeValue))
+        <*> P.many (P.xchild (P.name "slash-dot") (parseEmpty))
+
+-- | Smart constructor for 'SeqSlash'
+mkSeqSlash :: NoteTypeValue -> SeqSlash
+mkSeqSlash a = SeqSlash a []
+
+-- | @sound@ /(sequence)/
+data SeqSound = 
+      SeqSound {
+          soundMidiDevice :: (Maybe MidiDevice) -- ^ /midi-device/ child element
+        , soundMidiInstrument :: (Maybe MidiInstrument) -- ^ /midi-instrument/ child element
+        , soundPlay :: (Maybe Play) -- ^ /play/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml SeqSound where
+    emitXml (SeqSound a b c) =
+      XContent XEmpty
+        []
+        ([maybe XEmpty (XElement (QN "midi-device" Nothing).emitXml) a] ++
+        [maybe XEmpty (XElement (QN "midi-instrument" Nothing).emitXml) b] ++
+        [maybe XEmpty (XElement (QN "play" Nothing).emitXml) c])
+parseSeqSound :: P.XParse SeqSound
+parseSeqSound = 
+      SeqSound
+        <$> P.optional (P.xchild (P.name "midi-device") (parseMidiDevice))
+        <*> P.optional (P.xchild (P.name "midi-instrument") (parseMidiInstrument))
+        <*> P.optional (P.xchild (P.name "play") (parsePlay))
+
+-- | Smart constructor for 'SeqSound'
+mkSeqSound :: SeqSound
+mkSeqSound = SeqSound Nothing Nothing Nothing
 
 -- | @time-modification@ /(sequence)/
 data SeqTimeModification = 
@@ -11159,6 +15339,29 @@ parseBeatUnit =
 -- | Smart constructor for 'BeatUnit'
 mkBeatUnit :: NoteTypeValue -> BeatUnit
 mkBeatUnit a = BeatUnit a []
+
+-- | @display-step-octave@ /(group)/
+data DisplayStepOctave = 
+      DisplayStepOctave {
+          displayStepOctaveDisplayStep :: Step -- ^ /display-step/ child element
+        , displayStepOctaveDisplayOctave :: Octave -- ^ /display-octave/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml DisplayStepOctave where
+    emitXml (DisplayStepOctave a b) =
+      XContent XEmpty
+        []
+        ([XElement (QN "display-step" Nothing) (emitXml a)] ++
+        [XElement (QN "display-octave" Nothing) (emitXml b)])
+parseDisplayStepOctave :: P.XParse DisplayStepOctave
+parseDisplayStepOctave = 
+      DisplayStepOctave
+        <$> (P.xchild (P.name "display-step") (P.xtext >>= parseStep))
+        <*> (P.xchild (P.name "display-octave") (P.xtext >>= parseOctave))
+
+-- | Smart constructor for 'DisplayStepOctave'
+mkDisplayStepOctave :: Step -> Octave -> DisplayStepOctave
+mkDisplayStepOctave a b = DisplayStepOctave a b
 
 -- | @duration@ /(group)/
 data Duration = 
@@ -11411,23 +15614,26 @@ data NonTraditionalKey =
       NonTraditionalKey {
           nonTraditionalKeyKeyStep :: Step -- ^ /key-step/ child element
         , nonTraditionalKeyKeyAlter :: Semitones -- ^ /key-alter/ child element
+        , nonTraditionalKeyKeyAccidental :: (Maybe KeyAccidental) -- ^ /key-accidental/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml NonTraditionalKey where
-    emitXml (NonTraditionalKey a b) =
+    emitXml (NonTraditionalKey a b c) =
       XContent XEmpty
         []
         ([XElement (QN "key-step" Nothing) (emitXml a)] ++
-        [XElement (QN "key-alter" Nothing) (emitXml b)])
+        [XElement (QN "key-alter" Nothing) (emitXml b)] ++
+        [maybe XEmpty (XElement (QN "key-accidental" Nothing).emitXml) c])
 parseNonTraditionalKey :: P.XParse NonTraditionalKey
 parseNonTraditionalKey = 
       NonTraditionalKey
         <$> (P.xchild (P.name "key-step") (P.xtext >>= parseStep))
         <*> (P.xchild (P.name "key-alter") (P.xtext >>= parseSemitones))
+        <*> P.optional (P.xchild (P.name "key-accidental") (parseKeyAccidental))
 
 -- | Smart constructor for 'NonTraditionalKey'
 mkNonTraditionalKey :: Step -> Semitones -> NonTraditionalKey
-mkNonTraditionalKey a b = NonTraditionalKey a b
+mkNonTraditionalKey a b = NonTraditionalKey a b Nothing
 
 -- | @part-group@ /(group)/
 data GrpPartGroup = 
@@ -11490,7 +15696,7 @@ mkScoreHeader g = ScoreHeader Nothing Nothing Nothing Nothing Nothing [] g
 -- | @score-part@ /(group)/
 data ScorePart = 
       ScorePart {
-          scorePartScorePart :: CmpScorePart -- ^ /score-part/ child element
+          grpscorePartScorePart :: CmpScorePart -- ^ /score-part/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml ScorePart where
@@ -11510,25 +15716,25 @@ mkScorePart a = ScorePart a
 -- | @slash@ /(group)/
 data Slash = 
       Slash {
-          slashSlashType :: NoteTypeValue -- ^ /slash-type/ child element
-        , slashSlashDot :: [Empty] -- ^ /slash-dot/ child element
+          grpslashSlash :: (Maybe SeqSlash)
+        , slashExceptVoice :: [String] -- ^ /except-voice/ child element
        }
     deriving (Eq,Typeable,Generic,Show)
 instance EmitXml Slash where
     emitXml (Slash a b) =
       XContent XEmpty
         []
-        ([XElement (QN "slash-type" Nothing) (emitXml a)] ++
-        map (XElement (QN "slash-dot" Nothing).emitXml) b)
+        ([emitXml a] ++
+        map (XElement (QN "except-voice" Nothing).emitXml) b)
 parseSlash :: P.XParse Slash
 parseSlash = 
       Slash
-        <$> (P.xchild (P.name "slash-type") (P.xtext >>= parseNoteTypeValue))
-        <*> P.many (P.xchild (P.name "slash-dot") (parseEmpty))
+        <$> P.optional (parseSeqSlash)
+        <*> P.many (P.xchild (P.name "except-voice") (P.xtext >>= return))
 
 -- | Smart constructor for 'Slash'
-mkSlash :: NoteTypeValue -> Slash
-mkSlash a = Slash a []
+mkSlash :: Slash
+mkSlash = Slash Nothing []
 
 -- | @staff@ /(group)/
 data Staff = 
@@ -11549,6 +15755,29 @@ parseStaff =
 -- | Smart constructor for 'Staff'
 mkStaff :: PositiveInteger -> Staff
 mkStaff a = Staff a
+
+-- | @time-signature@ /(group)/
+data TimeSignature = 
+      TimeSignature {
+          timeSignatureBeats :: String -- ^ /beats/ child element
+        , timeSignatureBeatType :: String -- ^ /beat-type/ child element
+       }
+    deriving (Eq,Typeable,Generic,Show)
+instance EmitXml TimeSignature where
+    emitXml (TimeSignature a b) =
+      XContent XEmpty
+        []
+        ([XElement (QN "beats" Nothing) (emitXml a)] ++
+        [XElement (QN "beat-type" Nothing) (emitXml b)])
+parseTimeSignature :: P.XParse TimeSignature
+parseTimeSignature = 
+      TimeSignature
+        <$> (P.xchild (P.name "beats") (P.xtext >>= return))
+        <*> (P.xchild (P.name "beat-type") (P.xtext >>= return))
+
+-- | Smart constructor for 'TimeSignature'
+mkTimeSignature :: String -> String -> TimeSignature
+mkTimeSignature a b = TimeSignature a b
 
 -- | @traditional-key@ /(group)/
 data TraditionalKey = 

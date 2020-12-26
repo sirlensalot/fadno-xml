@@ -422,5 +422,5 @@ outputHeader moduleName = mapM_ outStrLn
     , "import qualified Fadno.Xml.XParse as P"
     , "import qualified Control.Applicative as P"
     , "import Control.Applicative ((<|>))"
-    , "import Control.Arrow as A"
+    , "import qualified Control.Arrow as A"
     ]
