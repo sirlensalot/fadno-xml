@@ -28,6 +28,7 @@ library
                    Fadno.Xml.EmitXml
                    Fadno.MusicXml.MusicXml20
                    Fadno.MusicXml.MusicXml30
+                   Fadno.MusicXml.MusicXml31
   -- other-modules:
   -- other-extensions:
   build-depends:       Decimal >= 0.4
