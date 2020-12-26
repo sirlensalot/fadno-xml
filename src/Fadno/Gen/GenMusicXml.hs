@@ -14,27 +14,29 @@ import System.IO
 -- | Emit the first element only.
 emitOneElement :: IO (Type,EmitState)
 emitOneElement = do
-  s <- loadMusicXml20
+  s <- loadMusicXml "xsd/musicxml.20.xsd"
   runEmit (Env s) mempty $ emitElement (head $ M.elems $ _elements s)
 
 -- | Emit 2.0 code.
 runMusicXml20 :: IO ()
-runMusicXml20 = do
-  s <- loadMusicXml20
-  e <- snd <$> runEmit (Env s) mempty (emitSchema s)
-  withFile "src/Fadno/MusicXml/MusicXml20.hs" WriteMode $ \h ->
-      void $ runOut' h $ do
-                  outputHeader "Fadno.MusicXml.MusicXml20"
-                  outputTypes e
+runMusicXml20 = runMusicXml "xsd/musicxml.20.xsd" "src/Fadno/MusicXml/MusicXml20.hs" "Fadno.MusicXml.MusicXml20"
 
 -- | Emit 3.0 code.
 runMusicXml30 :: IO ()
-runMusicXml30 = do
-  s <- loadMusicXml30
+runMusicXml30 = runMusicXml "xsd/musicxml.30.xsd" "src/Fadno/MusicXml/MusicXml30.hs" "Fadno.MusicXml.MusicXml30"
+
+-- | Emit 3.1 code.
+runMusicXml31 :: IO ()
+runMusicXml31 = runMusicXml "xsd/musicxml.31.xsd" "src/Fadno/MusicXml/MusicXml31.hs" "Fadno.MusicXml.MusicXml31"
+
+
+runMusicXml :: FilePath -> FilePath -> String -> IO ()
+runMusicXml xsd moduleFile moduleName = do
+  s <- loadMusicXml xsd
   e <- snd <$> runEmit (Env s) mempty (emitSchema s)
-  withFile "src/Fadno/MusicXml/MusicXml30.hs" WriteMode $ \h ->
+  withFile moduleFile WriteMode $ \h ->
       void $ runOut' h $ do
-                  outputHeader "Fadno.MusicXml.MusicXml30"
+                  outputHeader moduleName
                   outputTypes e
 
 
@@ -46,16 +48,9 @@ loadXlinkXmlSchemas = do
   xsd <- loadXsdSchema "xsd/XMLSchema.xsd"
   return (xml <> xlink <> xsd)
 
--- | Load Music XML 2.0 schema
-loadMusicXml20 :: IO Schema
-loadMusicXml20 = do
-  x <- parseFile "xsd/musicxml.20.xsd"
-  deps <- loadXlinkXmlSchemas
-  return (x <> deps)
-
--- | Load Music XML 2.0 schema
-loadMusicXml30 :: IO Schema
-loadMusicXml30 = do
-  x <- parseFile "xsd/musicxml.30.xsd"
+-- | Load Music XML XSD and deps
+loadMusicXml :: FilePath -> IO Schema
+loadMusicXml xsd = do
+  x <- parseFile xsd
   deps <- loadXlinkXmlSchemas
   return (x <> deps)
