@@ -22,6 +22,7 @@ module Fadno.Xml.XParser {-# DEPRECATED "in favor of XParse" #-}
 import qualified Text.XML.Light as X
 
 import Control.Exception
+import Control.Monad
 import Control.Monad.State.Strict hiding (sequence)
 import Control.Monad.Except hiding (sequence)
 import Data.Either

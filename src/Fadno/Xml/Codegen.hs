@@ -21,6 +21,7 @@ module Fadno.Xml.Codegen
 import Fadno.Xml.EmitTypes
 import Fadno.Xml.ParseXsd
 import Control.Lens hiding (Choice,element,elements)
+import Control.Monad
 import Control.Monad.State.Strict
 import Control.Monad.Reader
 import qualified Data.Map.Strict as M

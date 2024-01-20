@@ -18,6 +18,7 @@ import qualified Text.XML.Light as X
 import qualified Text.XML.Light.Cursor as C
 
 import Control.Exception
+import Control.Monad
 import Control.Monad.State.Strict hiding (sequence)
 import Control.Monad.Except hiding (sequence)
 import Data.Either

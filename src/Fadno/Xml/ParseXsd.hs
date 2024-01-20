@@ -366,10 +366,12 @@ instance Resolvable Element where
 
 
 instance Resolvable (Ref (Either ComplexType SimpleType)) where
-    resolve sch (Unresolved f) = Resolved f $ either error id
-                                 ((Left <$> searchRefTarget "Either-ComplexType" complexTypes f sch)
-                                  <|>
-                                  (Right <$> searchRefTarget "Either-SimpleType" simpleTypes f sch))
+    resolve sch (Unresolved f) = Resolved f $
+        case searchRefTarget "Either-ComplexType" complexTypes f sch of
+          Right r -> Left r
+          Left {} -> case searchRefTarget "Either-SimpleType" simpleTypes f sch of
+            Right r -> Right r
+            Left e -> error e
     resolve _ r = r
 
 

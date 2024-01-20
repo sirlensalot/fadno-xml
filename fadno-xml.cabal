@@ -1,5 +1,5 @@
 name:                fadno-xml
-version:             1.2
+version:             1.2.1
 synopsis:            XML/XSD combinators/schemas/codegen
 description:
             Library for generating code from XML schema files, with
@@ -40,7 +40,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       Decimal >= 0.4
-                     , base >= 4.9 && < 4.15
+                     , base >= 4.9 && < 4.20
                      , containers >= 0.5
                      , lens >= 4.15
                      , mtl >= 2.2
